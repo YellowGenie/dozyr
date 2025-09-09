@@ -33,13 +33,10 @@ jobs:
       env:
         NEXT_PUBLIC_API_URL: https://dozyr-backend.railway.app/api/v1
     
-    - name: Static HTML export
-      run: npm run export
-    
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
-        path: ./out
+        path: ./.next
   
   deploy:
     environment:

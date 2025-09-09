@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "export": "next export"
+    "lint": "eslint"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -30,6 +29,7 @@
     "@types/bcryptjs": "^2.4.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "emoji-picker-react": "^4.13.3",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.542.0",
