@@ -31,7 +31,7 @@ jobs:
     - name: Build with Next.js
       run: npm run build
       env:
-        NEXT_PUBLIC_API_URL: https://dozyr-backend.railway.app/api/v1
+        NEXT_PUBLIC_API_URL: https://wish-well.railway.app/api/v1
     
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
