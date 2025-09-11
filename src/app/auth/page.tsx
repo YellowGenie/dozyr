@@ -261,11 +261,15 @@ export default function AuthPage() {
                                 className="sr-only peer"
                                 disabled={isLoading}
                               />
-                              <div className={`glass-card p-6 rounded-xl border transition-all ${
-                                selectedRole === 'talent' 
-                                  ? 'border-[var(--accent)] bg-[var(--accent)]/10' 
-                                  : 'border-white/20 hover:border-[var(--accent)]/50'
-                              }`}>
+                              <div 
+                                className="glass-card p-6 rounded-xl border transition-all"
+                                style={{
+                                  borderColor: selectedRole === 'talent' ? '#facc15' : 'rgba(255,255,255,0.2)',
+                                  backgroundColor: selectedRole === 'talent' ? 'rgba(250,204,21,0.2)' : 'transparent',
+                                  boxShadow: selectedRole === 'talent' ? '0 0 20px rgba(250,204,21,0.3)' : 'none',
+                                  borderWidth: selectedRole === 'talent' ? '2px' : '1px'
+                                }}
+                              >
                                 <div className="text-center">
                                   <User className="h-8 w-8 mx-auto mb-3 text-[var(--accent)]" />
                                   <span className="font-semibold text-white block mb-1">Talent</span>
@@ -281,11 +285,15 @@ export default function AuthPage() {
                                 className="sr-only peer"
                                 disabled={isLoading}
                               />
-                              <div className={`glass-card p-6 rounded-xl border transition-all ${
-                                selectedRole === 'manager' 
-                                  ? 'border-[var(--accent)] bg-[var(--accent)]/10' 
-                                  : 'border-white/20 hover:border-[var(--accent)]/50'
-                              }`}>
+                              <div 
+                                className="glass-card p-6 rounded-xl border transition-all"
+                                style={{
+                                  borderColor: selectedRole === 'manager' ? '#facc15' : 'rgba(255,255,255,0.2)',
+                                  backgroundColor: selectedRole === 'manager' ? 'rgba(250,204,21,0.2)' : 'transparent',
+                                  boxShadow: selectedRole === 'manager' ? '0 0 20px rgba(250,204,21,0.3)' : 'none',
+                                  borderWidth: selectedRole === 'manager' ? '2px' : '1px'
+                                }}
+                              >
                                 <div className="text-center">
                                   <Briefcase className="h-8 w-8 mx-auto mb-3 text-[var(--accent)]" />
                                   <span className="font-semibold text-white block mb-1">Manager</span>
