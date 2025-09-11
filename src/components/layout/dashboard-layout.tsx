@@ -120,8 +120,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           className={cn(
             "flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer",
             isActive
-              ? "bg-gradient-to-r from-yellow-600 to-yellow-400 shadow-lg border border-yellow-400/30"
-              : "text-white hover:text-[var(--accent)] hover:bg-white/5 glass-card hover:border-[var(--accent)]/20"
+              ? "bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] shadow-lg border border-[var(--accent)]/30"
+              : "text-gray-600 hover:text-[var(--accent)] hover:bg-purple-50 enhanced-card hover:border-[var(--accent)]/20"
           )}
         >
           {isActive ? (
@@ -129,19 +129,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Icon 
                 className="h-5 w-5"
                 style={{ 
-                  color: '#000000',
-                  fill: '#000000',
-                  stroke: '#000000'
+                  color: '#ffffff',
+                  fill: '#ffffff',
+                  stroke: '#ffffff'
                 }}
               />
               <span 
                 className="font-bold"
-                style={{ color: '#000000' }}
+                style={{ color: '#ffffff' }}
               >
                 {label}
               </span>
               {badge && badge > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
+                <span className="ml-auto bg-red-500 text-gray-800 text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
                   {badge > 99 ? '99+' : badge}
                 </span>
               )}
@@ -149,9 +149,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Eye 
                   className="h-4 w-4 ml-auto opacity-50"
                   style={{ 
-                    color: '#000000',
-                    fill: '#000000',
-                    stroke: '#000000'
+                    color: '#ffffff',
+                    fill: '#ffffff',
+                    stroke: '#ffffff'
                   }}
                 />
               )}
@@ -161,7 +161,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Icon className="h-5 w-5 icon-depth text-[var(--accent)]" />
               <span className="font-medium">{label}</span>
               {badge && badge > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
+                <span className="ml-auto bg-red-500 text-gray-800 text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
                   {badge > 99 ? '99+' : badge}
                 </span>
               )}
@@ -174,7 +174,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen bg-dozyr-black">
+    <div className="flex h-screen bg-gray-50">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -189,45 +189,20 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-80 bg-dozyr-dark-gray/95 backdrop-blur-md border-r border-dozyr-medium-gray/50">
+      <aside className="hidden lg:flex lg:flex-col lg:w-80 bg-white backdrop-blur-md border-r border-gray-200 shadow-lg">
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-dozyr-medium-gray flex-shrink-0">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
             <Link href="/" className="group">
-              {/* Logo Text */}
-              <div className="flex flex-col">
-                <div className="relative overflow-hidden">
-                  <motion.div 
-                    className="text-2xl font-black bg-gradient-to-r from-[var(--accent)] via-yellow-400 to-[var(--accent-light)] bg-clip-text text-transparent"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  >
-                    Dozyr
-                  </motion.div>
-                  
-                  {/* Animated underline */}
-                  <motion.div
-                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-[var(--accent)] to-purple-500 rounded-full"
-                    initial={{ width: 0 }}
-                    whileHover={{ width: "100%" }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-                
-                <motion.div 
-                  className="text-xs text-[var(--accent)]/80 font-medium tracking-wide"
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  TALENT PLATFORM
-                </motion.div>
+              <div className="dozyr-brand">
+                <span className="dozyr-text text-2xl">Dozyr</span>
+                <div className="dozyr-sparkle"></div>
               </div>
             </Link>
           </div>
 
           {/* User Info */}
-          <div className="p-6 border-b border-dozyr-medium-gray flex-shrink-0">
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative w-10 h-10 rounded-full overflow-hidden">
                 {user?.profile_image && user.profile_image.trim() !== '' ? (
@@ -235,7 +210,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     key={`profile-${user.profile_image}-${Date.now()}`}
                     src={`${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt="Profile"
-                    className="w-full h-full object-cover rounded-full border-2 border-dozyr-gold"
+                    className="w-full h-full object-cover rounded-full border-2 border-[var(--accent)]"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                       const fallback = e.currentTarget.nextElementSibling as HTMLElement
@@ -246,19 +221,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 ) : null}
                 <div 
-                  className="w-full h-full bg-dozyr-gold rounded-full flex items-center justify-center absolute inset-0"
+                  className="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center absolute inset-0"
                   style={{ display: user?.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
                 >
-                  <span className="text-dozyr-black font-bold text-sm">
+                  <span className="text-gray-800 font-bold text-sm">
                     {user ? generateInitials(user.first_name, user.last_name) : 'U'}
                   </span>
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-white truncate">
+                <p className="font-semibold text-gray-800 truncate">
                   {user ? `${user.first_name} ${user.last_name}` : 'User'}
                 </p>
-                <p className="text-sm text-dozyr-light-gray capitalize">
+                <p className="text-sm text-gray-500 capitalize">
                   {user?.role || 'User'}
                 </p>
               </div>
@@ -273,7 +248,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </nav>
 
           {/* Logout */}
-          <div className="p-6 border-t border-dozyr-medium-gray flex-shrink-0">
+          <div className="p-6 border-t border-gray-200 flex-shrink-0">
             <Button
               variant="ghost"
               className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-400/10"
@@ -292,40 +267,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         animate={{
           x: isSidebarOpen ? 0 : -320,
         }}
-        className="fixed left-0 top-0 z-50 h-full w-80 bg-dozyr-dark-gray/95 backdrop-blur-md border-r border-dozyr-medium-gray/50 lg:hidden"
+        className="fixed left-0 top-0 z-50 h-full w-80 bg-white backdrop-blur-md border-r border-gray-200 shadow-lg lg:hidden"
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-dozyr-medium-gray flex-shrink-0">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
             <Link href="/" className="group">
-              {/* Logo Text */}
-              <div className="flex flex-col">
-                <div className="relative overflow-hidden">
-                  <motion.div 
-                    className="text-2xl font-black bg-gradient-to-r from-[var(--accent)] via-yellow-400 to-[var(--accent-light)] bg-clip-text text-transparent"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  >
-                    Dozyr
-                  </motion.div>
-                  
-                  {/* Animated underline */}
-                  <motion.div
-                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-[var(--accent)] to-purple-500 rounded-full"
-                    initial={{ width: 0 }}
-                    whileHover={{ width: "100%" }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-                
-                <motion.div 
-                  className="text-xs text-[var(--accent)]/80 font-medium tracking-wide"
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  TALENT PLATFORM
-                </motion.div>
+              <div className="dozyr-brand">
+                <span className="dozyr-text text-2xl">Dozyr</span>
+                <div className="dozyr-sparkle"></div>
               </div>
             </Link>
             <Button
@@ -334,12 +284,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               className="lg:hidden"
               onClick={() => setIsSidebarOpen(false)}
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 text-gray-600" />
             </Button>
           </div>
 
           {/* User Info */}
-          <div className="p-6 border-b border-dozyr-medium-gray flex-shrink-0">
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative w-10 h-10 rounded-full overflow-hidden">
                 {user?.profile_image && user.profile_image.trim() !== '' ? (
@@ -347,7 +297,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     key={`profile-${user.profile_image}-${Date.now()}`}
                     src={`${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt="Profile"
-                    className="w-full h-full object-cover rounded-full border-2 border-dozyr-gold"
+                    className="w-full h-full object-cover rounded-full border-2 border-[var(--accent)]"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                       const fallback = e.currentTarget.nextElementSibling as HTMLElement
@@ -358,19 +308,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 ) : null}
                 <div 
-                  className="w-full h-full bg-dozyr-gold rounded-full flex items-center justify-center absolute inset-0"
+                  className="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center absolute inset-0"
                   style={{ display: user?.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
                 >
-                  <span className="text-dozyr-black font-bold text-sm">
+                  <span className="text-gray-800 font-bold text-sm">
                     {user ? generateInitials(user.first_name, user.last_name) : 'U'}
                   </span>
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-white truncate">
+                <p className="font-semibold text-gray-800 truncate">
                   {user ? `${user.first_name} ${user.last_name}` : 'User'}
                 </p>
-                <p className="text-sm text-dozyr-light-gray capitalize">
+                <p className="text-sm text-gray-500 capitalize">
                   {user?.role || 'User'}
                 </p>
               </div>
@@ -385,7 +335,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </nav>
 
           {/* Logout */}
-          <div className="p-6 border-t border-dozyr-medium-gray flex-shrink-0">
+          <div className="p-6 border-t border-gray-200 flex-shrink-0">
             <Button
               variant="ghost"
               className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-400/10"
@@ -401,7 +351,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen min-w-0">
         {/* Top Navigation */}
-        <header className="flex-shrink-0 bg-dozyr-dark-gray/90 backdrop-blur-md border-b border-dozyr-medium-gray/50 relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/5 before:to-transparent before:pointer-events-none">
+        <header className="flex-shrink-0 bg-white/95 backdrop-blur-md border-b border-gray-200 relative shadow-sm">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
               <Button
@@ -430,7 +380,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     <img
                       src={user.profile_image}
                       alt="Profile"
-                      className="w-full h-full object-cover rounded-full border-2 border-dozyr-gold"
+                      className="w-full h-full object-cover rounded-full border-2 border-[var(--accent)]"
                       onError={(e) => {
                         // Hide broken image and show initials fallback
                         e.currentTarget.style.display = 'none'
@@ -442,10 +392,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     />
                   ) : null}
                   <div 
-                    className="w-full h-full bg-dozyr-gold rounded-full flex items-center justify-center absolute inset-0"
+                    className="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center absolute inset-0"
                     style={{ display: user?.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
                   >
-                    <span className="text-dozyr-black font-bold text-sm">
+                    <span className="text-gray-800 font-bold text-sm">
                       {user ? generateInitials(user.first_name, user.last_name) : 'U'}
                     </span>
                   </div>

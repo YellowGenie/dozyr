@@ -101,21 +101,24 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
         animate={{ opacity: 1, y: 0 }}
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
           isScrolled 
-            ? 'glass-card backdrop-blur-lg bg-black/90 border-b border-[var(--accent)]/20' 
-            : 'glass-card backdrop-blur-sm bg-black/50 border-b border-white/10'
+            ? 'glass-scrolled' 
+            : 'glass-card'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Link href="/">
-                <div className="text-2xl font-bold text-[var(--accent)] icon-depth cursor-pointer">Dozyr</div>
+                <div className="dozyr-brand">
+                  <span className="dozyr-text">Dozyr</span>
+                  <div className="dozyr-sparkle"></div>
+                </div>
               </Link>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item) => (
-                <Link key={item.href} href={item.href} className="text-white hover:text-[var(--accent)] transition-colors cursor-pointer interactive">
+                <Link key={item.href} href={item.href} className="text-gray-700 hover:text-[var(--accent)] transition-colors cursor-pointer interactive font-medium">
                   {item.label}
                 </Link>
               ))}
@@ -123,7 +126,7 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
 
             <div className="flex items-center space-x-4">
               <Link href="/auth">
-                <Button variant="ghost" className="text-white hover:text-[var(--accent)] interactive">
+                <Button variant="ghost" className="text-gray-700 hover:text-[var(--accent)] interactive">
                   Sign In
                 </Button>
               </Link>
@@ -146,15 +149,18 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
       animate={{ opacity: 1, y: 0 }}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'glass-card backdrop-blur-lg bg-black/90 border-b border-[var(--accent)]/20' 
-          : 'glass-card backdrop-blur-sm bg-black/50 border-b border-white/10'
+          ? 'glass-scrolled' 
+          : 'glass-card'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/">
-              <div className="text-2xl font-bold text-[var(--accent)] icon-depth cursor-pointer">Dozyr</div>
+              <div className="dozyr-brand">
+                <span className="dozyr-text">Dozyr</span>
+                <div className="dozyr-sparkle"></div>
+              </div>
             </Link>
           </div>
           
@@ -163,7 +169,7 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
               <Omnisearch />
             </div>
             {navItems.map((item) => (
-              <Link key={item.href} href={item.href} className="text-white hover:text-[var(--accent)] transition-colors cursor-pointer interactive flex items-center gap-2">
+              <Link key={item.href} href={item.href} className="text-gray-700 hover:text-[var(--accent)] transition-colors cursor-pointer interactive flex items-center gap-2 font-medium">
                 {item.icon && <item.icon className="h-4 w-4" />}
                 {item.label}
               </Link>
@@ -171,7 +177,7 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
           </div>
 
           <div className="flex items-center space-x-4 relative">
-            <div className="text-white/70 hidden sm:block">
+            <div className="text-gray-600 hidden sm:block font-medium">
               Welcome, {user.first_name}
             </div>
             
@@ -213,24 +219,24 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
                   onMouseLeave={() => setIsDropdownOpen(false)}
                 >
                   <div className="py-2">
-                    <div className="px-4 py-2 border-b border-white/10">
-                      <p className="text-white font-medium">{user.first_name} {user.last_name}</p>
-                      <p className="text-white/60 text-sm capitalize">{user.role}</p>
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="text-gray-800 font-medium">{user.first_name} {user.last_name}</p>
+                      <p className="text-gray-500 text-sm capitalize">{user.role}</p>
                     </div>
                     
-                    <Link href="/profile" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/5 transition-colors">
+                    <Link href="/profile" className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
                       <User className="h-4 w-4" />
                       Profile
                     </Link>
                     
-                    <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/5 transition-colors">
+                    <Link href="/settings" className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
                       <Settings className="h-4 w-4" />
                       Settings
                     </Link>
                     
                     <button 
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-red-400/10 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2 text-red-500 hover:bg-red-50 transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
                       Logout

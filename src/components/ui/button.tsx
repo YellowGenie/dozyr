@@ -15,8 +15,8 @@ const buttonVariants = cva(
         outline:
           "btn-secondary",
         secondary:
-          "glass-card text-white hover:bg-white/10",
-        ghost: "hover:bg-white/10 hover:text-white",
+          "glass-card text-gray-700 hover:bg-purple-50",
+        ghost: "hover:bg-purple-50 hover:text-gray-800",
         link: "accent-text underline-offset-4 hover:underline cursor-pointer",
       },
       size: {

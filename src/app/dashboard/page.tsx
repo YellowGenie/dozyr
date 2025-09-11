@@ -44,10 +44,10 @@ export default function DashboardPage() {
 
   // Show loading while redirecting for other users
   return (
-    <div className="min-h-screen bg-dozyr-black flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-dozyr-gold mx-auto mb-4"></div>
-        <p className="text-white">Loading your dashboard...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
+        <p className="text-gray-700">Loading your dashboard...</p>
       </div>
     </div>
   )
