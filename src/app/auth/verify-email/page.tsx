@@ -147,26 +147,36 @@ export default function VerifyEmailPage() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[var(--background)] relative overflow-hidden flex items-center justify-center p-6">
       {/* Animated Background */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--accent)]/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--accent)]/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--accent)]/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--accent)]/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--background)] via-[var(--background-secondary)] to-[var(--background)]"></div>
       </div>
 
       <motion.div 
         {...fadeInUp}
         className="relative w-full max-w-md mx-auto"
       >
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block">
+            <div className="dozyr-brand mb-6">
+              <span className="dozyr-text text-3xl">Dozyr</span>
+              <div className="dozyr-sparkle"></div>
+            </div>
+          </Link>
+        </div>
+        
         <Link 
           href="/auth" 
-          className="inline-flex items-center gap-2 text-white/60 hover:text-[var(--accent)] transition-colors mb-8 cursor-pointer interactive"
+          className="inline-flex items-center gap-2 text-[var(--muted-foreground)] hover:text-[var(--accent)] transition-colors mb-8 cursor-pointer interactive"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Auth
         </Link>
 
-        <Card className="glass-card border-white/10 depth-3">
+        <Card className="glass-card border-[var(--card-border)] depth-3 bg-[var(--card-bg)]">
           <CardContent className="p-8">
             {isVerified ? (
               <motion.div 
@@ -177,8 +187,8 @@ export default function VerifyEmailPage() {
                 <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Check className="h-8 w-8 text-green-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Email Verified!</h2>
-                <p className="text-white/60">Redirecting to dashboard...</p>
+                <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">Email Verified!</h2>
+                <p className="text-[var(--muted-foreground)]">Redirecting to dashboard...</p>
               </motion.div>
             ) : (
               <>
@@ -186,8 +196,8 @@ export default function VerifyEmailPage() {
                   <div className="w-16 h-16 bg-[var(--accent)]/20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Mail className="h-8 w-8 text-[var(--accent)]" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Verify Your Email</h2>
-                  <p className="text-white/60">
+                  <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">Verify Your Email</h2>
+                  <p className="text-[var(--muted-foreground)]">
                     We've sent a 4-digit verification code to
                     <br />
                     <span className="text-[var(--accent)] font-medium">{user.email}</span>
@@ -208,7 +218,7 @@ export default function VerifyEmailPage() {
                         onChange={(e) => handleCodeChange(index, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(index, e)}
                         onPaste={index === 0 ? handlePaste : undefined}
-                        className="w-14 h-14 text-center text-2xl font-bold bg-white/5 border-white/10 focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
+                        className="w-14 h-14 text-center text-2xl font-bold enhanced-input bg-[var(--card-bg)] border-[var(--card-border)] text-[var(--foreground)] focus:border-[var(--accent)] focus:ring-[var(--accent)]/20"
                         disabled={isLoading}
                       />
                     ))}
@@ -228,7 +238,7 @@ export default function VerifyEmailPage() {
                   <Button
                     onClick={() => handleVerify(code.join(''))}
                     disabled={code.some(digit => digit === '') || isLoading}
-                    className="w-full bg-[var(--accent)] hover:bg-[var(--accent)]/80 text-black font-semibold"
+                    className="w-full btn-primary"
                   >
                     {isLoading ? (
                       <RefreshCw className="h-4 w-4 animate-spin mr-2" />
@@ -238,12 +248,11 @@ export default function VerifyEmailPage() {
 
                   {/* Resend code */}
                   <div className="text-center">
-                    <p className="text-white/60 text-sm mb-2">Didn't receive the code?</p>
+                    <p className="text-[var(--muted-foreground)] text-sm mb-2">Didn't receive the code?</p>
                     <Button
                       onClick={handleResend}
                       disabled={countdown > 0 || isLoading}
-                      variant="ghost"
-                      className="text-[var(--accent)] hover:text-[var(--accent)]/80 hover:bg-[var(--accent)]/10"
+                      className="btn-secondary text-[var(--accent)] hover:text-[var(--accent)]/80 hover:bg-[var(--accent)]/10"
                     >
                       {countdown > 0 ? (
                         <>
@@ -265,7 +274,7 @@ export default function VerifyEmailPage() {
         </Card>
 
         <div className="text-center mt-6">
-          <p className="text-white/60 text-sm">
+          <p className="text-[var(--muted-foreground)] text-sm">
             The verification code expires in 15 minutes
           </p>
         </div>
