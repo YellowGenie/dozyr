@@ -111,7 +111,7 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
               <Link href="/">
                 <div className="dozyr-brand">
                   <span className="dozyr-text">Dozyr</span>
-                  <div className="dozyr-sparkle"></div>
+                  <span className="dozyr-tagline">Talent Platform</span>
                 </div>
               </Link>
             </div>

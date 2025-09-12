@@ -163,7 +163,7 @@ export default function VerifyEmailPage() {
           <Link href="/" className="inline-block">
             <div className="dozyr-brand mb-6">
               <span className="dozyr-text text-3xl">Dozyr</span>
-              <div className="dozyr-sparkle"></div>
+              <span className="dozyr-tagline">Talent Platform</span>
             </div>
           </Link>
         </div>

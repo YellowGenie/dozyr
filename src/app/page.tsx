@@ -468,7 +468,7 @@ export default function LandingPage() {
             <div>
               <div className="dozyr-brand mb-6">
                 <span className="dozyr-text text-3xl">Dozyr</span>
-                <div className="dozyr-sparkle"></div>
+                <span className="dozyr-tagline">Talent Platform</span>
               </div>
               <p className="text-gray-400 leading-relaxed mb-6">
                 Empowering the future of remote work through meaningful connections and innovative technology.

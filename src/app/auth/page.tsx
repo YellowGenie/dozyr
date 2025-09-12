@@ -116,9 +116,9 @@ export default function AuthPage() {
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                 Welcome to
                 <br />
-                <div className="dozyr-brand inline-flex items-center gap-3">
+                <div className="dozyr-brand inline-flex flex-col">
                   <span className="dozyr-text">Dozyr</span>
-                  <div className="dozyr-sparkle"></div>
+                  <span className="dozyr-tagline">Talent Platform</span>
                 </div>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed mb-8">

@@ -404,74 +404,44 @@ body {
   transform: scaleX(1.1);
 }
 
-/* Creative Dozyr Branding */
+/* Professional Dozyr Branding */
 .dozyr-brand {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
 }
 
 .dozyr-text {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light), var(--accent-dark));
-  background-size: 200% 200%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: gradient-shift 3s ease-in-out infinite;
-  letter-spacing: -0.02em;
-  text-shadow: 0 4px 8px rgba(124, 58, 237, 0.2);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0;
+  transition: color 0.3s ease;
 }
 
-.dozyr-sparkle {
-  width: 12px;
-  height: 12px;
-  background: linear-gradient(45deg, var(--accent-light), var(--accent));
-  border-radius: 50%;
-  position: relative;
-  animation: sparkle-rotate 2s linear infinite;
-  box-shadow: 0 0 12px rgba(124, 58, 237, 0.6);
-}
-
-.dozyr-sparkle::before,
-.dozyr-sparkle::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: inherit;
-  border-radius: inherit;
-  animation: sparkle-pulse 1.5s ease-in-out infinite alternate;
-}
-
-.dozyr-sparkle::before {
-  top: -6px;
-  left: -6px;
-  width: 6px;
-  height: 6px;
-  animation-delay: -0.5s;
-}
-
-.dozyr-sparkle::after {
-  top: 6px;
-  right: -6px;
-  width: 4px;
-  height: 4px;
-  animation-delay: -1s;
+.dozyr-tagline {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  line-height: 1;
 }
 
 .dozyr-brand:hover .dozyr-text {
-  transform: scale(1.05);
-  animation-duration: 1s;
+  color: var(--accent);
 }
 
-.dozyr-brand:hover .dozyr-sparkle {
-  animation-duration: 0.5s;
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.8);
+.dozyr-brand:hover .dozyr-tagline {
+  color: var(--accent);
 }
 
 @keyframes gradient-shift {

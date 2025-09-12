@@ -118,10 +118,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <Link href={href} onClick={handleClick}>
         <div
           className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-lg transition-all cursor-pointer",
+            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all cursor-pointer",
             isActive
               ? "bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] shadow-lg border border-[var(--accent)]/30"
-              : "text-gray-600 hover:text-[var(--accent)] hover:bg-purple-50 enhanced-card hover:border-[var(--accent)]/20"
+              : "text-gray-600 hover:text-[var(--accent)] hover:bg-purple-50/80 border border-transparent hover:border-[var(--accent)]/20"
           )}
         >
           {isActive ? (
@@ -195,8 +195,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
             <Link href="/" className="group">
               <div className="dozyr-brand">
-                <span className="dozyr-text text-2xl">Dozyr</span>
-                <div className="dozyr-sparkle"></div>
+                <span className="dozyr-text">Dozyr</span>
+                <span className="dozyr-tagline">Talent Platform</span>
               </div>
             </Link>
           </div>
@@ -274,8 +274,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
             <Link href="/" className="group">
               <div className="dozyr-brand">
-                <span className="dozyr-text text-2xl">Dozyr</span>
-                <div className="dozyr-sparkle"></div>
+                <span className="dozyr-text">Dozyr</span>
+                <span className="dozyr-tagline">Talent Platform</span>
               </div>
             </Link>
             <Button
@@ -351,7 +351,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen min-w-0">
         {/* Top Navigation */}
-        <header className="flex-shrink-0 bg-white/95 backdrop-blur-md border-b border-gray-200 relative shadow-sm">
+        <header className="flex-shrink-0 bg-white/95 backdrop-blur-md border-b border-gray-200 relative shadow-sm overflow-visible">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
               <Button
@@ -363,7 +363,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Menu className="h-5 w-5" />
               </Button>
               
-              <div className="hidden md:flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-4 relative">
                 <Omnisearch className="w-80" />
               </div>
             </div>
