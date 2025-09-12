@@ -142,7 +142,7 @@ export function SystemLogs({ className }: SystemLogsProps) {
                   {formatRelativeTime(log.created_at)}
                 </span>
               </div>
-              <p className="text-white text-sm font-medium line-clamp-2">
+              <p className="text-[var(--foreground)] text-sm font-medium line-clamp-2">
                 {log.message}
               </p>
             </div>
@@ -170,20 +170,20 @@ export function SystemLogs({ className }: SystemLogsProps) {
                   <div className="flex items-center gap-2">
                     <User className="h-3 w-3 text-dozyr-light-gray" />
                     <span className="text-dozyr-light-gray">User:</span>
-                    <span className="text-white font-mono">{log.user_id}</span>
+                    <span className="text-[var(--foreground)] font-mono">{log.user_id}</span>
                   </div>
                 )}
                 {log.ip_address && (
                   <div className="flex items-center gap-2">
                     <Globe className="h-3 w-3 text-dozyr-light-gray" />
                     <span className="text-dozyr-light-gray">IP:</span>
-                    <span className="text-white font-mono">{log.ip_address}</span>
+                    <span className="text-[var(--foreground)] font-mono">{log.ip_address}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3 w-3 text-dozyr-light-gray" />
                   <span className="text-dozyr-light-gray">Timestamp:</span>
-                  <span className="text-white font-mono">
+                  <span className="text-[var(--foreground)] font-mono">
                     {new Date(log.created_at).toLocaleString()}
                   </span>
                 </div>
@@ -195,7 +195,7 @@ export function SystemLogs({ className }: SystemLogsProps) {
                     <Monitor className="h-3 w-3 text-dozyr-light-gray" />
                     <span className="text-dozyr-light-gray text-xs">User Agent:</span>
                   </div>
-                  <p className="text-white font-mono text-xs bg-dozyr-dark-gray p-2 rounded break-all">
+                  <p className="text-[var(--foreground)] font-mono text-xs bg-dozyr-dark-gray p-2 rounded break-all">
                     {log.user_agent}
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export function SystemLogs({ className }: SystemLogsProps) {
                     <Info className="h-3 w-3 text-dozyr-light-gray" />
                     <span className="text-dozyr-light-gray text-xs">Metadata:</span>
                   </div>
-                  <pre className="text-white font-mono text-xs bg-dozyr-dark-gray p-2 rounded overflow-x-auto">
+                  <pre className="text-[var(--foreground)] font-mono text-xs bg-dozyr-dark-gray p-2 rounded overflow-x-auto">
                     {JSON.stringify(log.metadata, null, 2)}
                   </pre>
                 </div>
@@ -270,13 +270,13 @@ export function SystemLogs({ className }: SystemLogsProps) {
                 className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-dozyr-dark-gray rounded-lg"
               >
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
                     Log Level
                   </label>
                   <select
                     value={selectedLevel}
                     onChange={(e) => setSelectedLevel(e.target.value)}
-                    className="w-full bg-dozyr-black border border-dozyr-medium-gray rounded px-3 py-2 text-white"
+                    className="w-full bg-dozyr-black border border-dozyr-medium-gray rounded px-3 py-2 text-[var(--foreground)]"
                   >
                     <option value="">All Levels</option>
                     <option value="info">Info</option>
@@ -286,13 +286,13 @@ export function SystemLogs({ className }: SystemLogsProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
                     Module
                   </label>
                   <select
                     value={selectedModule}
                     onChange={(e) => setSelectedModule(e.target.value)}
-                    className="w-full bg-dozyr-black border border-dozyr-medium-gray rounded px-3 py-2 text-white"
+                    className="w-full bg-dozyr-black border border-dozyr-medium-gray rounded px-3 py-2 text-[var(--foreground)]"
                   >
                     <option value="">All Modules</option>
                     <option value="auth">Authentication</option>
@@ -306,7 +306,7 @@ export function SystemLogs({ className }: SystemLogsProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
                     Actions
                   </label>
                   <Button
@@ -338,11 +338,11 @@ export function SystemLogs({ className }: SystemLogsProps) {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <config.icon className={cn("h-4 w-4", config.color)} />
-                  <span className="text-sm font-medium text-white capitalize">
+                  <span className="text-sm font-medium text-[var(--foreground)] capitalize">
                     {level}
                   </span>
                 </div>
-                <p className="text-2xl font-bold text-white">{count}</p>
+                <p className="text-2xl font-bold text-[var(--foreground)]">{count}</p>
               </div>
             )
           })}
@@ -384,7 +384,7 @@ export function SystemLogs({ className }: SystemLogsProps) {
             {filteredLogs.length === 0 ? (
               <div className="text-center py-8">
                 <Monitor className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">No logs found</h3>
+                <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">No logs found</h3>
                 <p className="text-dozyr-light-gray">
                   Try adjusting your filters or search terms.
                 </p>

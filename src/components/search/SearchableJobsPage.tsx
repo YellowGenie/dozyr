@@ -43,10 +43,10 @@ const JobCard = ({ job }: { job: Job }) => {
                 <Building className="h-4 w-4 text-dozyr-gold flex-shrink-0" />
                 <span className="text-sm text-dozyr-light-gray truncate">{job.company_name}</span>
                 {job.featured && (
-                  <Badge className="bg-dozyr-orange text-white text-xs">Featured</Badge>
+                  <Badge className="bg-dozyr-orange text-black text-xs">Featured</Badge>
                 )}
               </div>
-              <CardTitle className="text-xl font-bold text-white mb-2 line-clamp-2">
+              <CardTitle className="text-xl font-bold text-black mb-2 line-clamp-2">
                 {job.title}
               </CardTitle>
               <div className="flex items-center gap-4 text-sm text-dozyr-light-gray mb-3">
@@ -139,7 +139,7 @@ export default function SearchableJobsPage() {
       <motion.div {...fadeInUp}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Find Jobs</h1>
+            <h1 className="text-3xl font-bold text-black mb-2">Find Jobs</h1>
             <p className="text-dozyr-light-gray">Discover opportunities that match your skills</p>
           </div>
           <Button 
@@ -212,7 +212,7 @@ export default function SearchableJobsPage() {
             <Card className="py-12">
               <CardContent className="text-center">
                 <Search className="h-16 w-16 text-dozyr-light-gray mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">No jobs found</h3>
+                <h3 className="text-xl font-semibold text-black mb-2">No jobs found</h3>
                 <p className="text-dozyr-light-gray mb-4">
                   Try adjusting your search criteria or removing some filters.
                 </p>

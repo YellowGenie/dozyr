@@ -168,10 +168,10 @@ export default function AdminProposalsPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-dozyr-light-gray text-sm font-medium">{title}</p>
-            <p className="text-2xl font-bold text-white">{value}</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">{value}</p>
           </div>
           <div className={`p-3 rounded-full ${color}`}>
-            <Icon className="h-6 w-6 text-white" />
+            <Icon className="h-6 w-6 text-[var(--foreground)]" />
           </div>
         </div>
       </CardContent>
@@ -191,15 +191,15 @@ export default function AdminProposalsPage() {
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-white mb-1">{proposal.job_title}</h3>
+            <h3 className="text-lg font-semibold text-[var(--foreground)] mb-1">{proposal.job_title}</h3>
             <p className="text-dozyr-light-gray text-sm mb-2">{proposal.company_name}</p>
             <div className="flex items-center gap-2 mb-2">
               <User className="h-4 w-4 text-dozyr-light-gray" />
-              <span className="text-sm text-white">{proposal.talent_name}</span>
+              <span className="text-sm text-[var(--foreground)]">{proposal.talent_name}</span>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <Badge className={`${statusConfig.color} text-white`}>
+            <Badge className={`${statusConfig.color} text-[var(--foreground)]`}>
               <StatusIcon className="h-3 w-3 mr-1" />
               {statusConfig.label}
             </Badge>
@@ -240,7 +240,7 @@ export default function AdminProposalsPage() {
                 <FileText className="h-8 w-8 text-dozyr-black" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">Proposals Management</h1>
+                <h1 className="text-3xl font-bold text-[var(--foreground)]">Proposals Management</h1>
                 <p className="text-dozyr-light-gray">Manage all job proposals across the platform</p>
               </div>
             </div>
@@ -302,7 +302,7 @@ export default function AdminProposalsPage() {
                 <Card className="glass-card border-dozyr-medium-gray">
                   <CardContent className="p-12 text-center">
                     <FileText className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">No Proposals Found</h3>
+                    <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">No Proposals Found</h3>
                     <p className="text-dozyr-light-gray">
                       {searchTerm || statusFilter !== 'all' 
                         ? 'No proposals match your current filters.' 
@@ -322,7 +322,7 @@ export default function AdminProposalsPage() {
           <Dialog open={!!selectedProposal} onOpenChange={() => setSelectedProposal(null)}>
             <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-white">
+                <DialogTitle className="text-xl font-bold text-[var(--foreground)]">
                   Proposal Details
                 </DialogTitle>
                 <DialogDescription>
@@ -336,19 +336,19 @@ export default function AdminProposalsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-dozyr-light-gray">Job Title</label>
-                      <p className="text-white font-semibold">{selectedProposal.job_title}</p>
+                      <p className="text-[var(--foreground)] font-semibold">{selectedProposal.job_title}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-dozyr-light-gray">Company</label>
-                      <p className="text-white font-semibold">{selectedProposal.company_name}</p>
+                      <p className="text-[var(--foreground)] font-semibold">{selectedProposal.company_name}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-dozyr-light-gray">Talent</label>
-                      <p className="text-white font-semibold">{selectedProposal.talent_name}</p>
+                      <p className="text-[var(--foreground)] font-semibold">{selectedProposal.talent_name}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-dozyr-light-gray">Email</label>
-                      <p className="text-white font-semibold">{selectedProposal.talent_email}</p>
+                      <p className="text-[var(--foreground)] font-semibold">{selectedProposal.talent_email}</p>
                     </div>
                   </div>
 
@@ -357,7 +357,7 @@ export default function AdminProposalsPage() {
                     <div>
                       <label className="text-sm font-medium text-dozyr-light-gray">Cover Letter</label>
                       <div className="mt-2 p-4 bg-dozyr-dark-gray/50 rounded-lg">
-                        <p className="text-white whitespace-pre-wrap">{selectedProposal.cover_letter}</p>
+                        <p className="text-[var(--foreground)] whitespace-pre-wrap">{selectedProposal.cover_letter}</p>
                       </div>
                     </div>
 
@@ -365,7 +365,7 @@ export default function AdminProposalsPage() {
                       <div>
                         <label className="text-sm font-medium text-dozyr-light-gray">Draft Offerings</label>
                         <div className="mt-2 p-4 bg-dozyr-dark-gray/50 rounded-lg">
-                          <p className="text-white whitespace-pre-wrap">{selectedProposal.draft_offerings}</p>
+                          <p className="text-[var(--foreground)] whitespace-pre-wrap">{selectedProposal.draft_offerings}</p>
                         </div>
                       </div>
                     )}
@@ -374,7 +374,7 @@ export default function AdminProposalsPage() {
                       <div>
                         <label className="text-sm font-medium text-dozyr-light-gray">Pricing Details</label>
                         <div className="mt-2 p-4 bg-dozyr-dark-gray/50 rounded-lg">
-                          <p className="text-white whitespace-pre-wrap">{selectedProposal.pricing_details}</p>
+                          <p className="text-[var(--foreground)] whitespace-pre-wrap">{selectedProposal.pricing_details}</p>
                         </div>
                       </div>
                     )}
@@ -382,7 +382,7 @@ export default function AdminProposalsPage() {
                     <div>
                       <label className="text-sm font-medium text-dozyr-light-gray">Availability</label>
                       <div className="mt-2 p-4 bg-dozyr-dark-gray/50 rounded-lg">
-                        <p className="text-white">{selectedProposal.availability}</p>
+                        <p className="text-[var(--foreground)]">{selectedProposal.availability}</p>
                       </div>
                     </div>
                   </div>
@@ -393,7 +393,7 @@ export default function AdminProposalsPage() {
                       <div>
                         <label className="text-sm font-medium text-dozyr-light-gray">Current Status</label>
                         <div className="mt-2">
-                          <Badge className={`${getStatusConfig(selectedProposal.status).color} text-white`}>
+                          <Badge className={`${getStatusConfig(selectedProposal.status).color} text-[var(--foreground)]`}>
                             {getStatusConfig(selectedProposal.status).label}
                           </Badge>
                         </div>

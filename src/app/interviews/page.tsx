@@ -155,7 +155,7 @@ export default function InterviewsPage() {
         <DashboardLayout>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-4">Please log in</h2>
+              <h2 className="text-2xl font-bold text-black mb-4">Please log in</h2>
               <p className="text-dozyr-light-gray">You need to be authenticated to view interviews.</p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function InterviewsPage() {
           <motion.div {...fadeInUp}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Interviews</h1>
+                <h1 className="text-3xl font-bold text-black mb-2">Interviews</h1>
                 <p className="text-dozyr-light-gray">
                   Manage your interview process and connect with candidates
                 </p>
@@ -214,7 +214,7 @@ export default function InterviewsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-dozyr-light-gray">Total</p>
-                      <p className="text-2xl font-bold text-white">{stats.total}</p>
+                      <p className="text-2xl font-bold text-black">{stats.total}</p>
                     </div>
                     <Star className="h-8 w-8 text-dozyr-gold" />
                   </div>
@@ -225,7 +225,7 @@ export default function InterviewsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-dozyr-light-gray">Scheduled</p>
-                      <p className="text-2xl font-bold text-white">{stats.scheduled}</p>
+                      <p className="text-2xl font-bold text-black">{stats.scheduled}</p>
                     </div>
                     <Calendar className="h-8 w-8 text-yellow-500" />
                   </div>
@@ -236,7 +236,7 @@ export default function InterviewsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-dozyr-light-gray">In Progress</p>
-                      <p className="text-2xl font-bold text-white">{stats.inProgress}</p>
+                      <p className="text-2xl font-bold text-black">{stats.inProgress}</p>
                     </div>
                     <Play className="h-8 w-8 text-blue-500" />
                   </div>
@@ -247,7 +247,7 @@ export default function InterviewsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-dozyr-light-gray">Completed</p>
-                      <p className="text-2xl font-bold text-white">{stats.completed}</p>
+                      <p className="text-2xl font-bold text-black">{stats.completed}</p>
                     </div>
                     <CheckCircle className="h-8 w-8 text-green-500" />
                   </div>
@@ -318,7 +318,7 @@ export default function InterviewsPage() {
                 {filteredInterviews.length === 0 ? (
                   <div className="p-12 text-center">
                     <Star className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <h3 className="text-xl font-semibold text-black mb-2">
                       {searchQuery ? 'No interviews found' : 'No interviews yet'}
                     </h3>
                     <p className="text-dozyr-light-gray mb-6">
@@ -348,7 +348,7 @@ export default function InterviewsPage() {
                             <div className="flex-1">
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
-                                  <h3 className="font-semibold text-white text-lg">
+                                  <h3 className="font-semibold text-black text-lg">
                                     {interview.title}
                                   </h3>
                                   {interview.job_title && (
@@ -364,7 +364,7 @@ export default function InterviewsPage() {
                                 </div>
                                 <div className="flex items-center gap-2 ml-4">
                                   <Badge 
-                                    className={`${getStatusColor(interview.status)} text-white`}
+                                    className={`${getStatusColor(interview.status)} text-black`}
                                   >
                                     {getStatusIcon(interview.status)}
                                     <span className="ml-1 capitalize">{interview.status.replace('_', ' ')}</span>

@@ -139,7 +139,7 @@ export function ProfileSharingModal({
         <CardHeader className="border-b border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2 text-white">
+              <CardTitle className="flex items-center gap-2 text-black">
                 <Share2 className="h-5 w-5 text-purple-400" />
                 Share Your Profile
               </CardTitle>
@@ -151,7 +151,7 @@ export function ProfileSharingModal({
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-black"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -162,7 +162,7 @@ export function ProfileSharingModal({
           {/* Profile URL */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium text-white">Profile URL</h3>
+              <h3 className="font-medium text-black">Profile URL</h3>
               <Badge className="bg-green-500/20 text-green-300 border-green-500/20">
                 <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
                 Live
@@ -206,7 +206,7 @@ export function ProfileSharingModal({
             <Button
               variant="outline"
               onClick={handleNativeShare}
-              className="border-gray-600 hover:bg-gray-800 text-white"
+              className="border-gray-600 hover:bg-gray-800 text-black"
               disabled={!shareUrl}
             >
               <Share2 className="h-4 w-4 mr-2" />
@@ -215,7 +215,7 @@ export function ProfileSharingModal({
             <Button
               variant="outline"
               onClick={() => shareUrl && window.open(shareUrl, '_blank')}
-              className="border-gray-600 hover:bg-gray-800 text-white"
+              className="border-gray-600 hover:bg-gray-800 text-black"
               disabled={!shareUrl}
             >
               <ExternalLink className="h-4 w-4 mr-2" />
@@ -225,7 +225,7 @@ export function ProfileSharingModal({
 
           {/* Social Sharing */}
           <div className="space-y-3">
-            <h3 className="font-medium text-white">Share on social media</h3>
+            <h3 className="font-medium text-black">Share on social media</h3>
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
@@ -269,7 +269,7 @@ export function ProfileSharingModal({
           {/* QR Code */}
           {qrCodeUrl && (
             <div className="space-y-3">
-              <h3 className="font-medium text-white">QR Code</h3>
+              <h3 className="font-medium text-black">QR Code</h3>
               <div className="bg-white p-4 rounded-lg text-center">
                 <img src={qrCodeUrl} alt="Profile QR Code" className="mx-auto mb-3" />
                 <Button
@@ -315,7 +315,7 @@ export function ProfileShareButton({
     <>
       <Button
         onClick={() => setIsModalOpen(true)}
-        className={`bg-purple-600 hover:bg-purple-700 text-white ${className}`}
+        className={`bg-purple-600 hover:bg-purple-700 text-black ${className}`}
       >
         <Share2 className="h-4 w-4 mr-2" />
         Share Profile

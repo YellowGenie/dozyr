@@ -262,7 +262,7 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
                 id="priority"
                 value={formData.priority}
                 onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
-                className="mt-1 w-full px-3 py-2 bg-dozyr-dark border border-dozyr-medium-gray rounded-md text-white focus:ring-2 focus:ring-dozyr-gold focus:border-transparent"
+                className="mt-1 w-full px-3 py-2 bg-dozyr-dark border border-dozyr-medium-gray rounded-md text-[var(--foreground)] focus:ring-2 focus:ring-dozyr-gold focus:border-transparent"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>

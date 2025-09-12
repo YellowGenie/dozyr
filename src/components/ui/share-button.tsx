@@ -110,21 +110,21 @@ export function ShareButton({
               <div className="space-y-2">
                 <button
                   onClick={() => shareOnPlatform('twitter')}
-                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
                 >
                   <Twitter className="h-4 w-4 text-blue-400" />
                   <span className="text-sm">Twitter</span>
                 </button>
                 <button
                   onClick={() => shareOnPlatform('facebook')}
-                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
                 >
                   <Facebook className="h-4 w-4 text-blue-600" />
                   <span className="text-sm">Facebook</span>
                 </button>
                 <button
                   onClick={() => shareOnPlatform('linkedin')}
-                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
                 >
                   <Linkedin className="h-4 w-4 text-blue-500" />
                   <span className="text-sm">LinkedIn</span>
@@ -132,7 +132,7 @@ export function ShareButton({
                 <div className="border-t border-dozyr-medium-gray pt-2">
                   <button
                     onClick={handleCopyLink}
-                    className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                    className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
                   >
                     {copied ? (
                       <Check className="h-4 w-4 text-green-400" />
@@ -174,21 +174,21 @@ export function ShareButton({
             <div className="space-y-2">
               <button
                 onClick={() => shareOnPlatform('twitter')}
-                className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
               >
                 <Twitter className="h-4 w-4 text-blue-400" />
                 <span className="text-sm">Twitter</span>
               </button>
               <button
                 onClick={() => shareOnPlatform('facebook')}
-                className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
               >
                 <Facebook className="h-4 w-4 text-blue-600" />
                 <span className="text-sm">Facebook</span>
               </button>
               <button
                 onClick={() => shareOnPlatform('linkedin')}
-                className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
               >
                 <Linkedin className="h-4 w-4 text-blue-500" />
                 <span className="text-sm">LinkedIn</span>
@@ -196,7 +196,7 @@ export function ShareButton({
               <div className="border-t border-dozyr-medium-gray pt-2">
                 <button
                   onClick={handleCopyLink}
-                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-white transition-colors"
+                  className="flex items-center gap-3 w-full p-2 hover:bg-dozyr-medium-gray rounded text-black transition-colors"
                 >
                   {copied ? (
                     <Check className="h-4 w-4 text-green-400" />

@@ -305,8 +305,8 @@ export default function SettingsPage() {
           <motion.div {...fadeInUp}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-                <p className="text-white/70">
+                <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">Settings</h1>
+                <p className="text-[var(--foreground)]/70">
                   Manage your account preferences, security, and privacy settings
                 </p>
               </div>
@@ -335,7 +335,7 @@ export default function SettingsPage() {
             <motion.div {...fadeInUp}>
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                     <Bell className="h-5 w-5" />
                     Notifications
                   </CardTitle>
@@ -343,8 +343,8 @@ export default function SettingsPage() {
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Email Notifications</h4>
-                      <p className="text-sm text-white/60">Receive updates via email</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Email Notifications</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">Receive updates via email</p>
                     </div>
                     <Switch
                       checked={settings.notifications.email_notifications}
@@ -354,8 +354,8 @@ export default function SettingsPage() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Push Notifications</h4>
-                      <p className="text-sm text-white/60">Browser notifications</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Push Notifications</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">Browser notifications</p>
                     </div>
                     <Switch
                       checked={settings.notifications.push_notifications}
@@ -365,8 +365,8 @@ export default function SettingsPage() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Job Alerts</h4>
-                      <p className="text-sm text-white/60">New job opportunities</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Job Alerts</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">New job opportunities</p>
                     </div>
                     <Switch
                       checked={settings.notifications.job_alerts}
@@ -376,8 +376,8 @@ export default function SettingsPage() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Message Notifications</h4>
-                      <p className="text-sm text-white/60">New messages and replies</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Message Notifications</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">New messages and replies</p>
                     </div>
                     <Switch
                       checked={settings.notifications.message_notifications}
@@ -387,8 +387,8 @@ export default function SettingsPage() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Marketing Emails</h4>
-                      <p className="text-sm text-white/60">Tips, news, and updates</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Marketing Emails</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">Tips, news, and updates</p>
                     </div>
                     <Switch
                       checked={settings.notifications.marketing_emails}
@@ -403,19 +403,19 @@ export default function SettingsPage() {
             <motion.div {...fadeInUp}>
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                     <Eye className="h-5 w-5" />
                     Privacy
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-white font-medium">Profile Visibility</Label>
+                    <Label className="text-[var(--foreground)] font-medium">Profile Visibility</Label>
                     <Select 
                       value={settings.privacy.profile_visibility}
                       onValueChange={(value) => handlePrivacyChange('profile_visibility', value)}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -428,8 +428,8 @@ export default function SettingsPage() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Show Email Address</h4>
-                      <p className="text-sm text-white/60">Display email on public profile</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Show Email Address</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">Display email on public profile</p>
                     </div>
                     <Switch
                       checked={settings.privacy.show_email}
@@ -439,8 +439,8 @@ export default function SettingsPage() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Show Phone Number</h4>
-                      <p className="text-sm text-white/60">Display phone on public profile</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Show Phone Number</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">Display phone on public profile</p>
                     </div>
                     <Switch
                       checked={settings.privacy.show_phone}
@@ -450,8 +450,8 @@ export default function SettingsPage() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-white">Search Visibility</h4>
-                      <p className="text-sm text-white/60">Appear in search results</p>
+                      <h4 className="font-medium text-[var(--foreground)]">Search Visibility</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">Appear in search results</p>
                     </div>
                     <Switch
                       checked={settings.privacy.search_visibility}
@@ -466,7 +466,7 @@ export default function SettingsPage() {
             <motion.div {...fadeInUp}>
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                     <Lock className="h-5 w-5" />
                     Change Password
                   </CardTitle>
@@ -487,35 +487,35 @@ export default function SettingsPage() {
                   )}
                   
                   <div className="space-y-2">
-                    <Label className="text-white">Current Password</Label>
+                    <Label className="text-[var(--foreground)]">Current Password</Label>
                     <Input
                       type="password"
                       value={passwordData.current_password}
                       onChange={(e) => setPasswordData({...passwordData, current_password: e.target.value})}
                       placeholder="Enter current password"
-                      className="bg-white/5 border-white/20 text-white"
+                      className="bg-white/5 border-white/20 text-[var(--foreground)]"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white">New Password</Label>
+                    <Label className="text-[var(--foreground)]">New Password</Label>
                     <Input
                       type="password"
                       value={passwordData.new_password}
                       onChange={(e) => setPasswordData({...passwordData, new_password: e.target.value})}
                       placeholder="Enter new password"
-                      className="bg-white/5 border-white/20 text-white"
+                      className="bg-white/5 border-white/20 text-[var(--foreground)]"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white">Confirm New Password</Label>
+                    <Label className="text-[var(--foreground)]">Confirm New Password</Label>
                     <Input
                       type="password"
                       value={passwordData.confirm_password}
                       onChange={(e) => setPasswordData({...passwordData, confirm_password: e.target.value})}
                       placeholder="Confirm new password"
-                      className="bg-white/5 border-white/20 text-white"
+                      className="bg-white/5 border-white/20 text-[var(--foreground)]"
                     />
                   </div>
                   
@@ -544,7 +544,7 @@ export default function SettingsPage() {
             <motion.div {...fadeInUp}>
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                     <Shield className="h-5 w-5" />
                     Two-Factor Authentication
                   </CardTitle>
@@ -557,10 +557,10 @@ export default function SettingsPage() {
                       <AlertCircle className="h-5 w-5 text-yellow-400" />
                     )}
                     <div className="flex-1">
-                      <h4 className="font-medium text-white">
+                      <h4 className="font-medium text-[var(--foreground)]">
                         {is2FAEnabled ? 'Two-Factor Authentication Enabled' : 'Two-Factor Authentication Disabled'}
                       </h4>
-                      <p className="text-sm text-white/60">
+                      <p className="text-sm text-[var(--foreground)]/60">
                         {is2FAEnabled 
                           ? 'Your account is protected with 2FA' 
                           : 'Add an extra layer of security to your account'
@@ -583,16 +583,16 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="text-center">
                         <img src={qrCodeUrl} alt="2FA QR Code" className="mx-auto mb-3" />
-                        <p className="text-sm text-white/70">Scan this QR code with your authenticator app</p>
+                        <p className="text-sm text-[var(--foreground)]/70">Scan this QR code with your authenticator app</p>
                       </div>
                       
                       <div className="space-y-2">
-                        <Label className="text-white">Verification Code</Label>
+                        <Label className="text-[var(--foreground)]">Verification Code</Label>
                         <Input
                           value={verificationCode}
                           onChange={(e) => setVerificationCode(e.target.value)}
                           placeholder="Enter 6-digit code"
-                          className="bg-white/5 border-white/20 text-white"
+                          className="bg-white/5 border-white/20 text-[var(--foreground)]"
                         />
                       </div>
                       
@@ -639,7 +639,7 @@ export default function SettingsPage() {
           <motion.div {...fadeInUp}>
             <Card className="glass-card border-white/20">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                   <Settings className="h-5 w-5" />
                   Preferences
                 </CardTitle>
@@ -647,12 +647,12 @@ export default function SettingsPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-white font-medium">Language</Label>
+                    <Label className="text-[var(--foreground)] font-medium">Language</Label>
                     <Select 
                       value={settings.preferences.language}
                       onValueChange={(value) => handlePreferenceChange('language', value)}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -665,12 +665,12 @@ export default function SettingsPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white font-medium">Time Zone</Label>
+                    <Label className="text-[var(--foreground)] font-medium">Time Zone</Label>
                     <Select 
                       value={settings.preferences.timezone}
                       onValueChange={(value) => handlePreferenceChange('timezone', value)}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -687,12 +687,12 @@ export default function SettingsPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white font-medium">Theme</Label>
+                    <Label className="text-[var(--foreground)] font-medium">Theme</Label>
                     <Select 
                       value={settings.preferences.theme}
                       onValueChange={(value) => handlePreferenceChange('theme', value)}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -704,12 +704,12 @@ export default function SettingsPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white font-medium">Email Frequency</Label>
+                    <Label className="text-[var(--foreground)] font-medium">Email Frequency</Label>
                     <Select 
                       value={settings.preferences.email_frequency}
                       onValueChange={(value) => handlePreferenceChange('email_frequency', value)}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                      <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -729,7 +729,7 @@ export default function SettingsPage() {
           <motion.div {...fadeInUp}>
             <Card className="glass-card border-white/20">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                   <Download className="h-5 w-5" />
                   Data Management
                 </CardTitle>
@@ -738,8 +738,8 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-white mb-2">Export Your Data</h3>
-                      <p className="text-sm text-white/60 mb-4">
+                      <h3 className="font-semibold text-[var(--foreground)] mb-2">Export Your Data</h3>
+                      <p className="text-sm text-[var(--foreground)]/60 mb-4">
                         Download a copy of your profile, applications, and other data.
                       </p>
                       
@@ -754,7 +754,7 @@ export default function SettingsPage() {
                         onClick={exportData}
                         disabled={isExporting}
                         variant="outline" 
-                        className="w-full border-white/20 hover:border-[var(--accent)]/50 text-white hover:text-[var(--accent)]"
+                        className="w-full border-white/20 hover:border-[var(--accent)]/50 text-[var(--foreground)] hover:text-[var(--accent)]"
                       >
                         {isExporting ? (
                           <>
@@ -773,24 +773,24 @@ export default function SettingsPage() {
                   
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-white mb-2 flex items-center gap-2">
+                      <h3 className="font-semibold text-[var(--foreground)] mb-2 flex items-center gap-2">
                         <AlertCircle className="h-4 w-4 text-red-400" />
                         Delete Account
                       </h3>
-                      <p className="text-sm text-white/60 mb-4">
+                      <p className="text-sm text-[var(--foreground)]/60 mb-4">
                         Permanently delete your account and all associated data. This action cannot be undone.
                       </p>
                       
                       <div className="space-y-3">
                         <div className="space-y-2">
-                          <Label className="text-white text-sm">
+                          <Label className="text-[var(--foreground)] text-sm">
                             Type "DELETE MY ACCOUNT" to confirm:
                           </Label>
                           <Input
                             value={deleteConfirmation}
                             onChange={(e) => setDeleteConfirmation(e.target.value)}
                             placeholder="DELETE MY ACCOUNT"
-                            className="bg-white/5 border-white/20 text-white"
+                            className="bg-white/5 border-white/20 text-[var(--foreground)]"
                           />
                         </div>
                         
@@ -821,8 +821,8 @@ export default function SettingsPage() {
                   <div className="flex items-start gap-3">
                     <Info className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                     <div>
-                      <h4 className="font-medium text-white mb-1">Data Protection Notice</h4>
-                      <p className="text-sm text-white/60">
+                      <h4 className="font-medium text-[var(--foreground)] mb-1">Data Protection Notice</h4>
+                      <p className="text-sm text-[var(--foreground)]/60">
                         We take your privacy seriously. Your data is encrypted and stored securely. 
                         We never share your personal information with third parties without your explicit consent. 
                         For more information, please read our Privacy Policy.

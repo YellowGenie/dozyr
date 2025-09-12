@@ -27,7 +27,7 @@ export function AuthDebug() {
   }
 
   return (
-    <div className="fixed top-4 right-4 bg-black/90 p-4 rounded-lg text-xs text-white z-50 max-w-sm">
+    <div className="fixed top-4 right-4 bg-black/90 p-4 rounded-lg text-xs text-black z-50 max-w-sm">
       <div className="space-y-2">
         <div><strong>Auth Debug:</strong></div>
         <div>Authenticated: {user ? 'Yes' : 'No'}</div>
@@ -43,7 +43,7 @@ export function AuthDebug() {
         <div>Token Match: {token === localStorageToken ? 'Yes' : 'No'}</div>
         <button 
           onClick={testAPI}
-          className="bg-blue-500 px-2 py-1 rounded text-white"
+          className="bg-blue-500 px-2 py-1 rounded text-black"
         >
           Test API
         </button>

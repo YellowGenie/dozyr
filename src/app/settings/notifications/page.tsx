@@ -329,15 +329,15 @@ export default function NotificationSettingsPage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Link href="/settings" className="text-white/70 hover:text-white transition-colors flex items-center gap-2">
+                  <Link href="/settings" className="text-black/70 hover:text-black transition-colors flex items-center gap-2">
                     <ArrowLeft className="h-4 w-4" />
                     Settings
                   </Link>
-                  <span className="text-white/50">/</span>
-                  <span className="text-white">Notifications</span>
+                  <span className="text-black/50">/</span>
+                  <span className="text-black">Notifications</span>
                 </div>
-                <h1 className="text-3xl font-bold text-white mb-2">Notification Settings</h1>
-                <p className="text-white/70">
+                <h1 className="text-3xl font-bold text-black mb-2">Notification Settings</h1>
+                <p className="text-black/70">
                   Control how and when you receive notifications across all platforms
                 </p>
               </div>
@@ -372,7 +372,7 @@ export default function NotificationSettingsPage() {
               <Card className="glass-card border-white/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-black flex items-center gap-2">
                       <Mail className="h-5 w-5" />
                       Email Notifications
                     </CardTitle>
@@ -381,7 +381,7 @@ export default function NotificationSettingsPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => testNotification('email')}
-                        className="border-white/20 text-white hover:border-[var(--accent)]/50 hover:text-[var(--accent)]"
+                        className="border-white/20 text-black hover:border-[var(--accent)]/50 hover:text-[var(--accent)]"
                       >
                         Test Email
                       </Button>
@@ -391,7 +391,7 @@ export default function NotificationSettingsPage() {
                       />
                     </div>
                   </div>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-black/60">
                     Receive notifications in your email inbox
                   </p>
                 </CardHeader>
@@ -399,12 +399,12 @@ export default function NotificationSettingsPage() {
                   {settings.email.enabled && (
                     <>
                       <div className="space-y-2">
-                        <Label className="text-white font-medium">Email Frequency</Label>
+                        <Label className="text-black font-medium">Email Frequency</Label>
                         <Select 
                           value={settings.email.frequency}
                           onValueChange={(value) => updateEmailSetting('frequency', value)}
                         >
-                          <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                          <SelectTrigger className="bg-white/5 border-white/20 text-black">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -420,7 +420,7 @@ export default function NotificationSettingsPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
-                          <h4 className="font-medium text-white flex items-center gap-2">
+                          <h4 className="font-medium text-black flex items-center gap-2">
                             <Briefcase className="h-4 w-4" />
                             Job Related
                           </h4>
@@ -429,8 +429,8 @@ export default function NotificationSettingsPage() {
                             {user?.role === 'talent' && (
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <Label className="text-white text-sm font-medium">Job Applications</Label>
-                                  <p className="text-xs text-white/60">Status updates on your applications</p>
+                                  <Label className="text-black text-sm font-medium">Job Applications</Label>
+                                  <p className="text-xs text-black/60">Status updates on your applications</p>
                                 </div>
                                 <Switch
                                   checked={settings.email.job_applications}
@@ -441,8 +441,8 @@ export default function NotificationSettingsPage() {
                             
                             <div className="flex items-center justify-between">
                               <div>
-                                <Label className="text-white text-sm font-medium">Job Updates</Label>
-                                <p className="text-xs text-white/60">New jobs matching your preferences</p>
+                                <Label className="text-black text-sm font-medium">Job Updates</Label>
+                                <p className="text-xs text-black/60">New jobs matching your preferences</p>
                               </div>
                               <Switch
                                 checked={settings.email.job_updates}
@@ -453,7 +453,7 @@ export default function NotificationSettingsPage() {
                         </div>
 
                         <div className="space-y-4">
-                          <h4 className="font-medium text-white flex items-center gap-2">
+                          <h4 className="font-medium text-black flex items-center gap-2">
                             <User className="h-4 w-4" />
                             Profile & Account
                           </h4>
@@ -461,8 +461,8 @@ export default function NotificationSettingsPage() {
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
                               <div>
-                                <Label className="text-white text-sm font-medium">Messages</Label>
-                                <p className="text-xs text-white/60">New messages from employers</p>
+                                <Label className="text-black text-sm font-medium">Messages</Label>
+                                <p className="text-xs text-black/60">New messages from employers</p>
                               </div>
                               <Switch
                                 checked={settings.email.messages}
@@ -473,8 +473,8 @@ export default function NotificationSettingsPage() {
                             {user?.role === 'talent' && (
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <Label className="text-white text-sm font-medium">Profile Views</Label>
-                                  <p className="text-xs text-white/60">When employers view your profile</p>
+                                  <Label className="text-black text-sm font-medium">Profile Views</Label>
+                                  <p className="text-xs text-black/60">When employers view your profile</p>
                                 </div>
                                 <Switch
                                   checked={settings.email.profile_views}
@@ -485,8 +485,8 @@ export default function NotificationSettingsPage() {
                             
                             <div className="flex items-center justify-between">
                               <div>
-                                <Label className="text-white text-sm font-medium">Security Alerts</Label>
-                                <p className="text-xs text-white/60">Account security notifications</p>
+                                <Label className="text-black text-sm font-medium">Security Alerts</Label>
+                                <p className="text-xs text-black/60">Account security notifications</p>
                               </div>
                               <Switch
                                 checked={settings.email.security_alerts}
@@ -502,8 +502,8 @@ export default function NotificationSettingsPage() {
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-white font-medium">Marketing Emails</Label>
-                          <p className="text-sm text-white/60">Tips, news, and product updates</p>
+                          <Label className="text-black font-medium">Marketing Emails</Label>
+                          <p className="text-sm text-black/60">Tips, news, and product updates</p>
                         </div>
                         <Switch
                           checked={settings.email.marketing}
@@ -522,7 +522,7 @@ export default function NotificationSettingsPage() {
                 <Card className="glass-card border-white/20">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-white flex items-center gap-2">
+                      <CardTitle className="text-black flex items-center gap-2">
                         <Bell className="h-5 w-5" />
                         Browser Push Notifications
                       </CardTitle>
@@ -531,7 +531,7 @@ export default function NotificationSettingsPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => testNotification('push')}
-                          className="border-white/20 text-white hover:border-[var(--accent)]/50 hover:text-[var(--accent)]"
+                          className="border-white/20 text-black hover:border-[var(--accent)]/50 hover:text-[var(--accent)]"
                         >
                           Test Push
                         </Button>
@@ -541,7 +541,7 @@ export default function NotificationSettingsPage() {
                         />
                       </div>
                     </div>
-                    <p className="text-sm text-white/60">
+                    <p className="text-sm text-black/60">
                       Get notifications directly in your browser
                     </p>
                   </CardHeader>
@@ -551,8 +551,8 @@ export default function NotificationSettingsPage() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">Messages</Label>
-                              <p className="text-xs text-white/60">New messages from employers</p>
+                              <Label className="text-black text-sm font-medium">Messages</Label>
+                              <p className="text-xs text-black/60">New messages from employers</p>
                             </div>
                             <Switch
                               checked={settings.push.messages}
@@ -562,8 +562,8 @@ export default function NotificationSettingsPage() {
                           
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">Job Alerts</Label>
-                              <p className="text-xs text-white/60">New job opportunities</p>
+                              <Label className="text-black text-sm font-medium">Job Alerts</Label>
+                              <p className="text-xs text-black/60">New job opportunities</p>
                             </div>
                             <Switch
                               checked={settings.push.job_alerts}
@@ -575,8 +575,8 @@ export default function NotificationSettingsPage() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">Profile Activity</Label>
-                              <p className="text-xs text-white/60">Profile views and interactions</p>
+                              <Label className="text-black text-sm font-medium">Profile Activity</Label>
+                              <p className="text-xs text-black/60">Profile views and interactions</p>
                             </div>
                             <Switch
                               checked={settings.push.profile_activity}
@@ -586,8 +586,8 @@ export default function NotificationSettingsPage() {
                           
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">System Updates</Label>
-                              <p className="text-xs text-white/60">Platform updates and announcements</p>
+                              <Label className="text-black text-sm font-medium">System Updates</Label>
+                              <p className="text-xs text-black/60">Platform updates and announcements</p>
                             </div>
                             <Switch
                               checked={settings.push.system_updates}
@@ -607,7 +607,7 @@ export default function NotificationSettingsPage() {
               <Card className="glass-card border-white/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-black flex items-center gap-2">
                       <Zap className="h-5 w-5" />
                       In-App Notifications
                     </CardTitle>
@@ -616,7 +616,7 @@ export default function NotificationSettingsPage() {
                       onCheckedChange={(value) => updateInAppSetting('enabled', value)}
                     />
                   </div>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-black/60">
                     Notifications that appear within the application
                   </p>
                 </CardHeader>
@@ -625,11 +625,11 @@ export default function NotificationSettingsPage() {
                     <>
                       <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-white font-medium flex items-center gap-2">
+                          <Label className="text-black font-medium flex items-center gap-2">
                             {settings.in_app.sound_enabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
                             Sound Effects
                           </Label>
-                          <p className="text-sm text-white/60">Play sounds for notifications</p>
+                          <p className="text-sm text-black/60">Play sounds for notifications</p>
                         </div>
                         <Switch
                           checked={settings.in_app.sound_enabled}
@@ -643,8 +643,8 @@ export default function NotificationSettingsPage() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">Messages</Label>
-                              <p className="text-xs text-white/60">New message notifications</p>
+                              <Label className="text-black text-sm font-medium">Messages</Label>
+                              <p className="text-xs text-black/60">New message notifications</p>
                             </div>
                             <Switch
                               checked={settings.in_app.messages}
@@ -654,8 +654,8 @@ export default function NotificationSettingsPage() {
                           
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">Job Alerts</Label>
-                              <p className="text-xs text-white/60">New job opportunities</p>
+                              <Label className="text-black text-sm font-medium">Job Alerts</Label>
+                              <p className="text-xs text-black/60">New job opportunities</p>
                             </div>
                             <Switch
                               checked={settings.in_app.job_alerts}
@@ -667,8 +667,8 @@ export default function NotificationSettingsPage() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">System Notifications</Label>
-                              <p className="text-xs text-white/60">App updates and announcements</p>
+                              <Label className="text-black text-sm font-medium">System Notifications</Label>
+                              <p className="text-xs text-black/60">App updates and announcements</p>
                             </div>
                             <Switch
                               checked={settings.in_app.system_notifications}
@@ -678,8 +678,8 @@ export default function NotificationSettingsPage() {
                           
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label className="text-white text-sm font-medium">Profile Activity</Label>
-                              <p className="text-xs text-white/60">Profile views and likes</p>
+                              <Label className="text-black text-sm font-medium">Profile Activity</Label>
+                              <p className="text-xs text-black/60">Profile views and likes</p>
                             </div>
                             <Switch
                               checked={settings.in_app.profile_activity}
@@ -699,7 +699,7 @@ export default function NotificationSettingsPage() {
               <Card className="glass-card border-white/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-black flex items-center gap-2">
                       <Clock className="h-5 w-5" />
                       Quiet Hours
                     </CardTitle>
@@ -708,7 +708,7 @@ export default function NotificationSettingsPage() {
                       onCheckedChange={(value) => updateQuietHoursSetting('enabled', value)}
                     />
                   </div>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-black/60">
                     Set times when you don't want to receive notifications
                   </p>
                 </CardHeader>
@@ -717,12 +717,12 @@ export default function NotificationSettingsPage() {
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <Label className="text-white font-medium">Start Time</Label>
+                          <Label className="text-black font-medium">Start Time</Label>
                           <Select 
                             value={settings.quiet_hours.start_time} 
                             onValueChange={(value) => updateQuietHoursSetting('start_time', value)}
                           >
-                            <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                            <SelectTrigger className="bg-white/5 border-white/20 text-black">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -736,12 +736,12 @@ export default function NotificationSettingsPage() {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label className="text-white font-medium">End Time</Label>
+                          <Label className="text-black font-medium">End Time</Label>
                           <Select 
                             value={settings.quiet_hours.end_time} 
                             onValueChange={(value) => updateQuietHoursSetting('end_time', value)}
                           >
-                            <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                            <SelectTrigger className="bg-white/5 border-white/20 text-black">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -759,7 +759,7 @@ export default function NotificationSettingsPage() {
                         <div className="flex items-center gap-3">
                           <AlertCircle className="h-5 w-5 text-yellow-400 flex-shrink-0" />
                           <div>
-                            <p className="text-sm text-white/80">
+                            <p className="text-sm text-black/80">
                               <strong>Note:</strong> Security alerts and urgent messages will still be delivered during quiet hours.
                             </p>
                           </div>

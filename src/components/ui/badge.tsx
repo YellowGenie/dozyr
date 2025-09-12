@@ -10,10 +10,10 @@ const badgeVariants = cva(
         default:
           "border-transparent bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/80",
         secondary:
-          "border-transparent bg-dozyr-medium-gray text-white hover:bg-dozyr-medium-gray/80",
+          "border-transparent bg-dozyr-medium-gray text-black hover:bg-dozyr-medium-gray/80",
         destructive:
-          "border-transparent bg-red-500 text-white hover:bg-red-500/80",
-        outline: "text-white border-dozyr-medium-gray hover:bg-dozyr-medium-gray/20",
+          "border-transparent bg-red-500 text-black hover:bg-red-500/80",
+        outline: "text-black border-dozyr-medium-gray hover:bg-dozyr-medium-gray/20",
       },
     },
     defaultVariants: {

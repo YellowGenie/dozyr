@@ -101,7 +101,7 @@ export function HelpTrigger({
             initial={{ opacity: 0, y: 10 }}
             whileHover={{ opacity: 1, y: 0 }}
           >
-            <div className="bg-dozyr-dark-gray/95 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap backdrop-blur-sm border border-white/10">
+            <div className="bg-dozyr-dark-gray/95 text-[var(--foreground)] px-3 py-2 rounded-lg text-sm whitespace-nowrap backdrop-blur-sm border border-white/10">
               Need help? Click for assistance
               <div className="absolute top-full right-4 w-2 h-2 bg-dozyr-dark-gray/95 rotate-45 transform -translate-y-1 border-r border-b border-white/10" />
             </div>
@@ -123,7 +123,7 @@ export function HelpTrigger({
       <>
         <motion.button
           onClick={handleOpen}
-          className={`inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-dozyr-light-gray hover:text-white rounded-lg transition-all duration-200 border border-white/10 hover:border-white/20 ${className}`}
+          className={`inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-dozyr-light-gray hover:text-[var(--foreground)] rounded-lg transition-all duration-200 border border-white/10 hover:border-white/20 ${className}`}
           whileHover={{ y: -1 }}
           whileTap={{ y: 0 }}
         >
@@ -146,7 +146,7 @@ export function HelpTrigger({
     <>
       <motion.button
         onClick={handleOpen}
-        className={`${sizeClasses[size]} rounded-lg bg-white/5 hover:bg-white/10 text-dozyr-light-gray hover:text-white transition-all duration-200 border border-white/10 hover:border-white/20 flex items-center justify-center group ${className}`}
+        className={`${sizeClasses[size]} rounded-lg bg-white/5 hover:bg-white/10 text-dozyr-light-gray hover:text-[var(--foreground)] transition-all duration-200 border border-white/10 hover:border-white/20 flex items-center justify-center group ${className}`}
         whileHover={{ y: -1, scale: 1.05 }}
         whileTap={{ y: 0, scale: 0.95 }}
       >

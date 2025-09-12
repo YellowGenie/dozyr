@@ -265,7 +265,7 @@ export default function PostJobPage() {
       whileHover={{ scale: 1.02 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
     >
-      <label className="flex items-center gap-2 text-sm font-medium text-white group-hover:text-[var(--accent)] transition-colors">
+      <label className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
         {Icon && <Icon className="h-4 w-4" />}
         {label} {required && <span className="text-red-400">*</span>}
       </label>
@@ -276,7 +276,7 @@ export default function PostJobPage() {
             onChange={(e) => handleInputChange(field, e.target.value)}
             onFocus={() => setFocusedField(field)}
             onBlur={() => setFocusedField('')}
-            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-white placeholder-white/50 backdrop-blur-sm shadow-lg
+            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
               ${focusedField === field 
                 ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]' 
                 : fieldErrors[field] 
@@ -285,7 +285,7 @@ export default function PostJobPage() {
               }`}
           >
             {options.map((option: any) => (
-              <option key={option.value} value={option.value} className="bg-black text-white">
+              <option key={option.value} value={option.value} className="bg-black text-[var(--foreground)]">
                 {option.label}
               </option>
             ))}
@@ -298,7 +298,7 @@ export default function PostJobPage() {
             onBlur={() => setFocusedField('')}
             placeholder={placeholder}
             rows={rows}
-            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-white placeholder-white/50 resize-none backdrop-blur-sm shadow-lg
+            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 resize-none backdrop-blur-sm shadow-lg
               ${focusedField === field 
                 ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]' 
                 : fieldErrors[field] 
@@ -314,7 +314,7 @@ export default function PostJobPage() {
             onFocus={() => setFocusedField(field)}
             onBlur={() => setFocusedField('')}
             placeholder={placeholder}
-            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-white placeholder-white/50 backdrop-blur-sm shadow-lg
+            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
               ${focusedField === field 
                 ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]' 
                 : fieldErrors[field] 
@@ -361,12 +361,12 @@ export default function PostJobPage() {
                 <span className="font-medium">Create Your Perfect Job Post</span>
               </motion.div>
               
-              <motion.h1 variants={fadeInUp} className="text-5xl lg:text-6xl font-bold text-white leading-tight">
+              <motion.h1 variants={fadeInUp} className="text-5xl lg:text-6xl font-bold text-[var(--foreground)] leading-tight">
                 Find Your Next
                 <span className="text-[var(--accent)] drop-shadow-lg"> Game Changer</span>
               </motion.h1>
               
-              <motion.p variants={fadeInUp} className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
+              <motion.p variants={fadeInUp} className="text-xl text-[var(--foreground)]/70 max-w-3xl mx-auto leading-relaxed">
                 Craft a compelling job post that attracts top talent from around the world. 
                 Our guided process makes it easy and effective.
               </motion.p>
@@ -396,10 +396,10 @@ export default function PostJobPage() {
                           ${isActive 
                             ? 'bg-[var(--accent)] border-[var(--accent)] text-black shadow-[0_0_30px_rgba(212,175,55,0.5)]' 
                             : isCompleted
-                              ? 'bg-green-500 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]'
+                              ? 'bg-green-500 border-green-500 text-[var(--foreground)] shadow-[0_0_20px_rgba(34,197,94,0.3)]'
                               : isAccessible
-                                ? 'bg-white/10 border-white/30 text-white hover:border-[var(--accent)] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]'
-                                : 'bg-white/5 border-white/20 text-white/50'
+                                ? 'bg-white/10 border-white/30 text-[var(--foreground)] hover:border-[var(--accent)] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]'
+                                : 'bg-white/5 border-white/20 text-[var(--foreground)]/50'
                           }`}
                         >
                           {isCompleted ? (
@@ -410,11 +410,11 @@ export default function PostJobPage() {
                         </div>
                         <div className="text-center">
                           <p className={`font-semibold text-sm transition-colors ${
-                            isActive ? 'text-[var(--accent)]' : isCompleted ? 'text-green-400' : 'text-white/70'
+                            isActive ? 'text-[var(--accent)]' : isCompleted ? 'text-green-400' : 'text-[var(--foreground)]/70'
                           }`}>
                             {step.title}
                           </p>
-                          <p className="text-xs text-white/50 mt-1">{step.description}</p>
+                          <p className="text-xs text-[var(--foreground)]/50 mt-1">{step.description}</p>
                         </div>
                       </motion.button>
                       {index < FORM_STEPS.length - 1 && (
@@ -448,8 +448,8 @@ export default function PostJobPage() {
                           <Briefcase className="h-6 w-6" />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold text-white">Job Basics</h2>
-                          <p className="text-white/60">Let's start with the fundamentals</p>
+                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Job Basics</h2>
+                          <p className="text-[var(--foreground)]/60">Let's start with the fundamentals</p>
                         </div>
                       </div>
 
@@ -535,8 +535,8 @@ export default function PostJobPage() {
                           <DollarSign className="h-6 w-6" />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold text-white">Compensation</h2>
-                          <p className="text-white/60">Define the value you bring</p>
+                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Compensation</h2>
+                          <p className="text-[var(--foreground)]/60">Define the value you bring</p>
                         </div>
                       </div>
 
@@ -609,9 +609,9 @@ export default function PostJobPage() {
                         >
                           <div className="flex items-center gap-3 mb-2">
                             <Zap className="h-5 w-5 text-[var(--accent)]" />
-                            <span className="font-semibold text-white">Pro Tip</span>
+                            <span className="font-semibold text-[var(--foreground)]">Pro Tip</span>
                           </div>
-                          <p className="text-white/80 text-sm">
+                          <p className="text-[var(--foreground)]/80 text-sm">
                             Transparent salary ranges attract 3x more qualified applications. Be competitive and honest about your budget.
                           </p>
                         </motion.div>
@@ -632,8 +632,8 @@ export default function PostJobPage() {
                           <FileText className="h-6 w-6" />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold text-white">Job Details</h2>
-                          <p className="text-white/60">Paint the complete picture</p>
+                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Job Details</h2>
+                          <p className="text-[var(--foreground)]/60">Paint the complete picture</p>
                         </div>
                       </div>
 
@@ -677,9 +677,9 @@ export default function PostJobPage() {
                         >
                           <div className="flex items-center gap-3 mb-2">
                             <Sparkles className="h-5 w-5 text-purple-400" />
-                            <span className="font-semibold text-white">Writing Tip</span>
+                            <span className="font-semibold text-[var(--foreground)]">Writing Tip</span>
                           </div>
-                          <p className="text-white/80 text-sm">
+                          <p className="text-[var(--foreground)]/80 text-sm">
                             Great job descriptions tell a story. Focus on impact, growth opportunities, and what makes working at your company special.
                           </p>
                         </motion.div>
@@ -700,8 +700,8 @@ export default function PostJobPage() {
                           <Eye className="h-6 w-6" />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold text-white">Review & Launch</h2>
-                          <p className="text-white/60">Perfect your job post before going live</p>
+                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Review & Launch</h2>
+                          <p className="text-[var(--foreground)]/60">Perfect your job post before going live</p>
                         </div>
                       </div>
 
@@ -713,14 +713,14 @@ export default function PostJobPage() {
                       >
                         {/* Job Preview */}
                         <div className="bg-gradient-to-r from-white/5 to-transparent p-6 rounded-xl border border-white/10">
-                          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
                             <Eye className="h-5 w-5 text-[var(--accent)]" />
                             Preview
                           </h3>
                           <div className="space-y-4">
                             <div>
                               <h4 className="text-2xl font-bold text-[var(--accent)]">{formData.title || 'Your Job Title'}</h4>
-                              <p className="text-white/70">{formData.company_name} • {formData.location} • {formData.work_type}</p>
+                              <p className="text-[var(--foreground)]/70">{formData.company_name} • {formData.location} • {formData.work_type}</p>
                             </div>
                             
                             <div className="flex items-center gap-4 text-sm">
@@ -740,7 +740,7 @@ export default function PostJobPage() {
                             
                             {formData.description && (
                               <div>
-                                <p className="text-white/80 line-clamp-3">{formData.description}</p>
+                                <p className="text-[var(--foreground)]/80 line-clamp-3">{formData.description}</p>
                               </div>
                             )}
                           </div>
@@ -753,21 +753,21 @@ export default function PostJobPage() {
                             variants={fadeInUp}
                           >
                             <div className="text-2xl font-bold text-[var(--accent)]">~50+</div>
-                            <p className="text-white/60 text-sm">Expected Applications</p>
+                            <p className="text-[var(--foreground)]/60 text-sm">Expected Applications</p>
                           </motion.div>
                           <motion.div 
                             className="bg-gradient-to-r from-green-500/10 to-transparent p-4 rounded-xl border border-green-500/20 text-center"
                             variants={fadeInUp}
                           >
                             <div className="text-2xl font-bold text-green-400">24h</div>
-                            <p className="text-white/60 text-sm">Average Response Time</p>
+                            <p className="text-[var(--foreground)]/60 text-sm">Average Response Time</p>
                           </motion.div>
                           <motion.div 
                             className="bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/20 text-center"
                             variants={fadeInUp}
                           >
                             <div className="text-2xl font-bold text-blue-400">85%</div>
-                            <p className="text-white/60 text-sm">Match Quality Score</p>
+                            <p className="text-[var(--foreground)]/60 text-sm">Match Quality Score</p>
                           </motion.div>
                         </div>
 
@@ -777,9 +777,9 @@ export default function PostJobPage() {
                         >
                           <div className="flex items-center gap-3 mb-2">
                             <Rocket className="h-5 w-5 text-green-400" />
-                            <span className="font-semibold text-white">Ready to Launch!</span>
+                            <span className="font-semibold text-[var(--foreground)]">Ready to Launch!</span>
                           </div>
-                          <p className="text-white/80 text-sm">
+                          <p className="text-[var(--foreground)]/80 text-sm">
                             Your job post looks great! Once you submit, it will be reviewed and published within 2-4 hours.
                           </p>
                         </motion.div>

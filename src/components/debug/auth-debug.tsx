@@ -10,7 +10,7 @@ export function AuthDebug() {
   }
 
   return (
-    <div className="fixed top-0 right-0 bg-black/80 text-white p-4 text-xs z-50 max-w-xs">
+    <div className="fixed top-0 right-0 bg-black/80 text-black p-4 text-xs z-50 max-w-xs">
       <h3 className="font-bold mb-2">Auth Debug</h3>
       <p>Authenticated: {isAuthenticated ? 'Yes' : 'No'}</p>
       <p>User Role: {user?.role || 'None'}</p>

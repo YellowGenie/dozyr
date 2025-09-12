@@ -11,7 +11,7 @@ const buttonVariants = cva(
         default:
           "btn-primary",
         destructive:
-          "bg-red-500 text-white depth-2 hover:bg-red-500/90",
+          "bg-red-500 text-black depth-2 hover:bg-red-500/90",
         outline:
           "btn-secondary",
         secondary:

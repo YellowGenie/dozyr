@@ -289,7 +289,7 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
     <div className="max-w-6xl mx-auto bg-gray-900 min-h-screen">
       <div className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700">
         <div className="flex items-center justify-between p-6">
-          <h1 className="text-2xl font-bold text-white">Edit Profile</h1>
+          <h1 className="text-2xl font-bold text-black">Edit Profile</h1>
           <div className="flex items-center gap-4">
             {isDirty && (
               <div className="flex items-center gap-2 text-yellow-400 text-sm">
@@ -345,8 +345,8 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-purple-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      ? 'bg-purple-600 text-black'
+                      : 'text-gray-300 hover:bg-gray-700 hover:text-black'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -687,9 +687,9 @@ export function ProfileEditor({ profile, onSave, onCancel }: ProfileEditorProps)
                       <div className="flex items-start gap-3">
                         <div className="p-2 bg-blue-500 rounded-lg">
                           {privacy.is_public ? (
-                            <Unlock className="h-5 w-5 text-white" />
+                            <Unlock className="h-5 w-5 text-black" />
                           ) : (
-                            <Lock className="h-5 w-5 text-white" />
+                            <Lock className="h-5 w-5 text-black" />
                           )}
                         </div>
                         <div>

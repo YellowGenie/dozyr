@@ -277,7 +277,7 @@ export default function SearchableTalentPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-lg text-white truncate">
+                    <h3 className="font-bold text-lg text-black truncate">
                       {talent.user?.first_name} {talent.user?.last_name}
                     </h3>
                     <p className="text-[var(--accent)] font-medium text-sm truncate">
@@ -290,7 +290,7 @@ export default function SearchableTalentPage() {
                     {talent.rating > 0 && (
                       <div className="flex items-center gap-1 mb-1">
                         <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                        <span className="text-sm text-white font-medium">{talent.rating.toFixed(1)}</span>
+                        <span className="text-sm text-black font-medium">{talent.rating.toFixed(1)}</span>
                       </div>
                     )}
                     {talent.hourly_rate && (
@@ -307,7 +307,7 @@ export default function SearchableTalentPage() {
           <CardContent className="space-y-4">
             {/* Bio */}
             {talent.bio && (
-              <p className="text-white/70 text-sm line-clamp-2 leading-relaxed">
+              <p className="text-black/70 text-sm line-clamp-2 leading-relaxed">
                 {talent.bio}
               </p>
             )}
@@ -327,7 +327,7 @@ export default function SearchableTalentPage() {
                 {talent.skills.length > 4 && (
                   <Badge 
                     variant="secondary" 
-                    className="bg-white/10 text-white/60 text-xs"
+                    className="bg-white/10 text-black/60 text-xs"
                   >
                     +{talent.skills.length - 4} more
                   </Badge>
@@ -337,7 +337,7 @@ export default function SearchableTalentPage() {
             
             {/* Stats */}
             <div className="flex items-center justify-between pt-4 border-t border-white/10">
-              <div className="flex items-center gap-4 text-xs text-white/50">
+              <div className="flex items-center gap-4 text-xs text-black/50">
                 {talent.jobs_completed > 0 && (
                   <div className="flex items-center gap-1">
                     <Award className="h-3 w-3" />
@@ -399,7 +399,7 @@ export default function SearchableTalentPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto"></div>
-          <p className="text-white/60">Finding amazing talent for you...</p>
+          <p className="text-black/60">Finding amazing talent for you...</p>
         </div>
       </div>
     )
@@ -412,10 +412,10 @@ export default function SearchableTalentPage() {
         {...fadeInUp}
         className="text-center space-y-4 py-12"
       >
-        <h1 className="text-4xl lg:text-5xl font-bold text-white">
+        <h1 className="text-4xl lg:text-5xl font-bold text-black">
           Find <span className="text-[var(--accent)] drop-shadow-lg">Exceptional</span> Talent
         </h1>
-        <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xl text-black/70 max-w-2xl mx-auto leading-relaxed">
           Connect with skilled professionals who can bring your vision to life
         </p>
       </motion.div>
@@ -427,13 +427,13 @@ export default function SearchableTalentPage() {
             <form onSubmit={handleSearch} className="space-y-6">
               {/* Main Search */}
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40 h-5 w-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black/40 h-5 w-5" />
                 <Input
                   type="text"
                   placeholder="Search by name, skills, or expertise..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 text-lg glass-card border-white/20 focus:border-[var(--accent)] text-white placeholder:text-white/40"
+                  className="pl-12 h-14 text-lg glass-card border-white/20 focus:border-[var(--accent)] text-black placeholder:text-black/40"
                 />
               </div>
 
@@ -449,7 +449,7 @@ export default function SearchableTalentPage() {
                   {showFilters ? 'Hide Filters' : 'Show Filters'}
                 </Button>
 
-                <div className="text-sm text-white/60">
+                <div className="text-sm text-black/60">
                   {filteredTalents.length} talent{filteredTalents.length !== 1 ? 's' : ''} found
                 </div>
               </div>
@@ -466,7 +466,7 @@ export default function SearchableTalentPage() {
                   >
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Skills</label>
+                        <label className="block text-sm font-medium text-black mb-2">Skills</label>
                         <Input
                           placeholder="e.g., React, Design"
                           value={filters.skills}
@@ -476,7 +476,7 @@ export default function SearchableTalentPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Location</label>
+                        <label className="block text-sm font-medium text-black mb-2">Location</label>
                         <Input
                           placeholder="e.g., New York, Remote"
                           value={filters.location}
@@ -486,7 +486,7 @@ export default function SearchableTalentPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Min Rate ($/hr)</label>
+                        <label className="block text-sm font-medium text-black mb-2">Min Rate ($/hr)</label>
                         <Input
                           type="number"
                           placeholder="25"
@@ -497,7 +497,7 @@ export default function SearchableTalentPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Max Rate ($/hr)</label>
+                        <label className="block text-sm font-medium text-black mb-2">Max Rate ($/hr)</label>
                         <Input
                           type="number"
                           placeholder="100"
@@ -510,11 +510,11 @@ export default function SearchableTalentPage() {
 
                     <div className="flex flex-wrap gap-4 items-end">
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Availability</label>
+                        <label className="block text-sm font-medium text-black mb-2">Availability</label>
                         <select
                           value={filters.availability}
                           onChange={(e) => handleFilterChange('availability', e.target.value)}
-                          className="h-10 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-white"
+                          className="h-10 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-black"
                         >
                           <option value="">All</option>
                           <option value="available">Available</option>
@@ -524,11 +524,11 @@ export default function SearchableTalentPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Sort by</label>
+                        <label className="block text-sm font-medium text-black mb-2">Sort by</label>
                         <select
                           value={filters.sort}
                           onChange={(e) => handleFilterChange('sort', e.target.value)}
-                          className="h-10 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-white"
+                          className="h-10 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-black"
                         >
                           <option value="featured">Featured</option>
                           <option value="rating">Highest Rated</option>
@@ -565,8 +565,8 @@ export default function SearchableTalentPage() {
                 <Users className="h-12 w-12 text-[var(--accent)]" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white mb-2">No talent found</h3>
-                <p className="text-white/60 mb-6">
+                <h3 className="text-2xl font-bold text-black mb-2">No talent found</h3>
+                <p className="text-black/60 mb-6">
                   Try adjusting your search criteria or removing some filters
                 </p>
                 <Button onClick={clearFilters} className="btn-primary">
@@ -613,7 +613,7 @@ export default function SearchableTalentPage() {
               
               {totalPages > MAX_PAGE_BUTTONS && currentPage < totalPages - 2 && (
                 <>
-                  <span className="text-white/40">...</span>
+                  <span className="text-black/40">...</span>
                   <PaginationButton page={totalPages} />
                 </>
               )}

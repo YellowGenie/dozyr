@@ -334,10 +334,10 @@ export default function ProfilePage() {
           <motion.div {...fadeInUp}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">
+                <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">
                   {user?.role === 'talent' ? 'Talent Profile' : 'Profile Settings'}
                 </h1>
-                <p className="text-white/70">
+                <p className="text-[var(--foreground)]/70">
                   {user?.role === 'talent' 
                     ? 'Manage your professional profile and showcase your skills'
                     : 'Manage your account information and preferences'
@@ -354,7 +354,7 @@ export default function ProfilePage() {
                           style={{ width: `${analytics.profile_completion}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm text-white/70">
+                      <span className="text-sm text-[var(--foreground)]/70">
                         {analytics.profile_completion}% complete
                       </span>
                     </div>
@@ -392,7 +392,7 @@ export default function ProfilePage() {
             <motion.div {...fadeInUp}>
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                     <Eye className="h-5 w-5" />
                     Profile Analytics
                   </CardTitle>
@@ -401,19 +401,19 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center p-4 rounded-lg bg-white/5">
                       <div className="text-2xl font-bold text-[var(--accent)]">{analytics.views}</div>
-                      <div className="text-sm text-white/70">Profile Views</div>
+                      <div className="text-sm text-[var(--foreground)]/70">Profile Views</div>
                     </div>
                     <div className="text-center p-4 rounded-lg bg-white/5">
                       <div className="text-2xl font-bold text-blue-400">{analytics.likes}</div>
-                      <div className="text-sm text-white/70">Likes</div>
+                      <div className="text-sm text-[var(--foreground)]/70">Likes</div>
                     </div>
                     <div className="text-center p-4 rounded-lg bg-white/5">
                       <div className="text-2xl font-bold text-green-400">{analytics.contact_requests}</div>
-                      <div className="text-sm text-white/70">Contact Requests</div>
+                      <div className="text-sm text-[var(--foreground)]/70">Contact Requests</div>
                     </div>
                     <div className="text-center p-4 rounded-lg bg-white/5">
                       <div className="text-2xl font-bold text-purple-400">{analytics.profile_completion}%</div>
-                      <div className="text-sm text-white/70">Completion</div>
+                      <div className="text-sm text-[var(--foreground)]/70">Completion</div>
                     </div>
                   </div>
                 </CardContent>
@@ -438,7 +438,7 @@ export default function ProfilePage() {
             <motion.div {...fadeInUp}>
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white">Profile Picture</CardTitle>
+                  <CardTitle className="text-[var(--foreground)]">Profile Picture</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ProfileImageUpload
@@ -454,7 +454,7 @@ export default function ProfilePage() {
                   {user?.role === 'talent' && !isEditing && (
                     <div className="mt-6 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-white/70">Availability</span>
+                        <span className="text-sm text-[var(--foreground)]/70">Availability</span>
                         <Badge 
                           variant="outline" 
                           className={`${formData.availability === 'available' ? 'border-green-500 text-green-400' : 
@@ -467,14 +467,14 @@ export default function ProfilePage() {
                       
                       {formData.hourly_rate && (
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-white/70">Hourly Rate</span>
+                          <span className="text-sm text-[var(--foreground)]/70">Hourly Rate</span>
                           <span className="text-[var(--accent)] font-medium">${formData.hourly_rate}/hr</span>
                         </div>
                       )}
                       
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-white/70">Experience</span>
-                        <span className="text-white font-medium">{formData.years_experience} years</span>
+                        <span className="text-sm text-[var(--foreground)]/70">Experience</span>
+                        <span className="text-[var(--foreground)] font-medium">{formData.years_experience} years</span>
                       </div>
                     </div>
                   )}
@@ -487,7 +487,7 @@ export default function ProfilePage() {
               <Card className="glass-card border-white/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                       <User className="h-5 w-5" />
                       {isEditing ? 'Edit Profile' : 'Profile Information'}
                     </CardTitle>
@@ -523,7 +523,7 @@ export default function ProfilePage() {
                   {/* Basic Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="text-[var(--foreground)] flex items-center gap-2">
                         <User className="h-4 w-4" />
                         First Name
                       </Label>
@@ -532,17 +532,17 @@ export default function ProfilePage() {
                           value={formData.first_name}
                           onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                           placeholder="Enter first name"
-                          className="bg-white/5 border-white/20 text-white"
+                          className="bg-white/5 border-white/20 text-[var(--foreground)]"
                         />
                       ) : (
                         <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                          <span className="text-white">{user?.first_name || 'Not set'}</span>
+                          <span className="text-[var(--foreground)]">{user?.first_name || 'Not set'}</span>
                         </div>
                       )}
                     </div>
                     
                     <div className="space-y-2">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="text-[var(--foreground)] flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Last Name
                       </Label>
@@ -551,18 +551,18 @@ export default function ProfilePage() {
                           value={formData.last_name}
                           onChange={(e) => setFormData({...formData, last_name: e.target.value})}
                           placeholder="Enter last name"
-                          className="bg-white/5 border-white/20 text-white"
+                          className="bg-white/5 border-white/20 text-[var(--foreground)]"
                         />
                       ) : (
                         <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                          <span className="text-white">{user?.last_name || 'Not set'}</span>
+                          <span className="text-[var(--foreground)]">{user?.last_name || 'Not set'}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white flex items-center gap-2">
+                    <Label className="text-[var(--foreground)] flex items-center gap-2">
                       <Mail className="h-4 w-4" />
                       Email Address
                       {user?.email_verified && (
@@ -575,11 +575,11 @@ export default function ProfilePage() {
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         placeholder="Enter email address"
-                        className="bg-white/5 border-white/20 text-white"
+                        className="bg-white/5 border-white/20 text-[var(--foreground)]"
                       />
                     ) : (
                       <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                        <span className="text-white">{user?.email || 'Not set'}</span>
+                        <span className="text-[var(--foreground)]">{user?.email || 'Not set'}</span>
                       </div>
                     )}
                   </div>
@@ -589,7 +589,7 @@ export default function ProfilePage() {
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-white flex items-center gap-2">
+                          <Label className="text-[var(--foreground)] flex items-center gap-2">
                             <Briefcase className="h-4 w-4" />
                             Professional Title
                           </Label>
@@ -598,17 +598,17 @@ export default function ProfilePage() {
                               value={formData.title}
                               onChange={(e) => setFormData({...formData, title: e.target.value})}
                               placeholder="e.g., Senior React Developer"
-                              className="bg-white/5 border-white/20 text-white"
+                              className="bg-white/5 border-white/20 text-[var(--foreground)]"
                             />
                           ) : (
                             <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                              <span className="text-white">{formData.title || 'Not set'}</span>
+                              <span className="text-[var(--foreground)]">{formData.title || 'Not set'}</span>
                             </div>
                           )}
                         </div>
                         
                         <div className="space-y-2">
-                          <Label className="text-white flex items-center gap-2">
+                          <Label className="text-[var(--foreground)] flex items-center gap-2">
                             <DollarSign className="h-4 w-4" />
                             Hourly Rate (USD)
                           </Label>
@@ -618,11 +618,11 @@ export default function ProfilePage() {
                               value={formData.hourly_rate}
                               onChange={(e) => setFormData({...formData, hourly_rate: e.target.value})}
                               placeholder="50"
-                              className="bg-white/5 border-white/20 text-white"
+                              className="bg-white/5 border-white/20 text-[var(--foreground)]"
                             />
                           ) : (
                             <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                              <span className="text-white">
+                              <span className="text-[var(--foreground)]">
                                 {formData.hourly_rate ? `$${formData.hourly_rate}/hr` : 'Not set'}
                               </span>
                             </div>
@@ -632,7 +632,7 @@ export default function ProfilePage() {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-white flex items-center gap-2">
+                          <Label className="text-[var(--foreground)] flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
                             Location
                           </Label>
@@ -641,23 +641,23 @@ export default function ProfilePage() {
                               value={formData.location}
                               onChange={(e) => setFormData({...formData, location: e.target.value})}
                               placeholder="New York, NY"
-                              className="bg-white/5 border-white/20 text-white"
+                              className="bg-white/5 border-white/20 text-[var(--foreground)]"
                             />
                           ) : (
                             <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                              <span className="text-white">{formData.location || 'Not set'}</span>
+                              <span className="text-[var(--foreground)]">{formData.location || 'Not set'}</span>
                             </div>
                           )}
                         </div>
                         
                         <div className="space-y-2">
-                          <Label className="text-white flex items-center gap-2">
+                          <Label className="text-[var(--foreground)] flex items-center gap-2">
                             <Clock className="h-4 w-4" />
                             Availability
                           </Label>
                           {isEditing ? (
                             <Select value={formData.availability} onValueChange={(value) => setFormData({...formData, availability: value})}>
-                              <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                              <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)]">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -682,7 +682,7 @@ export default function ProfilePage() {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label className="text-white flex items-center gap-2">
+                        <Label className="text-[var(--foreground)] flex items-center gap-2">
                           <User className="h-4 w-4" />
                           Bio
                         </Label>
@@ -691,12 +691,12 @@ export default function ProfilePage() {
                             value={formData.bio}
                             onChange={(e) => setFormData({...formData, bio: e.target.value})}
                             placeholder="Tell us about yourself, your experience, and what you're passionate about..."
-                            className="bg-white/5 border-white/20 text-white min-h-[120px]"
+                            className="bg-white/5 border-white/20 text-[var(--foreground)] min-h-[120px]"
                             rows={4}
                           />
                         ) : (
                           <div className="p-3 bg-white/5 border border-white/10 rounded-lg min-h-[120px]">
-                            <span className="text-white whitespace-pre-wrap">
+                            <span className="text-[var(--foreground)] whitespace-pre-wrap">
                               {formData.bio || 'No bio added yet'}
                             </span>
                           </div>
@@ -708,7 +708,7 @@ export default function ProfilePage() {
                   {/* Basic Contact Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="text-[var(--foreground)] flex items-center gap-2">
                         <Phone className="h-4 w-4" />
                         Phone Number
                       </Label>
@@ -717,17 +717,17 @@ export default function ProfilePage() {
                           value={formData.phone}
                           onChange={(e) => setFormData({...formData, phone: e.target.value})}
                           placeholder="+1 (555) 123-4567"
-                          className="bg-white/5 border-white/20 text-white"
+                          className="bg-white/5 border-white/20 text-[var(--foreground)]"
                         />
                       ) : (
                         <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                          <span className="text-white">{formData.phone || 'Not set'}</span>
+                          <span className="text-[var(--foreground)]">{formData.phone || 'Not set'}</span>
                         </div>
                       )}
                     </div>
                     
                     <div className="space-y-2">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="text-[var(--foreground)] flex items-center gap-2">
                         <Globe className="h-4 w-4" />
                         Website
                       </Label>
@@ -736,7 +736,7 @@ export default function ProfilePage() {
                           value={formData.website}
                           onChange={(e) => setFormData({...formData, website: e.target.value})}
                           placeholder="https://yourwebsite.com"
-                          className="bg-white/5 border-white/20 text-white"
+                          className="bg-white/5 border-white/20 text-[var(--foreground)]"
                         />
                       ) : (
                         <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
@@ -746,7 +746,7 @@ export default function ProfilePage() {
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : (
-                            <span className="text-white">Not set</span>
+                            <span className="text-[var(--foreground)]">Not set</span>
                           )}
                         </div>
                       )}
@@ -757,7 +757,7 @@ export default function ProfilePage() {
                   <div className="pt-4 border-t border-white/10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-white flex items-center gap-2">
+                        <Label className="text-[var(--foreground)] flex items-center gap-2">
                           <User className="h-4 w-4" />
                           Role
                         </Label>
@@ -769,12 +769,12 @@ export default function ProfilePage() {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label className="text-white flex items-center gap-2">
+                        <Label className="text-[var(--foreground)] flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
                           Member Since
                         </Label>
                         <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                          <span className="text-white">
+                          <span className="text-[var(--foreground)]">
                             {user?.created_at 
                               ? new Date(user.created_at).toLocaleDateString()
                               : 'Unknown'
@@ -794,7 +794,7 @@ export default function ProfilePage() {
             <motion.div {...fadeInUp} className="lg:col-span-3">
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                     <Award className="h-5 w-5" />
                     Skills & Expertise
                   </CardTitle>
@@ -808,8 +808,8 @@ export default function ProfilePage() {
                         className="group flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/20 rounded-lg hover:border-[var(--accent)]/50 transition-colors"
                       >
                         <div className={`w-2 h-2 rounded-full ${getProficiencyColor(skill.proficiency)}`}></div>
-                        <span className="text-white text-sm">{skill.name}</span>
-                        <span className="text-xs text-white/50 capitalize">({skill.proficiency})</span>
+                        <span className="text-[var(--foreground)] text-sm">{skill.name}</span>
+                        <span className="text-xs text-[var(--foreground)]/50 capitalize">({skill.proficiency})</span>
                         {isEditing && (
                           <Button
                             size="sm"
@@ -824,7 +824,7 @@ export default function ProfilePage() {
                     ))}
                     
                     {skills.length === 0 && (
-                      <p className="text-white/50 text-sm italic">No skills added yet</p>
+                      <p className="text-[var(--foreground)]/50 text-sm italic">No skills added yet</p>
                     )}
                   </div>
                   
@@ -835,10 +835,10 @@ export default function ProfilePage() {
                         value={newSkill.name}
                         onChange={(e) => setNewSkill({...newSkill, name: e.target.value})}
                         placeholder="Skill name (e.g., React, Python)"
-                        className="bg-white/5 border-white/20 text-white"
+                        className="bg-white/5 border-white/20 text-[var(--foreground)]"
                       />
                       <Select value={newSkill.proficiency} onValueChange={(value) => setNewSkill({...newSkill, proficiency: value})}>
-                        <SelectTrigger className="bg-white/5 border-white/20 text-white w-40">
+                        <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)] w-40">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -866,7 +866,7 @@ export default function ProfilePage() {
             <motion.div {...fadeInUp} className="lg:col-span-3">
               <Card className="glass-card border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                     <LinkIcon className="h-5 w-5" />
                     Social Links & Portfolio
                   </CardTitle>
@@ -880,7 +880,7 @@ export default function ProfilePage() {
                         className="group flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/20 rounded-lg hover:border-[var(--accent)]/50 transition-colors"
                       >
                         {getSocialIcon(link.platform)}
-                        <span className="text-white text-sm capitalize">{link.platform}</span>
+                        <span className="text-[var(--foreground)] text-sm capitalize">{link.platform}</span>
                         <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:underline text-sm">
                           View
                         </a>
@@ -898,7 +898,7 @@ export default function ProfilePage() {
                     ))}
                     
                     {socialLinks.length === 0 && (
-                      <p className="text-white/50 text-sm italic">No social links added yet</p>
+                      <p className="text-[var(--foreground)]/50 text-sm italic">No social links added yet</p>
                     )}
                   </div>
                   
@@ -906,7 +906,7 @@ export default function ProfilePage() {
                   {isEditing && (
                     <div className="flex gap-3">
                       <Select value={newSocialLink.platform} onValueChange={(value) => setNewSocialLink({...newSocialLink, platform: value})}>
-                        <SelectTrigger className="bg-white/5 border-white/20 text-white w-40">
+                        <SelectTrigger className="bg-white/5 border-white/20 text-[var(--foreground)] w-40">
                           <SelectValue placeholder="Platform" />
                         </SelectTrigger>
                         <SelectContent>
@@ -921,7 +921,7 @@ export default function ProfilePage() {
                         value={newSocialLink.url}
                         onChange={(e) => setNewSocialLink({...newSocialLink, url: e.target.value})}
                         placeholder="https://github.com/username"
-                        className="bg-white/5 border-white/20 text-white"
+                        className="bg-white/5 border-white/20 text-[var(--foreground)]"
                       />
                       <Button 
                         onClick={handleAddSocialLink}
@@ -940,7 +940,7 @@ export default function ProfilePage() {
           <motion.div {...fadeInUp} className="lg:col-span-3">
             <Card className="glass-card border-white/20">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-[var(--foreground)] flex items-center gap-2">
                   <Settings className="h-5 w-5" />
                   Quick Actions
                 </CardTitle>
@@ -948,18 +948,18 @@ export default function ProfilePage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-white flex items-center gap-2">
+                    <h3 className="font-semibold text-[var(--foreground)] flex items-center gap-2">
                       <Shield className="h-4 w-4" />
                       Security
                     </h3>
                     <Link href="/settings">
-                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-white hover:text-[var(--accent)]">
+                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-[var(--foreground)] hover:text-[var(--accent)]">
                         <Shield className="h-4 w-4 mr-2" />
                         Change Password
                       </Button>
                     </Link>
                     <Link href="/settings">
-                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-white hover:text-[var(--accent)]">
+                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-[var(--foreground)] hover:text-[var(--accent)]">
                         <Shield className="h-4 w-4 mr-2" />
                         Two-Factor Authentication
                       </Button>
@@ -967,18 +967,18 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-white flex items-center gap-2">
+                    <h3 className="font-semibold text-[var(--foreground)] flex items-center gap-2">
                       <Settings className="h-4 w-4" />
                       Preferences
                     </h3>
                     <Link href="/settings/notifications">
-                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-white hover:text-[var(--accent)]">
+                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-[var(--foreground)] hover:text-[var(--accent)]">
                         <Mail className="h-4 w-4 mr-2" />
                         Notifications
                       </Button>
                     </Link>
                     <Link href="/settings">
-                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-white hover:text-[var(--accent)]">
+                      <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-[var(--foreground)] hover:text-[var(--accent)]">
                         <Eye className="h-4 w-4 mr-2" />
                         Privacy Settings
                       </Button>
@@ -986,16 +986,16 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-white flex items-center gap-2">
+                    <h3 className="font-semibold text-[var(--foreground)] flex items-center gap-2">
                       <Download className="h-4 w-4" />
                       Data
                     </h3>
-                    <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-white hover:text-[var(--accent)]">
+                    <Button variant="outline" className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-[var(--foreground)] hover:text-[var(--accent)]">
                       <Download className="h-4 w-4 mr-2" />
                       Export Data
                     </Button>
                     {user?.role === 'talent' && (
-                      <Button variant="outline" onClick={generateShareLink} className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-white hover:text-[var(--accent)]">
+                      <Button variant="outline" onClick={generateShareLink} className="w-full justify-start border-white/20 hover:border-[var(--accent)]/50 text-[var(--foreground)] hover:text-[var(--accent)]">
                         <Share2 className="h-4 w-4 mr-2" />
                         Share Profile
                       </Button>

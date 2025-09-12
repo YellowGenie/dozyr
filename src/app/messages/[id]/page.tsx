@@ -303,7 +303,7 @@ export default function ConversationPage() {
           <div className="max-w-4xl mx-auto">
             <Card>
               <CardContent className="p-12 text-center">
-                <h3 className="text-xl font-semibold text-white mb-2">Conversation not found</h3>
+                <h3 className="text-xl font-semibold text-black mb-2">Conversation not found</h3>
                 <p className="text-dozyr-light-gray mb-6">
                   The conversation you're looking for doesn't exist.
                 </p>
@@ -344,7 +344,7 @@ export default function ConversationPage() {
                         <User className="h-5 w-5 text-dozyr-black" />
                       </div>
                       <div>
-                        <h2 className="font-semibold text-white">
+                        <h2 className="font-semibold text-black">
                           {conversation.other_user?.first_name} {conversation.other_user?.last_name}
                         </h2>
                         <div className="flex items-center gap-2 text-sm">
@@ -416,7 +416,7 @@ export default function ConversationPage() {
                               <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                                 isFromCurrentUser
                                   ? 'bg-dozyr-gold text-dozyr-black'
-                                  : 'bg-dozyr-medium-gray text-white'
+                                  : 'bg-dozyr-medium-gray text-black'
                               }`}>
                                 <p className="text-sm">{message.message}</p>
                                 <div className={`flex items-center gap-1 mt-1 text-xs ${

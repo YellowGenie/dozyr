@@ -153,7 +153,7 @@ export default function MessagesPage() {
           <motion.div {...fadeInUp}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Messages</h1>
+                <h1 className="text-3xl font-bold text-black mb-2">Messages</h1>
                 <p className="text-dozyr-light-gray">
                   {getTotalUnreadCount() > 0 ? (
                     <span>
@@ -202,7 +202,7 @@ export default function MessagesPage() {
                 {filteredConversations.length === 0 ? (
                   <div className="p-12 text-center">
                     <MessageSquare className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <h3 className="text-xl font-semibold text-black mb-2">
                       {searchQuery ? 'No conversations found' : 'No messages yet'}
                     </h3>
                     <p className="text-dozyr-light-gray mb-6">
@@ -235,7 +235,7 @@ export default function MessagesPage() {
                               </div>
                               {conversation.unread_count > 0 && (
                                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                                  <span className="text-xs text-white font-bold">
+                                  <span className="text-xs text-black font-bold">
                                     {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
                                   </span>
                                 </div>
@@ -245,7 +245,7 @@ export default function MessagesPage() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between mb-1">
                                 <div>
-                                  <h3 className="font-semibold text-white">
+                                  <h3 className="font-semibold text-black">
                                     {conversation.other_user?.first_name} {conversation.other_user?.last_name}
                                   </h3>
                                   <p className="text-sm text-dozyr-gold">
@@ -274,7 +274,7 @@ export default function MessagesPage() {
                               
                               <p className={`text-sm line-clamp-2 ${
                                 conversation.unread_count > 0 
-                                  ? 'text-white font-medium' 
+                                  ? 'text-black font-medium' 
                                   : 'text-dozyr-light-gray'
                               }`}>
                                 {conversation.last_message?.message || 'No messages yet'}

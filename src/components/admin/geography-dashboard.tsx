@@ -94,14 +94,14 @@ export function GeographyDashboard() {
       {/* Overview */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-bold text-white mb-1">Global User Distribution</h3>
+          <h3 className="text-xl font-bold text-[var(--foreground)] mb-1">Global User Distribution</h3>
           <p className="text-dozyr-light-gray">
             Users from {data.total_countries} countries worldwide
           </p>
         </div>
         <div className="text-right">
           <p className="text-sm text-dozyr-light-gray">Last updated</p>
-          <p className="text-sm text-white">{formatRelativeTime(data.generated_at)}</p>
+          <p className="text-sm text-[var(--foreground)]">{formatRelativeTime(data.generated_at)}</p>
         </div>
       </div>
 
@@ -133,14 +133,14 @@ export function GeographyDashboard() {
                         <span className="text-blue-400 text-xs font-bold">#{index + 1}</span>
                       </div>
                       <div>
-                        <p className="text-white font-medium">{country.country}</p>
+                        <p className="text-[var(--foreground)] font-medium">{country.country}</p>
                         <p className="text-dozyr-light-gray text-xs">
                           {country.talent_count} talents, {country.manager_count} managers
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-white font-semibold">{country.total_users}</p>
+                      <p className="text-[var(--foreground)] font-semibold">{country.total_users}</p>
                       <p className="text-dozyr-light-gray text-xs">{percentage.toFixed(1)}%</p>
                       <div className="w-16 bg-dozyr-medium-gray rounded-full h-1 mt-1">
                         <div 
@@ -188,12 +188,12 @@ export function GeographyDashboard() {
                         <MapPin className="h-4 w-4 text-green-400" />
                       </div>
                       <div>
-                        <p className="text-white font-medium">{city.city}</p>
+                        <p className="text-[var(--foreground)] font-medium">{city.city}</p>
                         <p className="text-dozyr-light-gray text-xs">{city.country}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-white font-semibold">{city.user_count}</p>
+                      <p className="text-[var(--foreground)] font-semibold">{city.user_count}</p>
                       <p className="text-dozyr-light-gray text-xs">
                         {city.active_weekly} active this week
                       </p>

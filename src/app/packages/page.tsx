@@ -153,7 +153,7 @@ export default function PackagesPage() {
               >
                 ← Back to Packages
               </Button>
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-black">
                 Purchase {selectedPackage.name}
               </h1>
             </motion.div>
@@ -176,7 +176,7 @@ export default function PackagesPage() {
           {/* Header */}
           <motion.div {...fadeInUp}>
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+              <h1 className="text-3xl font-bold text-black mb-2 flex items-center gap-2">
                 <Package className="w-8 h-8 text-dozyr-gold" />
                 Job Posting Credits
               </h1>
@@ -192,16 +192,16 @@ export default function PackagesPage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Your Current Credits</h3>
+                    <h3 className="text-lg font-semibold text-black mb-2">Your Current Credits</h3>
                     <div className="flex items-center gap-6">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                        <span className="text-white font-medium">{totalCredits.post_credits}</span>
+                        <span className="text-black font-medium">{totalCredits.post_credits}</span>
                         <span className="text-dozyr-light-gray">Regular Posts</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 bg-dozyr-gold rounded-full"></div>
-                        <span className="text-white font-medium">{totalCredits.featured_credits}</span>
+                        <span className="text-black font-medium">{totalCredits.featured_credits}</span>
                         <span className="text-dozyr-light-gray">Featured Posts</span>
                       </div>
                     </div>
@@ -242,7 +242,7 @@ export default function PackagesPage() {
                             {discount.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-white font-medium mb-1">
+                        <p className="text-sm text-black font-medium mb-1">
                           {discount.discount_type === 'percentage' && `${discount.discount_value}% off`}
                           {discount.discount_type === 'fixed_amount' && `$${discount.discount_value} off`}
                           {discount.discount_type === 'free_posts' && `+${discount.discount_value} free posts`}
@@ -266,7 +266,7 @@ export default function PackagesPage() {
             className="space-y-6"
           >
             <motion.div {...fadeInUp}>
-              <h2 className="text-2xl font-semibold text-white mb-6">Available Packages</h2>
+              <h2 className="text-2xl font-semibold text-black mb-6">Available Packages</h2>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -284,7 +284,7 @@ export default function PackagesPage() {
                     
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl text-white">{pkg.name}</CardTitle>
+                        <CardTitle className="text-xl text-black">{pkg.name}</CardTitle>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-dozyr-gold">
                             ${pkg.price.toFixed(2)}
@@ -304,7 +304,7 @@ export default function PackagesPage() {
                               <Clock className="w-4 h-4 text-blue-400 flex-shrink-0" /> : 
                               <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
                             }
-                            <span className="text-white">{feature}</span>
+                            <span className="text-black">{feature}</span>
                           </div>
                         ))}
                       </div>
@@ -317,7 +317,7 @@ export default function PackagesPage() {
                         className={`w-full ${
                           pkg.is_popular 
                             ? 'bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/90' 
-                            : 'bg-dozyr-medium-gray text-white hover:bg-dozyr-light-gray'
+                            : 'bg-dozyr-medium-gray text-black hover:bg-dozyr-light-gray'
                         }`}
                       >
                         <CreditCard className="w-4 h-4 mr-2" />
@@ -333,7 +333,7 @@ export default function PackagesPage() {
           {/* Active Packages */}
           {userPackages.length > 0 && (
             <motion.div {...fadeInUp} className="space-y-4">
-              <h2 className="text-2xl font-semibold text-white">Your Active Packages</h2>
+              <h2 className="text-2xl font-semibold text-black">Your Active Packages</h2>
               <div className="grid gap-4">
                 {userPackages.map((userPkg) => (
                   <Card key={userPkg.id}>
@@ -344,7 +344,7 @@ export default function PackagesPage() {
                             <Package className="w-6 h-6 text-dozyr-gold" />
                           </div>
                           <div>
-                            <h4 className="font-semibold text-white">{userPkg.package_name}</h4>
+                            <h4 className="font-semibold text-black">{userPkg.package_name}</h4>
                             <p className="text-sm text-dozyr-light-gray">
                               {userPkg.credits_remaining} regular, {userPkg.featured_credits_remaining} featured credits remaining
                             </p>

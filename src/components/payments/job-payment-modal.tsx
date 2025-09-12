@@ -132,7 +132,7 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Briefcase className="h-4 w-4 text-dozyr-gold" />
-            <span className="text-sm font-medium text-white">Job Posting Fee</span>
+            <span className="text-sm font-medium text-black">Job Posting Fee</span>
           </div>
           <div className="flex items-center gap-1 text-dozyr-gold font-bold">
             <DollarSign className="h-4 w-4" />
@@ -160,7 +160,7 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-white mb-3">
+          <label className="block text-sm font-medium text-black mb-3">
             Card Information
           </label>
           <div className="bg-dozyr-black border border-dozyr-medium-gray rounded-lg p-4">

@@ -108,7 +108,7 @@ export default function JobProposalsPage() {
             <Card>
               <CardContent className="p-12 text-center">
                 <Briefcase className="h-12 w-12 text-red-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Error Loading Proposals</h3>
+                <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">Error Loading Proposals</h3>
                 <p className="text-dozyr-light-gray mb-6">{error}</p>
                 <Link href="/my-jobs">
                   <Button className="bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/90">
@@ -132,7 +132,7 @@ export default function JobProposalsPage() {
             <Card>
               <CardContent className="p-12 text-center">
                 <Briefcase className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Job Not Found</h3>
+                <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">Job Not Found</h3>
                 <p className="text-dozyr-light-gray mb-6">
                   The requested job could not be found.
                 </p>
@@ -164,7 +164,7 @@ export default function JobProposalsPage() {
                 </Button>
               </Link>
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-white mb-2">Job Proposals</h1>
+                <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">Job Proposals</h1>
                 <p className="text-dozyr-light-gray">
                   Manage proposals for "{job.title}"
                 </p>

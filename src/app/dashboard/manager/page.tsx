@@ -122,7 +122,7 @@ export default function ManagerDashboardPage() {
         <DashboardLayout>
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-center py-12">
-              <div className="text-white">Loading dashboard...</div>
+              <div className="text-[var(--foreground)]">Loading dashboard...</div>
             </div>
           </div>
         </DashboardLayout>
@@ -150,7 +150,7 @@ export default function ManagerDashboardPage() {
         <DashboardLayout>
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-center py-12">
-              <div className="text-white">No dashboard data available</div>
+              <div className="text-[var(--foreground)]">No dashboard data available</div>
             </div>
           </div>
         </DashboardLayout>
@@ -165,7 +165,7 @@ export default function ManagerDashboardPage() {
           {/* Welcome Section */}
           <motion.div {...fadeInUp}>
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">
                 Welcome back, {user?.first_name}! 🚀
               </h1>
               <p className="text-dozyr-light-gray">
@@ -187,7 +187,7 @@ export default function ManagerDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Jobs Posted</p>
-                      <p className="text-2xl font-bold text-white">{dashboardData.stats.jobs_posted}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">{dashboardData.stats.jobs_posted}</p>
                     </div>
                     <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                       <Briefcase className="h-6 w-6 text-blue-400" />
@@ -203,7 +203,7 @@ export default function ManagerDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Applications</p>
-                      <p className="text-2xl font-bold text-white">{dashboardData.stats.applications_received}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">{dashboardData.stats.applications_received}</p>
                     </div>
                     <div className="h-12 w-12 bg-dozyr-gold/20 rounded-lg flex items-center justify-center">
                       <Users className="h-6 w-6 text-dozyr-gold" />
@@ -219,7 +219,7 @@ export default function ManagerDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Hires Made</p>
-                      <p className="text-2xl font-bold text-white">{dashboardData.stats.hires_made}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">{dashboardData.stats.hires_made}</p>
                     </div>
                     <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                       <CheckCircle className="h-6 w-6 text-green-400" />
@@ -235,7 +235,7 @@ export default function ManagerDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Total Spent</p>
-                      <p className="text-2xl font-bold text-white">${dashboardData.stats.total_spent.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">${dashboardData.stats.total_spent.toLocaleString()}</p>
                     </div>
                     <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                       <DollarSign className="h-6 w-6 text-green-400" />
@@ -264,14 +264,14 @@ export default function ManagerDashboardPage() {
                         <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
                         <span className="text-dozyr-light-gray">Regular Posts</span>
                       </div>
-                      <span className="text-2xl font-bold text-white">{userCredits.post_credits}</span>
+                      <span className="text-2xl font-bold text-[var(--foreground)]">{userCredits.post_credits}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 bg-dozyr-gold rounded-full"></div>
                         <span className="text-dozyr-light-gray">Featured Posts</span>
                       </div>
-                      <span className="text-2xl font-bold text-white">{userCredits.featured_credits}</span>
+                      <span className="text-2xl font-bold text-[var(--foreground)]">{userCredits.featured_credits}</span>
                     </div>
                     <div className="pt-4 border-t border-dozyr-medium-gray">
                       <Button 
@@ -327,7 +327,7 @@ export default function ManagerDashboardPage() {
                               {discount.status}
                             </Badge>
                           </div>
-                          <p className="text-sm text-white">
+                          <p className="text-sm text-[var(--foreground)]">
                             {discount.discount_type === 'percentage' && `${discount.discount_value}% off`}
                             {discount.discount_type === 'fixed_amount' && `$${discount.discount_value} off`}
                             {discount.discount_type === 'free_posts' && `+${discount.discount_value} free posts`}
@@ -372,7 +372,7 @@ export default function ManagerDashboardPage() {
                       onClick={() => router.push(`/jobs/${job.id}`)}
                     >
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-white truncate hover:text-dozyr-gold">{job.title}</h4>
+                        <h4 className="font-semibold text-[var(--foreground)] truncate hover:text-dozyr-gold">{job.title}</h4>
                         <div className="flex items-center gap-4 text-sm text-dozyr-light-gray mt-1">
                           <div className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
@@ -414,7 +414,7 @@ export default function ManagerDashboardPage() {
                     <div key={application.id} className="p-4 bg-dozyr-dark-gray rounded-lg hover:bg-dozyr-medium-gray/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-white">{application.applicant_name}</h4>
+                          <h4 className="font-semibold text-[var(--foreground)]">{application.applicant_name}</h4>
                           <p className="text-sm text-dozyr-light-gray">{application.job_title}</p>
                           <div className="flex items-center gap-4 text-xs text-dozyr-light-gray mt-1">
                             <span>{application.experience} experience</span>

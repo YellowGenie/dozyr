@@ -139,7 +139,7 @@ export default function AuthPage() {
                     onClick={() => setActiveTab('login')}
                     className={`flex-1 py-3 px-6 rounded-l-xl font-semibold transition-all ${
                       activeTab === 'login'
-                        ? 'bg-[var(--accent)] text-white'
+                        ? 'bg-[var(--accent)] text-black'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -150,7 +150,7 @@ export default function AuthPage() {
                     onClick={() => setActiveTab('register')}
                     className={`flex-1 py-3 px-6 rounded-r-xl font-semibold transition-all ${
                       activeTab === 'register'
-                        ? 'bg-[var(--accent)] text-white'
+                        ? 'bg-[var(--accent)] text-black'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >

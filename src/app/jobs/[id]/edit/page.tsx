@@ -133,7 +133,7 @@ export default function EditJobPage() {
                   </Button>
                 </Link>
                 <div>
-                  <h1 className="text-3xl font-bold text-white mb-2">Edit Job</h1>
+                  <h1 className="text-3xl font-bold text-black mb-2">Edit Job</h1>
                   <p className="text-dozyr-light-gray">
                     Update your job posting details
                   </p>
@@ -163,7 +163,7 @@ export default function EditJobPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white">Job Title *</label>
+                      <label className="text-sm font-medium text-black">Job Title *</label>
                       <Input
                         required
                         value={formData.title}
@@ -174,12 +174,12 @@ export default function EditJobPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-white">Budget Type *</label>
+                        <label className="text-sm font-medium text-black">Budget Type *</label>
                         <select 
                           required
                           value={formData.budget_type}
                           onChange={(e) => handleInputChange('budget_type', e.target.value)}
-                          className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-white"
+                          className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-black"
                         >
                           <option value="fixed">Fixed Price</option>
                           <option value="hourly">Hourly Rate</option>
@@ -187,7 +187,7 @@ export default function EditJobPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-white">Category</label>
+                        <label className="text-sm font-medium text-black">Category</label>
                         <Input
                           value={formData.category}
                           onChange={(e) => handleInputChange('category', e.target.value)}
@@ -197,12 +197,12 @@ export default function EditJobPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white">Experience Level *</label>
+                      <label className="text-sm font-medium text-black">Experience Level *</label>
                       <select 
                         required
                         value={formData.experience_level}
                         onChange={(e) => handleInputChange('experience_level', e.target.value)}
-                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-white"
+                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-black"
                       >
                         <option value="entry">Entry Level</option>
                         <option value="intermediate">Intermediate</option>
@@ -211,12 +211,12 @@ export default function EditJobPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white">Job Status *</label>
+                      <label className="text-sm font-medium text-black">Job Status *</label>
                       <select 
                         required
                         value={formData.status}
                         onChange={(e) => handleInputChange('status', e.target.value)}
-                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-white"
+                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-black"
                       >
                         <option value="open">Open</option>
                         <option value="in_progress">In Progress</option>
@@ -239,11 +239,11 @@ export default function EditJobPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white">Currency</label>
+                      <label className="text-sm font-medium text-black">Currency</label>
                       <select 
                         value={formData.currency}
                         onChange={(e) => handleInputChange('currency', e.target.value)}
-                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-white"
+                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-black"
                       >
                         <option value="USD">USD ($)</option>
                         <option value="EUR">EUR (€)</option>
@@ -254,7 +254,7 @@ export default function EditJobPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-white">
+                        <label className="text-sm font-medium text-black">
                           Minimum {formData.budget_type === 'hourly' ? 'Rate' : 'Budget'} *
                         </label>
                         <Input
@@ -267,7 +267,7 @@ export default function EditJobPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-white">
+                        <label className="text-sm font-medium text-black">
                           Maximum {formData.budget_type === 'hourly' ? 'Rate' : 'Budget'} *
                         </label>
                         <Input
@@ -281,7 +281,7 @@ export default function EditJobPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white">Skills Required</label>
+                      <label className="text-sm font-medium text-black">Skills Required</label>
                       <Input
                         value={formData.skills_required}
                         onChange={(e) => handleInputChange('skills_required', e.target.value)}
@@ -304,13 +304,13 @@ export default function EditJobPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">Job Description *</label>
+                    <label className="text-sm font-medium text-black">Job Description *</label>
                     <textarea
                       required
                       value={formData.description}
                       onChange={(e) => handleInputChange('description', e.target.value)}
                       placeholder="Describe the role, responsibilities, and what makes this position exciting..."
-                      className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-white placeholder-dozyr-light-gray resize-none"
+                      className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-black placeholder-dozyr-light-gray resize-none"
                       rows={12}
                     />
                   </div>

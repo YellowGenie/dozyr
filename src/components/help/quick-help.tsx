@@ -123,7 +123,7 @@ export function QuickHelp({
                   <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-dozyr-gold/25 to-dozyr-gold/10 flex items-center justify-center">
                     <HelpCircle className="h-3 w-3 text-dozyr-gold" />
                   </div>
-                  <h3 className="text-sm font-medium text-white">{title}</h3>
+                  <h3 className="text-sm font-medium text-[var(--foreground)]">{title}</h3>
                 </div>
                 {showOnce && (
                   <button
@@ -150,7 +150,7 @@ export function QuickHelp({
                   >
                     <div className="flex items-start gap-2">
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-white mb-1">{tip.title}</h4>
+                        <h4 className="text-sm font-medium text-[var(--foreground)] mb-1">{tip.title}</h4>
                         <p className="text-xs text-dozyr-light-gray leading-relaxed">{tip.description}</p>
                       </div>
                       {tip.action && (

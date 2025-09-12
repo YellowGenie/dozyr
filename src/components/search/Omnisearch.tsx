@@ -73,7 +73,7 @@ export function Omnisearch({ className = '' }: OmnisearchProps) {
             setIsOpen(true)
           }}
           onFocus={() => setIsOpen(true)}
-          className="pl-10 pr-10 h-10 bg-dozyr-black border border-dozyr-medium-gray rounded-lg text-white placeholder-dozyr-light-gray focus:border-dozyr-gold focus:outline-none w-full transition-all duration-200"
+          className="pl-10 pr-10 h-10 bg-dozyr-black border border-dozyr-medium-gray rounded-lg text-black placeholder-dozyr-light-gray focus:border-dozyr-gold focus:outline-none w-full transition-all duration-200"
         />
         {!isOpen && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1 text-dozyr-light-gray text-xs">
@@ -104,7 +104,7 @@ export function Omnisearch({ className = '' }: OmnisearchProps) {
               // Empty state with tips
               <div className="p-6 text-center">
                 <Search className="h-12 w-12 text-dozyr-light-gray/50 mx-auto mb-4" />
-                <h3 className="text-white font-medium mb-2">Search everything in Dozyr</h3>
+                <h3 className="text-black font-medium mb-2">Search everything in Dozyr</h3>
                 <p className="text-dozyr-light-gray text-sm mb-4">
                   Find pages, settings, actions, and more
                 </p>
@@ -128,7 +128,7 @@ export function Omnisearch({ className = '' }: OmnisearchProps) {
               // No results
               <div className="p-6 text-center">
                 <Hash className="h-8 w-8 text-dozyr-light-gray/50 mx-auto mb-3" />
-                <p className="text-white font-medium mb-1">No results found</p>
+                <p className="text-black font-medium mb-1">No results found</p>
                 <p className="text-dozyr-light-gray text-sm">
                   Try searching for pages, settings, or actions
                 </p>
@@ -177,7 +177,7 @@ export function Omnisearch({ className = '' }: OmnisearchProps) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`font-medium truncate ${
-                            isSelected ? 'text-white' : 'text-white/90'
+                            isSelected ? 'text-black' : 'text-black/90'
                           }`}>
                             {item.title}
                           </span>

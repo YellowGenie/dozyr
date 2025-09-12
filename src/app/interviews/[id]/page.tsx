@@ -170,7 +170,7 @@ export default function InterviewDetailPage() {
       <ProtectedRoute requiredRole={['manager', 'talent', 'admin']}>
         <DashboardLayout>
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-white">Interview Not Found</h2>
+            <h2 className="text-2xl font-bold text-black">Interview Not Found</h2>
             <Button 
               onClick={() => router.push('/interviews')}
               className="mt-4"
@@ -200,9 +200,9 @@ export default function InterviewDetailPage() {
                 Back
               </Button>
               <div>
-                <h1 className="text-3xl font-bold text-white">{interview.title}</h1>
+                <h1 className="text-3xl font-bold text-black">{interview.title}</h1>
                 <div className="flex items-center gap-4 mt-2">
-                  <Badge className={`${getStatusColor(interview.status)} text-white`}>
+                  <Badge className={`${getStatusColor(interview.status)} text-black`}>
                     {getStatusIcon(interview.status)}
                     <span className="ml-1 capitalize">{interview.status.replace('_', ' ')}</span>
                   </Badge>
@@ -225,7 +225,7 @@ export default function InterviewDetailPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <h3 className="font-medium text-white mb-2">Description</h3>
+                      <h3 className="font-medium text-black mb-2">Description</h3>
                       <p className="text-dozyr-light-gray leading-relaxed">
                         {interview.description}
                       </p>
@@ -233,20 +233,20 @@ export default function InterviewDetailPage() {
 
                     {interview.job_title && (
                       <div>
-                        <h3 className="font-medium text-white mb-2">Position</h3>
+                        <h3 className="font-medium text-black mb-2">Position</h3>
                         <p className="text-dozyr-gold">{interview.job_title}</p>
                       </div>
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <h3 className="font-medium text-white mb-2">Created</h3>
+                        <h3 className="font-medium text-black mb-2">Created</h3>
                         <p className="text-dozyr-light-gray">{formatDate(interview.created_at)}</p>
                       </div>
                       
                       {interview.scheduled_at && (
                         <div>
-                          <h3 className="font-medium text-white mb-2">Scheduled</h3>
+                          <h3 className="font-medium text-black mb-2">Scheduled</h3>
                           <p className="text-dozyr-light-gray">{formatDate(interview.scheduled_at)}</p>
                         </div>
                       )}
@@ -271,9 +271,9 @@ export default function InterviewDetailPage() {
                       {interview.questions.map((question, index) => (
                         <div key={question.id} className="border border-dozyr-medium-gray rounded-lg p-4">
                           <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-medium text-white">Question {index + 1}</h4>
+                            <h4 className="font-medium text-black">Question {index + 1}</h4>
                             {question.answer ? (
-                              <Badge className="bg-green-500 text-white">
+                              <Badge className="bg-green-500 text-black">
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Answered
                               </Badge>
@@ -286,7 +286,7 @@ export default function InterviewDetailPage() {
                           <p className="text-dozyr-light-gray mb-3">{question.question}</p>
                           {question.answer && (
                             <div className="bg-dozyr-medium-gray/20 rounded-lg p-3">
-                              <h5 className="font-medium text-white text-sm mb-2">Answer:</h5>
+                              <h5 className="font-medium text-black text-sm mb-2">Answer:</h5>
                               <p className="text-dozyr-light-gray text-sm">{question.answer}</p>
                               {question.answered_at && (
                                 <p className="text-dozyr-light-gray text-xs mt-2">
@@ -318,7 +318,7 @@ export default function InterviewDetailPage() {
                           <User className="h-5 w-5 text-dozyr-black" />
                         </div>
                         <div>
-                          <p className="font-medium text-white">
+                          <p className="font-medium text-black">
                             {interview.manager_first_name} {interview.manager_last_name}
                           </p>
                           <p className="text-sm text-dozyr-light-gray">Client</p>
@@ -330,7 +330,7 @@ export default function InterviewDetailPage() {
                           <User className="h-5 w-5 text-dozyr-black" />
                         </div>
                         <div>
-                          <p className="font-medium text-white">
+                          <p className="font-medium text-black">
                             {interview.talent_first_name} {interview.talent_last_name}
                           </p>
                           <p className="text-sm text-dozyr-light-gray">Freelancer</p>
@@ -398,7 +398,7 @@ export default function InterviewDetailPage() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-dozyr-light-gray">Questions Answered</span>
-                          <span className="text-white">
+                          <span className="text-black">
                             {interview.answered_questions || 0}/{interview.total_questions}
                           </span>
                         </div>

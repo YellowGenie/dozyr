@@ -131,7 +131,7 @@ export default function JobViewPage() {
             <Card>
               <CardContent className="p-12 text-center">
                 <Briefcase className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">Job not found</h3>
+                <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">Job not found</h3>
                 <p className="text-dozyr-light-gray mb-6">
                   The job you're looking for doesn't exist or has been removed.
                 </p>
@@ -164,7 +164,7 @@ export default function JobViewPage() {
                   </Button>
                 </Link>
                 <div>
-                  <h1 className="text-3xl font-bold text-white mb-2">{job.title}</h1>
+                  <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">{job.title}</h1>
                   <div className="flex items-center gap-3">
                     <Badge className={getStatusColor(job.status)}>
                       {job.status?.replace('_', ' ') || 'Unknown'}
@@ -233,23 +233,23 @@ export default function JobViewPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-dozyr-light-gray">Budget</span>
-                      <span className="text-white font-medium">{formatBudget(job)}</span>
+                      <span className="text-[var(--foreground)] font-medium">{formatBudget(job)}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-dozyr-light-gray">Type</span>
-                      <span className="text-white font-medium capitalize">{job.budget_type}</span>
+                      <span className="text-[var(--foreground)] font-medium capitalize">{job.budget_type}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-dozyr-light-gray">Experience</span>
-                      <span className="text-white font-medium capitalize">{job.experience_level}</span>
+                      <span className="text-[var(--foreground)] font-medium capitalize">{job.experience_level}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-dozyr-light-gray">Category</span>
-                      <span className="text-white font-medium">{job.category || 'General'}</span>
+                      <span className="text-[var(--foreground)] font-medium">{job.category || 'General'}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-dozyr-light-gray">Applications</span>
-                      <span className="text-white font-medium">{job.applications_count || 0}</span>
+                      <span className="text-[var(--foreground)] font-medium">{job.applications_count || 0}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -266,7 +266,7 @@ export default function JobViewPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div>
-                      <h4 className="text-white font-medium">{job.company_name || 'Your Company'}</h4>
+                      <h4 className="text-[var(--foreground)] font-medium">{job.company_name || 'Your Company'}</h4>
                       <p className="text-dozyr-light-gray text-sm">{job.location || 'Remote'}</p>
                     </div>
                   </div>

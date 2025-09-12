@@ -352,7 +352,7 @@ export function NotificationCreator({ onNotificationCreated }: {
         {(formData.notification_type === 'chatbot' || formData.notification_type === 'both') && (
           <div className="flex justify-end">
             <div className="max-w-sm">
-              <Card className="bg-blue-500 text-white">
+              <Card className="bg-blue-500 text-black">
                 <CardContent className="p-3">
                   <div className="flex items-start space-x-2">
                     <Bell className="h-4 w-4 mt-0.5" />

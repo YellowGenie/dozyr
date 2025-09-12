@@ -54,10 +54,10 @@ export function ProfileNavigation({
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-600 rounded-lg">
-                <User className="h-5 w-5 text-white" />
+                <User className="h-5 w-5 text-black" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Your Profile</h3>
+                <h3 className="font-semibold text-black">Your Profile</h3>
                 <p className="text-sm text-gray-300">Manage your professional presence</p>
               </div>
             </div>
@@ -69,7 +69,7 @@ export function ProfileNavigation({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {isOwnProfile && (
               <Button 
-                className="h-auto p-4 flex-col items-start bg-purple-600 text-white hover:bg-purple-700" 
+                className="h-auto p-4 flex-col items-start bg-purple-600 text-black hover:bg-purple-700" 
                 onClick={handleEditProfile}
               >
                 <Edit3 className="h-5 w-5 mb-2" />
@@ -106,7 +106,7 @@ export function ProfileNavigation({
               <Button
                 size="lg"
                 onClick={handleEditProfile}
-                className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg"
+                className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-700 text-black shadow-lg"
               >
                 <Edit3 className="h-6 w-6" />
               </Button>
@@ -121,7 +121,7 @@ export function ProfileNavigation({
               size="lg"
               variant="outline"
               onClick={handleViewProfile}
-              className="w-14 h-14 rounded-full border-purple-500/30 bg-white/10 backdrop-blur-sm hover:bg-purple-500/20 text-white shadow-lg"
+              className="w-14 h-14 rounded-full border-purple-500/30 bg-white/10 backdrop-blur-sm hover:bg-purple-500/20 text-black shadow-lg"
             >
               <Eye className="h-6 w-6" />
             </Button>

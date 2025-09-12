@@ -264,14 +264,14 @@ export default function AdminUsersPage() {
       <Card>
         <CardContent className="p-4 text-center">
           <Users className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white">{users.length}</p>
+          <p className="text-2xl font-bold text-[var(--foreground)]">{users.length}</p>
           <p className="text-sm text-dozyr-light-gray">Total Users</p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-4 text-center">
           <UserCheck className="h-8 w-8 text-green-400 mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-bold text-[var(--foreground)]">
             {users.filter(u => u.is_verified).length}
           </p>
           <p className="text-sm text-dozyr-light-gray">Verified</p>
@@ -280,7 +280,7 @@ export default function AdminUsersPage() {
       <Card>
         <CardContent className="p-4 text-center">
           <Shield className="h-8 w-8 text-dozyr-gold mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-bold text-[var(--foreground)]">
             {users.filter(u => u.role === 'admin').length}
           </p>
           <p className="text-sm text-dozyr-light-gray">Admins</p>
@@ -289,7 +289,7 @@ export default function AdminUsersPage() {
       <Card>
         <CardContent className="p-4 text-center">
           <AlertTriangle className="h-8 w-8 text-orange-400 mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-bold text-[var(--foreground)]">
             {users.filter(u => !u.is_verified).length}
           </p>
           <p className="text-sm text-dozyr-light-gray">Pending</p>
@@ -432,7 +432,7 @@ export default function AdminUsersPage() {
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-xl font-semibold text-[var(--foreground)]">
                   {selectedUser.first_name} {selectedUser.last_name}
                 </h3>
                 <p className="text-dozyr-light-gray">{selectedUser.email}</p>
@@ -450,21 +450,21 @@ export default function AdminUsersPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-sm text-dozyr-light-gray">User ID</Label>
-                <p className="text-white font-mono text-sm">{selectedUser.id}</p>
+                <p className="text-[var(--foreground)] font-mono text-sm">{selectedUser.id}</p>
               </div>
               <div>
                 <Label className="text-sm text-dozyr-light-gray">Role</Label>
-                <p className="text-white capitalize">{selectedUser.role}</p>
+                <p className="text-[var(--foreground)] capitalize">{selectedUser.role}</p>
               </div>
               <div>
                 <Label className="text-sm text-dozyr-light-gray">Created</Label>
-                <p className="text-white">{formatRelativeTime(selectedUser.created_at)}</p>
+                <p className="text-[var(--foreground)]">{formatRelativeTime(selectedUser.created_at)}</p>
               </div>
               <div>
                 <Label className="text-sm text-dozyr-light-gray">Status</Label>
                 <div className="flex items-center gap-2">
                   {getUserStatusIcon(selectedUser)}
-                  <span className="text-white">
+                  <span className="text-[var(--foreground)]">
                     {selectedUser.is_verified ? 'Verified' : 'Unverified'}
                   </span>
                 </div>
@@ -615,7 +615,7 @@ export default function AdminUsersPage() {
         <div className="py-4">
           <p className="text-dozyr-light-gray">
             Are you sure you want to reset the password for{' '}
-            <span className="text-white font-medium">
+            <span className="text-[var(--foreground)] font-medium">
               {selectedUser?.first_name} {selectedUser?.last_name}
             </span>
             ? They will receive an email with instructions to set a new password.
@@ -659,13 +659,13 @@ export default function AdminUsersPage() {
               <AlertTriangle className="h-6 w-6 text-red-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">Permanent Action</h3>
+              <h3 className="font-semibold text-[var(--foreground)]">Permanent Action</h3>
               <p className="text-sm text-dozyr-light-gray">This action cannot be undone</p>
             </div>
           </div>
           <p className="text-dozyr-light-gray">
             Are you sure you want to permanently delete{' '}
-            <span className="text-white font-medium">
+            <span className="text-[var(--foreground)] font-medium">
               {selectedUser?.first_name} {selectedUser?.last_name}
             </span>
             ? This will remove all user data and cannot be reversed.
@@ -708,7 +708,7 @@ export default function AdminUsersPage() {
           {/* Header */}
           <motion.div {...fadeInUp} className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">User Management</h1>
+              <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">User Management</h1>
               <p className="text-dozyr-light-gray">
                 Manage user accounts, permissions, and access controls.
               </p>
@@ -861,7 +861,7 @@ export default function AdminUsersPage() {
                             </div>
                           </div>
                           <div>
-                            <div className="font-medium text-white">
+                            <div className="font-medium text-[var(--foreground)]">
                               {user.first_name} {user.last_name}
                             </div>
                             <div className="text-sm text-dozyr-light-gray">

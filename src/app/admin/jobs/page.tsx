@@ -284,7 +284,7 @@ export default function AdminJobsPage() {
             />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-semibold text-white">{job.title}</h3>
+                <h3 className="text-lg font-semibold text-[var(--foreground)]">{job.title}</h3>
                 {getStatusBadge(job)}
                 {getPaymentStatus(job)}
               </div>
@@ -400,7 +400,7 @@ export default function AdminJobsPage() {
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Search</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Search</label>
             <Input
               placeholder="Search jobs, companies..."
               value={filters.search}
@@ -409,9 +409,9 @@ export default function AdminJobsPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Status</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Status</label>
             <select
-              className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-white"
+              className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-[var(--foreground)]"
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value as JobFilters['status'] })}
             >
@@ -425,9 +425,9 @@ export default function AdminJobsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Date Range</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Date Range</label>
             <select
-              className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-white"
+              className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-[var(--foreground)]"
               value={filters.dateRange}
               onChange={(e) => setFilters({ ...filters, dateRange: e.target.value as JobFilters['dateRange'] })}
             >
@@ -440,7 +440,7 @@ export default function AdminJobsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Company</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Company</label>
             <Input
               placeholder="Filter by company"
               value={filters.company}
@@ -449,7 +449,7 @@ export default function AdminJobsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Manager</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Manager</label>
             <Input
               placeholder="Filter by manager"
               value={filters.manager}
@@ -458,9 +458,9 @@ export default function AdminJobsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Job Type</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Job Type</label>
             <select
-              className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-white"
+              className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-[var(--foreground)]"
               value={filters.jobType}
               onChange={(e) => setFilters({ ...filters, jobType: e.target.value as JobFilters['jobType'] })}
             >
@@ -475,7 +475,7 @@ export default function AdminJobsPage() {
 
         <div className="flex items-center gap-4">
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Min Salary</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Min Salary</label>
             <Input
               type="number"
               placeholder="0"
@@ -484,7 +484,7 @@ export default function AdminJobsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Max Salary</label>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Max Salary</label>
             <Input
               type="number"
               placeholder="No limit"
@@ -504,7 +504,7 @@ export default function AdminJobsPage() {
           {/* Header */}
           <motion.div {...fadeInUp} className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Job Management</h1>
+              <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">Job Management</h1>
               <p className="text-dozyr-light-gray">
                 Manage all job postings, review applications, and monitor performance.
               </p>
@@ -528,7 +528,7 @@ export default function AdminJobsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-dozyr-light-gray">Total Jobs</p>
-                    <p className="text-2xl font-bold text-white">{jobs.length.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-[var(--foreground)]">{jobs.length.toLocaleString()}</p>
                   </div>
                   <Briefcase className="h-8 w-8 text-blue-400" />
                 </div>
@@ -540,7 +540,7 @@ export default function AdminJobsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-dozyr-light-gray">Pending Review</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-[var(--foreground)]">
                       {jobs.filter(j => j.admin_status === 'pending').length}
                     </p>
                   </div>
@@ -554,7 +554,7 @@ export default function AdminJobsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-dozyr-light-gray">Inappropriate</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-[var(--foreground)]">
                       {jobs.filter(j => j.admin_status === 'inappropriate').length}
                     </p>
                   </div>
@@ -568,7 +568,7 @@ export default function AdminJobsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-dozyr-light-gray">Total Applications</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-[var(--foreground)]">
                       {jobs.reduce((sum, job) => sum + job.analytics.applications, 0).toLocaleString()}
                     </p>
                   </div>
@@ -589,7 +589,7 @@ export default function AdminJobsPage() {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-white">
+                    <p className="text-[var(--foreground)]">
                       {selectedJobs.length} job(s) selected
                     </p>
                     <div className="flex items-center gap-2">
@@ -651,7 +651,7 @@ export default function AdminJobsPage() {
               <Card>
                 <CardContent className="p-12 text-center">
                   <Briefcase className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-white mb-2">No jobs found</h3>
+                  <h3 className="text-lg font-medium text-[var(--foreground)] mb-2">No jobs found</h3>
                   <p className="text-dozyr-light-gray">
                     No jobs match your current filters. Try adjusting your search criteria.
                   </p>

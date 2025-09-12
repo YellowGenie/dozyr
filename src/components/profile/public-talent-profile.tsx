@@ -183,7 +183,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
         <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
           <CardContent className="p-12 text-center">
             <Eye className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">Profile Private</h3>
+            <h3 className="text-xl font-semibold text-black mb-2">Profile Private</h3>
             <p className="text-gray-400 max-w-md">
               This talent profile is set to private and cannot be viewed publicly.
             </p>
@@ -224,20 +224,20 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                     {profile.user_id?.charAt(0).toUpperCase()}
                   </Avatar.Fallback>
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-white" />
+                    <CheckCircle className="w-4 h-4 text-black" />
                   </div>
                 </Avatar.Root>
               </motion.div>
 
               {/* Name and Title */}
               <motion.div variants={fadeInUp} className="space-y-2">
-                <h1 className="text-5xl font-bold text-white tracking-tight">
+                <h1 className="text-5xl font-bold text-black tracking-tight">
                   {profile.user_id}
                 </h1>
                 <p className="text-2xl font-medium accent-text">
                   {profile.title}
                 </p>
-                <div className="flex items-center justify-center gap-4 text-white/70">
+                <div className="flex items-center justify-center gap-4 text-black/70">
                   {profile.rating && (
                     <div className="flex items-center gap-1">
                       <Star className="h-5 w-5 accent-text fill-current icon-depth" />
@@ -287,16 +287,16 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
               {/* Stats */}
               <motion.div variants={fadeInUp} className="flex items-center justify-center gap-8 pt-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{profile.jobs_completed || 0}</div>
-                  <div className="text-sm text-white/70">Projects Completed</div>
+                  <div className="text-3xl font-bold text-black">{profile.jobs_completed || 0}</div>
+                  <div className="text-sm text-black/70">Projects Completed</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{profile.success_rate || 0}%</div>
-                  <div className="text-sm text-white/70">Success Rate</div>
+                  <div className="text-3xl font-bold text-black">{profile.success_rate || 0}%</div>
+                  <div className="text-sm text-black/70">Success Rate</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{views}</div>
-                  <div className="text-sm text-white/70">Profile Views</div>
+                  <div className="text-3xl font-bold text-black">{views}</div>
+                  <div className="text-sm text-black/70">Profile Views</div>
                 </div>
               </motion.div>
             </div>
@@ -314,7 +314,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                   className={`capitalize font-medium transition-colors interactive ${
                     activeSection === section 
                       ? 'accent-text border-b-2 accent-border' 
-                      : 'text-white/70 hover:text-white'
+                      : 'text-black/70 hover:text-black'
                   } pb-1`}
                 >
                   {section}
@@ -339,17 +339,17 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                 <div className="lg:col-span-2">
                   <Card className="glass-card">
                     <CardHeader>
-                      <CardTitle className="text-white text-2xl">About Me</CardTitle>
+                      <CardTitle className="text-black text-2xl">About Me</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-white/80 leading-relaxed text-lg">
+                      <p className="text-black/80 leading-relaxed text-lg">
                         {profile.bio}
                       </p>
                       
                       {/* Passions */}
                       {profile.passions && profile.passions.length > 0 && (
                         <div className="mt-8">
-                          <h4 className="text-white font-semibold text-lg mb-4">What I'm Passionate About</h4>
+                          <h4 className="text-black font-semibold text-lg mb-4">What I'm Passionate About</h4>
                           <div className="flex flex-wrap gap-2">
                             {profile.passions.map((passion, index) => (
                               <Badge key={index} className="bg-[var(--accent-muted)] accent-text border-[var(--accent)]/30 px-3 py-1">
@@ -369,25 +369,25 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                   {/* Quick Info */}
                   <Card className="bg-white/10 backdrop-blur-lg border-white/10">
                     <CardHeader>
-                      <CardTitle className="text-white">Quick Info</CardTitle>
+                      <CardTitle className="text-black">Quick Info</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Experience</span>
-                        <span className="text-white font-semibold">{profile.experience_years}+ years</span>
+                        <span className="text-black/70">Experience</span>
+                        <span className="text-black font-semibold">{profile.experience_years}+ years</span>
                       </div>
                       {profile.profile_visibility?.show_hourly_rate && profile.hourly_rate && (
                         <div className="flex justify-between items-center">
-                          <span className="text-white/70">Rate</span>
-                          <span className="text-white font-semibold">${profile.hourly_rate}/hr</span>
+                          <span className="text-black/70">Rate</span>
+                          <span className="text-black font-semibold">${profile.hourly_rate}/hr</span>
                         </div>
                       )}
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Response Time</span>
-                        <span className="text-white font-semibold">{profile.response_time}h</span>
+                        <span className="text-black/70">Response Time</span>
+                        <span className="text-black font-semibold">{profile.response_time}h</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Availability</span>
+                        <span className="text-black/70">Availability</span>
                         <Badge className={`${
                           profile.availability === 'available' ? 'bg-green-500/20 text-green-300 border-green-500/20' :
                           profile.availability === 'busy' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/20' :
@@ -403,7 +403,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                   {visibleSocialLinks.length > 0 && (
                     <Card className="bg-white/10 backdrop-blur-lg border-white/10">
                       <CardHeader>
-                        <CardTitle className="text-white">Connect</CardTitle>
+                        <CardTitle className="text-black">Connect</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
@@ -415,7 +415,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-3 text-white/70 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5"
+                                className="flex items-center gap-3 text-black/70 hover:text-black transition-colors p-2 rounded-lg hover:bg-white/5"
                               >
                                 <Icon className="h-5 w-5" />
                                 <span className="capitalize">{link.platform}</span>
@@ -443,8 +443,8 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                 exit={{ opacity: 0, y: -20 }}
               >
                 <div className="text-center mb-12">
-                  <h2 className="text-4xl font-bold text-white mb-4">Skills & Expertise</h2>
-                  <p className="text-white/70 text-lg">My technical skills and proficiency levels</p>
+                  <h2 className="text-4xl font-bold text-black mb-4">Skills & Expertise</h2>
+                  <p className="text-black/70 text-lg">My technical skills and proficiency levels</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -472,13 +472,13 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                                   </Badge>
                                 </div>
                                 
-                                <h3 className="text-white font-semibold text-lg mb-2">{skill.name}</h3>
-                                <p className="text-white/70 text-sm mb-4">{skill.years_experience} years experience</p>
+                                <h3 className="text-black font-semibold text-lg mb-2">{skill.name}</h3>
+                                <p className="text-black/70 text-sm mb-4">{skill.years_experience} years experience</p>
                                 
                                 <div className="space-y-2">
                                   <div className="flex justify-between text-sm">
-                                    <span className="text-white/70">Proficiency</span>
-                                    <span className="text-white">{percentage}%</span>
+                                    <span className="text-black/70">Proficiency</span>
+                                    <span className="text-black">{percentage}%</span>
                                   </div>
                                   <Progress.Root className="relative overflow-hidden bg-white/10 rounded-full w-full h-2">
                                     <Progress.Indicator
@@ -493,7 +493,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                           
                           <HoverCard.Content className="w-80 bg-gray-800 border-gray-700 rounded-lg p-4 shadow-xl">
                             <div className="space-y-2">
-                              <h4 className="text-white font-semibold">{skill.name}</h4>
+                              <h4 className="text-black font-semibold">{skill.name}</h4>
                               <p className="text-gray-300 text-sm">
                                 {skill.proficiency} level with {skill.years_experience} years of hands-on experience.
                               </p>
@@ -519,8 +519,8 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                 exit={{ opacity: 0, y: -20 }}
               >
                 <div className="text-center mb-12">
-                  <h2 className="text-4xl font-bold text-white mb-4">Featured Projects</h2>
-                  <p className="text-white/70 text-lg">A showcase of my best work</p>
+                  <h2 className="text-4xl font-bold text-black mb-4">Featured Projects</h2>
+                  <p className="text-black/70 text-lg">A showcase of my best work</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -546,7 +546,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                               <div className="absolute bottom-4 left-4 right-4">
-                                <Badge className="bg-purple-500/80 text-white border-purple-500/30 capitalize mb-2">
+                                <Badge className="bg-purple-500/80 text-black border-purple-500/30 capitalize mb-2">
                                   <CategoryIcon className="h-3 w-3 mr-1" />
                                   {project.category}
                                 </Badge>
@@ -555,22 +555,22 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                           )}
                           
                           <CardContent className="p-6">
-                            <h3 className="text-white font-bold text-xl mb-2 group-hover:text-purple-300 transition-colors">
+                            <h3 className="text-black font-bold text-xl mb-2 group-hover:text-purple-300 transition-colors">
                               {project.title}
                             </h3>
-                            <p className="text-white/70 mb-4 line-clamp-3">
+                            <p className="text-black/70 mb-4 line-clamp-3">
                               {project.description}
                             </p>
                             
                             {/* Technologies */}
                             <div className="flex flex-wrap gap-2 mb-4">
                               {project.technologies.slice(0, 3).map((tech) => (
-                                <Badge key={tech} variant="outline" className="text-white/70 border-white/20 text-xs">
+                                <Badge key={tech} variant="outline" className="text-black/70 border-white/20 text-xs">
                                   {tech}
                                 </Badge>
                               ))}
                               {project.technologies.length > 3 && (
-                                <Badge variant="outline" className="text-white/70 border-white/20 text-xs">
+                                <Badge variant="outline" className="text-black/70 border-white/20 text-xs">
                                   +{project.technologies.length - 3} more
                                 </Badge>
                               )}
@@ -579,7 +579,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                             {/* Project Links */}
                             <div className="flex gap-2">
                               {project.demo_url && (
-                                <Button variant="outline" size="sm" asChild className="flex-1 border-white/20 text-white hover:bg-white/10">
+                                <Button variant="outline" size="sm" asChild className="flex-1 border-white/20 text-black hover:bg-white/10">
                                   <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
                                     <Play className="h-4 w-4 mr-2" />
                                     Demo
@@ -587,7 +587,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                                 </Button>
                               )}
                               {project.github_url && (
-                                <Button variant="outline" size="sm" asChild className="flex-1 border-white/20 text-white hover:bg-white/10">
+                                <Button variant="outline" size="sm" asChild className="flex-1 border-white/20 text-black hover:bg-white/10">
                                   <a href={project.github_url} target="_blank" rel="noopener noreferrer">
                                     <Github className="h-4 w-4 mr-2" />
                                     Code
@@ -601,14 +601,14 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                               <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 gap-4 text-sm">
                                 {project.duration && (
                                   <div>
-                                    <span className="text-white/50">Duration</span>
-                                    <div className="text-white font-medium">{project.duration}</div>
+                                    <span className="text-black/50">Duration</span>
+                                    <div className="text-black font-medium">{project.duration}</div>
                                   </div>
                                 )}
                                 {project.role && (
                                   <div>
-                                    <span className="text-white/50">Role</span>
-                                    <div className="text-white font-medium">{project.role}</div>
+                                    <span className="text-black/50">Role</span>
+                                    <div className="text-black font-medium">{project.role}</div>
                                   </div>
                                 )}
                               </div>
@@ -622,7 +622,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
 
                 {visibleProjects.length > 3 && (
                   <div className="text-center mt-8">
-                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                    <Button variant="outline" className="border-white/20 text-black hover:bg-white/10">
                       View All Projects
                       <ChevronRight className="h-4 w-4 ml-2" />
                     </Button>
@@ -642,8 +642,8 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                 exit={{ opacity: 0, y: -20 }}
               >
                 <div className="text-center mb-12">
-                  <h2 className="text-4xl font-bold text-white mb-4">Work Experience</h2>
-                  <p className="text-white/70 text-lg">My professional journey</p>
+                  <h2 className="text-4xl font-bold text-black mb-4">Work Experience</h2>
+                  <p className="text-black/70 text-lg">My professional journey</p>
                 </div>
 
                 <div className="max-w-4xl mx-auto">
@@ -663,7 +663,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                           {/* Timeline marker */}
                           <div className="relative z-10">
                             <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                              <Briefcase className="h-8 w-8 text-white" />
+                              <Briefcase className="h-8 w-8 text-black" />
                             </div>
                           </div>
                           
@@ -672,16 +672,16 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                             <CardContent className="p-6">
                               <div className="flex justify-between items-start mb-4">
                                 <div>
-                                  <h3 className="text-xl font-bold text-white">{exp.title}</h3>
+                                  <h3 className="text-xl font-bold text-black">{exp.title}</h3>
                                   <p className="text-purple-300 font-medium">{exp.company}</p>
                                   {exp.location && (
-                                    <p className="text-white/60 text-sm flex items-center gap-1 mt-1">
+                                    <p className="text-black/60 text-sm flex items-center gap-1 mt-1">
                                       <MapPin className="h-3 w-3" />
                                       {exp.location}
                                     </p>
                                   )}
                                 </div>
-                                <div className="text-right text-white/70">
+                                <div className="text-right text-black/70">
                                   <div className="text-sm">
                                     {new Date(exp.start_date).getFullYear()} - {
                                       exp.is_current ? 'Present' : new Date(exp.end_date!).getFullYear()
@@ -694,7 +694,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                                   )}
                                 </div>
                               </div>
-                              <p className="text-white/80 leading-relaxed">
+                              <p className="text-black/80 leading-relaxed">
                                 {exp.description}
                               </p>
                             </CardContent>
@@ -718,8 +718,8 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                 exit={{ opacity: 0, y: -20 }}
               >
                 <div className="text-center mb-12">
-                  <h2 className="text-4xl font-bold text-white mb-4">Achievements & Recognition</h2>
-                  <p className="text-white/70 text-lg">Milestones and awards in my career</p>
+                  <h2 className="text-4xl font-bold text-black mb-4">Achievements & Recognition</h2>
+                  <p className="text-black/70 text-lg">Milestones and awards in my career</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -744,21 +744,21 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                           <CardContent className="p-6">
                             <div className="flex items-start justify-between mb-4">
                               <div className="p-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                                <CategoryIcon className="h-6 w-6 text-white" />
+                                <CategoryIcon className="h-6 w-6 text-black" />
                               </div>
                               <Badge className="bg-yellow-500/20 text-yellow-200 border-yellow-500/20 capitalize">
                                 {achievement.category}
                               </Badge>
                             </div>
                             
-                            <h3 className="text-white font-bold text-lg mb-2">
+                            <h3 className="text-black font-bold text-lg mb-2">
                               {achievement.title}
                             </h3>
-                            <p className="text-white/80 text-sm mb-4">
+                            <p className="text-black/80 text-sm mb-4">
                               {achievement.description}
                             </p>
                             
-                            <div className="flex justify-between items-center text-sm text-white/60">
+                            <div className="flex justify-between items-center text-sm text-black/60">
                               {achievement.issuer && (
                                 <span>{achievement.issuer}</span>
                               )}
@@ -778,8 +778,8 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
           {visibleTestimonials.length > 0 && (
             <section className="py-16">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-white mb-4">What Clients Say</h2>
-                <p className="text-white/70 text-lg">Testimonials from satisfied clients</p>
+                <h2 className="text-4xl font-bold text-black mb-4">What Clients Say</h2>
+                <p className="text-black/70 text-lg">Testimonials from satisfied clients</p>
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -800,22 +800,22 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                           </div>
                         )}
                         
-                        <p className="text-white/80 italic mb-6 leading-relaxed">
+                        <p className="text-black/80 italic mb-6 leading-relaxed">
                           "{testimonial.content}"
                         </p>
                         
                         <div className="border-t border-white/10 pt-4">
-                          <div className="font-semibold text-white">
+                          <div className="font-semibold text-black">
                             {testimonial.author_name}
                           </div>
                           {testimonial.author_title && (
-                            <div className="text-white/70 text-sm">
+                            <div className="text-black/70 text-sm">
                               {testimonial.author_title}
                               {testimonial.author_company && ` at ${testimonial.author_company}`}
                             </div>
                           )}
                           {testimonial.project_context && (
-                            <div className="text-white/50 text-xs mt-1">
+                            <div className="text-black/50 text-xs mt-1">
                               Project: {testimonial.project_context}
                             </div>
                           )}

@@ -58,25 +58,25 @@ const themeConfig = {
   info: {
     icon: Info,
     bg: 'bg-blue-500',
-    text: 'text-white',
+    text: 'text-black',
     accent: 'bg-blue-600'
   },
   success: {
     icon: CheckCircle,
     bg: 'bg-green-500',
-    text: 'text-white',
+    text: 'text-black',
     accent: 'bg-green-600'
   },
   warning: {
     icon: AlertTriangle,
     bg: 'bg-yellow-500',
-    text: 'text-white',
+    text: 'text-black',
     accent: 'bg-yellow-600'
   },
   error: {
     icon: AlertCircle,
     bg: 'bg-red-500',
-    text: 'text-white',
+    text: 'text-black',
     accent: 'bg-red-600'
   }
 }
@@ -191,7 +191,7 @@ export function AdminNotificationChatbot({
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className={`absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold ${
+              className={`absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-black text-xs flex items-center justify-center font-bold ${
                 priorityConfig.urgent.pulse ? 'animate-pulse' : ''
               }`}
             >
@@ -213,13 +213,13 @@ export function AdminNotificationChatbot({
             className="fixed bottom-36 right-6 w-96 max-h-[600px] bg-white rounded-xl shadow-2xl z-50 border border-gray-200 overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-black p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Bell className="h-5 w-5" />
                   <h3 className="font-semibold">Notifications</h3>
                   {unreadCount > 0 && (
-                    <Badge variant="secondary" className="bg-white/20 text-white">
+                    <Badge variant="secondary" className="bg-white/20 text-black">
                       {unreadCount} new
                     </Badge>
                   )}
@@ -230,7 +230,7 @@ export function AdminNotificationChatbot({
                       size="sm"
                       variant="ghost"
                       onClick={dismissAll}
-                      className="text-white hover:bg-white/20 text-xs"
+                      className="text-black hover:bg-white/20 text-xs"
                     >
                       Clear All
                     </Button>
@@ -239,7 +239,7 @@ export function AdminNotificationChatbot({
                     size="sm"
                     variant="ghost"
                     onClick={onToggle}
-                    className="text-white hover:bg-white/20"
+                    className="text-black hover:bg-white/20"
                   >
                     <X className="h-4 w-4" />
                   </Button>

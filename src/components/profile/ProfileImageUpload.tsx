@@ -364,7 +364,7 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
             size="sm"
             variant="outline"
             onClick={handleDownloadCurrentImage}
-            className="flex items-center gap-1 border-white/20 text-white hover:border-[var(--accent)]/50 hover:text-[var(--accent)]"
+            className="flex items-center gap-1 border-white/20 text-black hover:border-[var(--accent)]/50 hover:text-[var(--accent)]"
           >
             <Download className="h-3 w-3" />
             Download
@@ -381,7 +381,7 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
         </div>
       )}
 
-      <p className="text-sm text-white/70">
+      <p className="text-sm text-black/70">
         {isEditing 
           ? "Click the camera icon to upload a new photo" 
           : hasProfileImage 
@@ -408,8 +408,8 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
         <DialogContent className="sm:max-w-4xl max-h-screen w-screen sm:w-auto sm:h-auto overflow-hidden p-0 bg-black/95 backdrop-blur-md border border-white/20">
           <div className="flex flex-col h-full max-h-screen">
             <DialogHeader className="p-6 border-b border-white/10 flex-shrink-0">
-              <DialogTitle className="text-white text-xl font-semibold">Crop Profile Image</DialogTitle>
-              <DialogDescription className="text-white/70 mt-2">
+              <DialogTitle className="text-black text-xl font-semibold">Crop Profile Image</DialogTitle>
+              <DialogDescription className="text-black/70 mt-2">
                 Adjust the crop area to select the portion of the image you want to use as your profile picture.
               </DialogDescription>
             </DialogHeader>
@@ -443,7 +443,7 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
 
                 {completedCrop && (
                   <div className="flex flex-col items-center space-y-3">
-                    <p className="text-sm text-white/70 font-medium">Preview:</p>
+                    <p className="text-sm text-black/70 font-medium">Preview:</p>
                     <canvas
                       ref={previewCanvasRef}
                       className="border-2 border-white/30 rounded-full shadow-xl"
@@ -462,7 +462,7 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
                 <Button 
                   variant="outline" 
                   onClick={closeModal} 
-                  className="border-white/30 text-white hover:border-white/50 hover:bg-white/5"
+                  className="border-white/30 text-black hover:border-white/50 hover:bg-white/5"
                 >
                   <X className="h-4 w-4 mr-2" />
                   Cancel
@@ -471,7 +471,7 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
                   <Button 
                     variant="outline" 
                     onClick={onDownloadCropClick} 
-                    className="border-white/30 text-white hover:border-[var(--accent)]/50 hover:text-[var(--accent)] hover:bg-[var(--accent)]/5"
+                    className="border-white/30 text-black hover:border-[var(--accent)]/50 hover:text-[var(--accent)] hover:bg-[var(--accent)]/5"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Download

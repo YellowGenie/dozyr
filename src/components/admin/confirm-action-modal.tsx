@@ -94,7 +94,7 @@ export function ConfirmActionModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] bg-dozyr-dark-gray border-dozyr-medium-gray">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-white">
+          <DialogTitle className="flex items-center gap-3 text-[var(--foreground)]">
             {getIcon()}
             {getTitle()}
           </DialogTitle>

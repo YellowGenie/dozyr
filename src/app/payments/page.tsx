@@ -227,7 +227,7 @@ export default function PaymentsPage() {
           {/* Header */}
           <motion.div {...fadeInUp}>
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-3xl font-bold text-black mb-2">
                 💳 Payment Center
               </h1>
               <p className="text-dozyr-light-gray">
@@ -250,7 +250,7 @@ export default function PaymentsPage() {
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium transition-colors ${
                     selectedTab === key
                       ? 'bg-dozyr-gold text-dozyr-black'
-                      : 'text-dozyr-light-gray hover:text-white'
+                      : 'text-dozyr-light-gray hover:text-black'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -276,7 +276,7 @@ export default function PaymentsPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-dozyr-light-gray text-sm font-medium">Total Spent</p>
-                          <p className="text-2xl font-bold text-white">${(totalSpent / 100).toFixed(2)}</p>
+                          <p className="text-2xl font-bold text-black">${(totalSpent / 100).toFixed(2)}</p>
                         </div>
                         <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                           <DollarSign className="h-6 w-6 text-green-400" />
@@ -292,7 +292,7 @@ export default function PaymentsPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-dozyr-light-gray text-sm font-medium">Payment Methods</p>
-                          <p className="text-2xl font-bold text-white">{cards.length}</p>
+                          <p className="text-2xl font-bold text-black">{cards.length}</p>
                         </div>
                         <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                           <CreditCard className="h-6 w-6 text-blue-400" />
@@ -308,7 +308,7 @@ export default function PaymentsPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-dozyr-light-gray text-sm font-medium">Transactions</p>
-                          <p className="text-2xl font-bold text-white">{payments.length}</p>
+                          <p className="text-2xl font-bold text-black">{payments.length}</p>
                         </div>
                         <div className="h-12 w-12 bg-dozyr-gold/20 rounded-lg flex items-center justify-center">
                           <Receipt className="h-6 w-6 text-dozyr-gold" />
@@ -335,14 +335,14 @@ export default function PaymentsPage() {
                         {payments.slice(0, 5).map((payment) => (
                           <div key={payment.id} className="flex items-center justify-between p-4 bg-dozyr-dark-gray rounded-lg">
                             <div className="flex-1">
-                              <h4 className="font-semibold text-white">{payment.description}</h4>
+                              <h4 className="font-semibold text-black">{payment.description}</h4>
                               <p className="text-sm text-dozyr-light-gray">{formatDate(payment.created_at)}</p>
                             </div>
                             <div className="flex items-center gap-4">
                               <Badge className={getPaymentStatusColor(payment.status)}>
                                 {payment.status}
                               </Badge>
-                              <span className="font-semibold text-white">
+                              <span className="font-semibold text-black">
                                 ${(payment.amount / 100).toFixed(2)}
                               </span>
                             </div>
@@ -399,7 +399,7 @@ export default function PaymentsPage() {
                                 <CreditCard className="h-6 w-6 text-dozyr-gold" />
                               </div>
                               <div>
-                                <h4 className="font-semibold text-white">
+                                <h4 className="font-semibold text-black">
                                   {getCardBrand(card.brand)} ending in {card.last_four}
                                 </h4>
                                 <p className="text-sm text-dozyr-light-gray">
@@ -468,7 +468,7 @@ export default function PaymentsPage() {
                             <div className="flex-1">
                               <div className="flex items-start justify-between mb-2">
                                 <div>
-                                  <h4 className="font-semibold text-white">{payment.description}</h4>
+                                  <h4 className="font-semibold text-black">{payment.description}</h4>
                                   {payment.job_title && (
                                     <p className="text-sm text-dozyr-light-gray">Job: {payment.job_title}</p>
                                   )}

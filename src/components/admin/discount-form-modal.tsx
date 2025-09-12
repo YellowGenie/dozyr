@@ -224,7 +224,7 @@ export function DiscountFormModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] bg-dozyr-dark-gray border-dozyr-medium-gray max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-white">
+          <DialogTitle className="text-black">
             {isEditing ? 'Edit Discount Code' : 'Create New Discount Code'}
           </DialogTitle>
           <DialogDescription className="text-dozyr-light-gray">
@@ -236,7 +236,7 @@ export function DiscountFormModal({
           {/* Basic Information */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="code" className="text-white">
+              <Label htmlFor="code" className="text-black">
                 Discount Code *
               </Label>
               <Input
@@ -244,18 +244,18 @@ export function DiscountFormModal({
                 value={formData.code}
                 onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
                 placeholder="SAVE20"
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white placeholder-dozyr-light-gray"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
                 disabled={isSubmitting || isLoading}
               />
               {errors.code && <p className="text-red-400 text-sm">{errors.code}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status" className="text-white">
+              <Label htmlFor="status" className="text-black">
                 Status *
               </Label>
               <Select value={formData.status} onValueChange={(value: any) => setFormData(prev => ({ ...prev, status: value }))}>
-                <SelectTrigger className="bg-dozyr-medium-gray border-dozyr-light-gray text-white">
+                <SelectTrigger className="bg-dozyr-medium-gray border-dozyr-light-gray text-black">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -269,7 +269,7 @@ export function DiscountFormModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-white">
+            <Label htmlFor="name" className="text-black">
               Display Name *
             </Label>
             <Input
@@ -277,14 +277,14 @@ export function DiscountFormModal({
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="20% Off Special Offer"
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-white placeholder-dozyr-light-gray"
+              className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
               disabled={isSubmitting || isLoading}
             />
             {errors.name && <p className="text-red-400 text-sm">{errors.name}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-white">
+            <Label htmlFor="description" className="text-black">
               Description
             </Label>
             <Textarea
@@ -293,7 +293,7 @@ export function DiscountFormModal({
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Brief description of this discount..."
               rows={3}
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-white placeholder-dozyr-light-gray"
+              className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
               disabled={isSubmitting || isLoading}
             />
           </div>
@@ -301,11 +301,11 @@ export function DiscountFormModal({
           {/* Discount Type & Value */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="type" className="text-white">
+              <Label htmlFor="type" className="text-black">
                 Discount Type *
               </Label>
               <Select value={formData.type} onValueChange={(value: any) => setFormData(prev => ({ ...prev, type: value }))}>
-                <SelectTrigger className="bg-dozyr-medium-gray border-dozyr-light-gray text-white">
+                <SelectTrigger className="bg-dozyr-medium-gray border-dozyr-light-gray text-black">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -317,7 +317,7 @@ export function DiscountFormModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="value" className="text-white">
+              <Label htmlFor="value" className="text-black">
                 Value *
               </Label>
               <Input
@@ -328,7 +328,7 @@ export function DiscountFormModal({
                 step={formData.type === 'percentage' ? "1" : "0.01"}
                 value={formData.value}
                 onChange={(e) => setFormData(prev => ({ ...prev, value: parseFloat(e.target.value) || 0 }))}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black"
                 disabled={isSubmitting || isLoading}
               />
               {errors.value && <p className="text-red-400 text-sm">{errors.value}</p>}
@@ -349,7 +349,7 @@ export function DiscountFormModal({
           {/* Restrictions */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="min_purchase_amount" className="text-white">
+              <Label htmlFor="min_purchase_amount" className="text-black">
                 Minimum Purchase Amount
               </Label>
               <Input
@@ -363,14 +363,14 @@ export function DiscountFormModal({
                   min_purchase_amount: e.target.value ? parseFloat(e.target.value) : null 
                 }))}
                 placeholder="0.00"
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white placeholder-dozyr-light-gray"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
                 disabled={isSubmitting || isLoading}
               />
               {errors.min_purchase_amount && <p className="text-red-400 text-sm">{errors.min_purchase_amount}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="max_uses" className="text-white">
+              <Label htmlFor="max_uses" className="text-black">
                 Maximum Uses
               </Label>
               <Input
@@ -383,7 +383,7 @@ export function DiscountFormModal({
                   max_uses: e.target.value ? parseInt(e.target.value) : null 
                 }))}
                 placeholder="Unlimited"
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white placeholder-dozyr-light-gray"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
                 disabled={isSubmitting || isLoading}
               />
               {errors.max_uses && <p className="text-red-400 text-sm">{errors.max_uses}</p>}
@@ -391,7 +391,7 @@ export function DiscountFormModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="expires_at" className="text-white">
+            <Label htmlFor="expires_at" className="text-black">
               Expiration Date
             </Label>
             <Input
@@ -399,14 +399,14 @@ export function DiscountFormModal({
               type="datetime-local"
               value={formData.expires_at}
               onChange={(e) => setFormData(prev => ({ ...prev, expires_at: e.target.value }))}
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+              className="bg-dozyr-medium-gray border-dozyr-light-gray text-black"
               disabled={isSubmitting || isLoading}
             />
           </div>
 
           {/* Applicable Packages */}
           <div className="space-y-2">
-            <Label className="text-white">Applicable To *</Label>
+            <Label className="text-black">Applicable To *</Label>
             <div className="space-y-2">
               {PACKAGE_OPTIONS.map((option) => (
                 <div key={option.value} className="flex items-center space-x-2">
@@ -418,7 +418,7 @@ export function DiscountFormModal({
                   />
                   <Label
                     htmlFor={`package-${option.value}`}
-                    className="text-white text-sm font-normal cursor-pointer"
+                    className="text-black text-sm font-normal cursor-pointer"
                   >
                     {option.label}
                   </Label>

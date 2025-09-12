@@ -189,7 +189,7 @@ export function NewConversationDialog({ open, onClose }: NewConversationDialogPr
                         )}
                       </div>
                       <div>
-                        <p className="font-medium text-white">
+                        <p className="font-medium text-black">
                           {user.first_name} {user.last_name}
                         </p>
                         <p className="text-sm text-dozyr-light-gray">
@@ -221,7 +221,7 @@ export function NewConversationDialog({ open, onClose }: NewConversationDialogPr
             ) : searchQuery.trim() && !loading ? (
               <div className="text-center py-8">
                 <User className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                <p className="text-white font-medium mb-2">0 users found</p>
+                <p className="text-black font-medium mb-2">0 users found</p>
                 <p className="text-sm text-dozyr-light-gray">
                   {isValidEmail(searchQuery) 
                     ? "User not in system - try the button below"
@@ -232,7 +232,7 @@ export function NewConversationDialog({ open, onClose }: NewConversationDialogPr
             ) : !searchQuery.trim() ? (
               <div className="text-center py-8">
                 <Search className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                <p className="text-white font-medium mb-2">Start A Conversation</p>
+                <p className="text-black font-medium mb-2">Start A Conversation</p>
                 <p className="text-sm text-dozyr-light-gray">
                   Search for users or enter an email address to connect
                 </p>

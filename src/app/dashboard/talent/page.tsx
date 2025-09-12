@@ -181,7 +181,7 @@ export default function TalentDashboardPage() {
           {/* Welcome Section */}
           <motion.div {...fadeInUp}>
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">
                 Welcome back, {user?.first_name}! 👋
               </h1>
               <p className="text-dozyr-light-gray">
@@ -203,7 +203,7 @@ export default function TalentDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Applications Sent</p>
-                      <p className="text-2xl font-bold text-white">{stats.applications_sent}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">{stats.applications_sent}</p>
                     </div>
                     <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                       <Briefcase className="h-6 w-6 text-blue-400" />
@@ -219,7 +219,7 @@ export default function TalentDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Interviews</p>
-                      <p className="text-2xl font-bold text-white">{stats.interviews_scheduled}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">{stats.interviews_scheduled}</p>
                     </div>
                     <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                       <Clock className="h-6 w-6 text-green-400" />
@@ -235,7 +235,7 @@ export default function TalentDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Completed</p>
-                      <p className="text-2xl font-bold text-white">{stats.jobs_completed}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">{stats.jobs_completed}</p>
                     </div>
                     <div className="h-12 w-12 bg-dozyr-gold/20 rounded-lg flex items-center justify-center">
                       <CheckCircle className="h-6 w-6 text-dozyr-gold" />
@@ -251,7 +251,7 @@ export default function TalentDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-dozyr-light-gray text-sm font-medium">Total Earned</p>
-                      <p className="text-2xl font-bold text-white">${stats.total_earned.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-[var(--foreground)]">${stats.total_earned.toLocaleString()}</p>
                     </div>
                     <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                       <DollarSign className="h-6 w-6 text-green-400" />
@@ -279,7 +279,7 @@ export default function TalentDashboardPage() {
                   {recentApplications.map((application) => (
                     <div key={application.id} className="flex items-center justify-between p-4 bg-dozyr-dark-gray rounded-lg">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-white truncate">{application.job_title}</h4>
+                        <h4 className="font-semibold text-[var(--foreground)] truncate">{application.job_title}</h4>
                         <p className="text-sm text-dozyr-light-gray">{application.company_name}</p>
                         <p className="text-xs text-dozyr-light-gray">Applied {application.applied_at}</p>
                       </div>
@@ -312,7 +312,7 @@ export default function TalentDashboardPage() {
                     <div key={job.id} className="p-4 bg-dozyr-dark-gray rounded-lg hover:bg-dozyr-medium-gray/50 transition-colors cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-white truncate">{job.title}</h4>
+                          <h4 className="font-semibold text-[var(--foreground)] truncate">{job.title}</h4>
                           <div className="flex items-center gap-4 text-sm text-dozyr-light-gray mt-1">
                             <div className="flex items-center gap-1">
                               <Building className="h-3 w-3" />
@@ -355,7 +355,7 @@ export default function TalentDashboardPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Button 
-                    className="h-auto p-6 flex-col items-start bg-purple-600 text-white hover:bg-purple-700" 
+                    className="h-auto p-6 flex-col items-start bg-purple-600 text-[var(--foreground)] hover:bg-purple-700" 
                     onClick={() => router.push('/profile/edit')}
                   >
                     <Edit3 className="h-6 w-6 mb-2" />

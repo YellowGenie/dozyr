@@ -55,7 +55,7 @@ export default function ManagerSetupPage() {
           {/* Header */}
           <motion.div {...fadeInUp}>
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">Complete Your Manager Profile</h1>
+              <h1 className="text-3xl font-bold text-black mb-2">Complete Your Manager Profile</h1>
               <p className="text-dozyr-light-gray">
                 We need some basic information about your company to get started
               </p>
@@ -74,7 +74,7 @@ export default function ManagerSetupPage() {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">Company Name *</label>
+                    <label className="text-sm font-medium text-black">Company Name *</label>
                     <Input
                       required
                       value={formData.company_name}
@@ -84,25 +84,25 @@ export default function ManagerSetupPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">Company Description *</label>
+                    <label className="text-sm font-medium text-black">Company Description *</label>
                     <textarea
                       required
                       value={formData.company_description}
                       onChange={(e) => handleInputChange('company_description', e.target.value)}
                       placeholder="Tell us about your company..."
-                      className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-white placeholder-dozyr-light-gray resize-none"
+                      className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-black placeholder-dozyr-light-gray resize-none"
                       rows={4}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white">Company Size *</label>
+                      <label className="text-sm font-medium text-black">Company Size *</label>
                       <select
                         required
                         value={formData.company_size}
                         onChange={(e) => handleInputChange('company_size', e.target.value)}
-                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-white"
+                        className="w-full bg-dozyr-dark-gray border border-dozyr-medium-gray rounded-lg px-3 py-2 text-black"
                       >
                         <option value="1-10">1-10 employees</option>
                         <option value="11-50">11-50 employees</option>
@@ -113,7 +113,7 @@ export default function ManagerSetupPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white">Industry *</label>
+                      <label className="text-sm font-medium text-black">Industry *</label>
                       <Input
                         required
                         value={formData.industry}
@@ -124,7 +124,7 @@ export default function ManagerSetupPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">Location *</label>
+                    <label className="text-sm font-medium text-black">Location *</label>
                     <Input
                       required
                       value={formData.location}

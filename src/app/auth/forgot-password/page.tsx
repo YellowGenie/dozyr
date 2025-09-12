@@ -77,9 +77,9 @@ export default function ForgotPasswordPage() {
           <Card className="border border-dozyr-medium-gray shadow-2xl">
             <CardHeader className="text-center pb-4">
               <div className="mx-auto w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4">
-                <CheckCircle className="h-8 w-8 text-white" />
+                <CheckCircle className="h-8 w-8 text-black" />
               </div>
-              <CardTitle className="text-2xl font-bold text-white">
+              <CardTitle className="text-2xl font-bold text-black">
                 Check Your Email
               </CardTitle>
               <p className="text-dozyr-light-gray">
@@ -155,7 +155,7 @@ export default function ForgotPasswordPage() {
             <div className="mx-auto w-16 h-16 bg-dozyr-gold rounded-full flex items-center justify-center mb-4">
               <Mail className="h-8 w-8 text-dozyr-black" />
             </div>
-            <CardTitle className="text-2xl font-bold text-white">
+            <CardTitle className="text-2xl font-bold text-black">
               Reset Password
             </CardTitle>
             <p className="text-dozyr-light-gray">
@@ -172,7 +172,7 @@ export default function ForgotPasswordPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white">
+                <label className="text-sm font-medium text-black">
                   Email Address
                 </label>
                 <div className="relative">

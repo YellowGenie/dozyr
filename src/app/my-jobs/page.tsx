@@ -128,7 +128,7 @@ export default function MyJobsPage() {
           <motion.div {...fadeInUp}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">My Jobs</h1>
+                <h1 className="text-3xl font-bold text-black mb-2">My Jobs</h1>
                 <p className="text-dozyr-light-gray">
                   Manage your job postings and applications
                 </p>
@@ -149,7 +149,7 @@ export default function MyJobsPage() {
                 <Card>
                   <CardContent className="p-12 text-center">
                     <Building className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">Complete Your Manager Profile</h3>
+                    <h3 className="text-xl font-semibold text-black mb-2">Complete Your Manager Profile</h3>
                     <p className="text-dozyr-light-gray mb-6">
                       You need to set up your manager profile before you can post jobs and manage your listings.
                     </p>
@@ -167,7 +167,7 @@ export default function MyJobsPage() {
                 <Card>
                   <CardContent className="p-12 text-center">
                     <Briefcase className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">No jobs posted yet</h3>
+                    <h3 className="text-xl font-semibold text-black mb-2">No jobs posted yet</h3>
                     <p className="text-dozyr-light-gray mb-6">
                       Start by posting your first job to attract talented freelancers.
                     </p>
@@ -193,7 +193,7 @@ export default function MyJobsPage() {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="absolute -top-2 left-4 z-10 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
+                      className="absolute -top-2 left-4 z-10 bg-red-500 text-black px-3 py-1 rounded-full text-xs font-bold shadow-lg"
                     >
                       <Bell className="h-3 w-3 inline mr-1" />
                       {job.new_proposals_count} new proposal{job.new_proposals_count !== 1 ? 's' : ''}
@@ -207,12 +207,12 @@ export default function MyJobsPage() {
                           <div className="flex items-start gap-4">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
-                                <h3 className="text-xl font-semibold text-white">{job.title}</h3>
+                                <h3 className="text-xl font-semibold text-black">{job.title}</h3>
                                 <Badge className={getStatusColor(job.status)}>
                                   {job.status.replace('_', ' ')}
                                 </Badge>
                                 {job.new_proposals_count > 0 && (
-                                  <Badge className="bg-red-500 text-white animate-pulse">
+                                  <Badge className="bg-red-500 text-black animate-pulse">
                                     {job.new_proposals_count} NEW
                                   </Badge>
                                 )}
@@ -246,7 +246,7 @@ export default function MyJobsPage() {
                               <Button 
                                 variant={job.new_proposals_count > 0 ? "default" : "outline"} 
                                 size="sm"
-                                className={job.new_proposals_count > 0 ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" : ""}
+                                className={job.new_proposals_count > 0 ? "bg-red-500 hover:bg-red-600 text-black animate-pulse" : ""}
                               >
                                 <FileText className="h-4 w-4 mr-2" />
                                 View Proposals

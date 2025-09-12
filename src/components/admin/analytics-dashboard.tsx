@@ -58,7 +58,7 @@ const MetricCard = ({ title, value, change, changeLabel, icon, trend, color = 't
               {title}
             </p>
             <div className="flex items-baseline gap-2 mb-2">
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-2xl font-bold text-[var(--foreground)]">
                 {typeof value === 'number' && title.includes('Revenue') ? formatCurrency(value) : value}
               </h3>
               {change !== undefined && (
@@ -193,7 +193,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
       {/* Time Range Selector */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-1">Platform Analytics</h2>
+          <h2 className="text-2xl font-bold text-[var(--foreground)] mb-1">Platform Analytics</h2>
           <p className="text-dozyr-light-gray">
             Real-time insights and performance metrics
           </p>
@@ -202,7 +202,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as '7d' | '30d' | '90d')}
-            className="bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-white text-sm"
+            className="bg-dozyr-dark-gray border border-dozyr-medium-gray rounded px-3 py-2 text-[var(--foreground)] text-sm"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
@@ -300,7 +300,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                 <p className="text-dozyr-light-gray text-sm font-medium mb-1">
                   Server Uptime
                 </p>
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-[var(--foreground)]">
                   {additionalMetrics.server_uptime}%
                 </h3>
               </div>
@@ -322,7 +322,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                 <p className="text-dozyr-light-gray text-sm font-medium mb-1">
                   API Response Time
                 </p>
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-[var(--foreground)]">
                   {additionalMetrics.api_response_time}
                 </h3>
               </div>
@@ -341,7 +341,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                 <p className="text-dozyr-light-gray text-sm font-medium mb-1">
                   Error Rate
                 </p>
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-[var(--foreground)]">
                   {additionalMetrics.error_rate}%
                 </h3>
               </div>
@@ -361,7 +361,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                 <p className="text-dozyr-light-gray text-sm font-medium mb-1">
                   User Satisfaction
                 </p>
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-[var(--foreground)]">
                   {additionalMetrics.user_satisfaction}/5.0
                 </h3>
               </div>

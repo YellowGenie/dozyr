@@ -46,7 +46,7 @@ export default function PublicProfilePage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto"></div>
-          <p className="text-white/70">Loading profile...</p>
+          <p className="text-black/70">Loading profile...</p>
         </div>
       </div>
     )

@@ -163,7 +163,7 @@ export function PackageFormModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] bg-dozyr-dark-gray border-dozyr-medium-gray">
         <DialogHeader>
-          <DialogTitle className="text-white">
+          <DialogTitle className="text-[var(--foreground)]">
             {editPackage ? 'Edit Package' : 'Create New Package'}
           </DialogTitle>
           <DialogDescription className="text-dozyr-light-gray">
@@ -177,26 +177,26 @@ export function PackageFormModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Package Name */}
           <div>
-            <Label htmlFor="name" className="text-white">Package Name</Label>
+            <Label htmlFor="name" className="text-[var(--foreground)]">Package Name</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="e.g., Professional Pack"
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+              className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
             />
             {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
           </div>
 
           {/* Description */}
           <div>
-            <Label htmlFor="description" className="text-white">Description</Label>
+            <Label htmlFor="description" className="text-[var(--foreground)]">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Describe what this package offers..."
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+              className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               rows={3}
             />
             {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
@@ -205,7 +205,7 @@ export function PackageFormModal({
           {/* Price and Credits Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="price" className="text-white">Price ($)</Label>
+              <Label htmlFor="price" className="text-[var(--foreground)]">Price ($)</Label>
               <Input
                 id="price"
                 type="number"
@@ -213,19 +213,19 @@ export function PackageFormModal({
                 min="0"
                 value={formData.price}
                 onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
             </div>
             <div>
-              <Label htmlFor="duration_days" className="text-white">Duration (days)</Label>
+              <Label htmlFor="duration_days" className="text-[var(--foreground)]">Duration (days)</Label>
               <Input
                 id="duration_days"
                 type="number"
                 min="1"
                 value={formData.duration_days}
                 onChange={(e) => handleInputChange('duration_days', parseInt(e.target.value) || 30)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.duration_days && <p className="text-red-400 text-sm mt-1">{errors.duration_days}</p>}
             </div>
@@ -234,26 +234,26 @@ export function PackageFormModal({
           {/* Credits Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="post_credits" className="text-white">Regular Post Credits</Label>
+              <Label htmlFor="post_credits" className="text-[var(--foreground)]">Regular Post Credits</Label>
               <Input
                 id="post_credits"
                 type="number"
                 min="1"
                 value={formData.post_credits}
                 onChange={(e) => handleInputChange('post_credits', parseInt(e.target.value) || 0)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.post_credits && <p className="text-red-400 text-sm mt-1">{errors.post_credits}</p>}
             </div>
             <div>
-              <Label htmlFor="featured_credits" className="text-white">Featured Post Credits</Label>
+              <Label htmlFor="featured_credits" className="text-[var(--foreground)]">Featured Post Credits</Label>
               <Input
                 id="featured_credits"
                 type="number"
                 min="0"
                 value={formData.featured_credits}
                 onChange={(e) => handleInputChange('featured_credits', parseInt(e.target.value) || 0)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.featured_credits && <p className="text-red-400 text-sm mt-1">{errors.featured_credits}</p>}
             </div>
@@ -261,14 +261,14 @@ export function PackageFormModal({
 
           {/* Features */}
           <div>
-            <Label className="text-white">Features</Label>
+            <Label className="text-[var(--foreground)]">Features</Label>
             <div className="flex gap-2 mb-2">
               <Input
                 value={newFeature}
                 onChange={(e) => setNewFeature(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Add a feature..."
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-white flex-1"
+                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)] flex-1"
               />
               <Button type="button" onClick={addFeature} size="sm">
                 <Plus className="h-4 w-4" />

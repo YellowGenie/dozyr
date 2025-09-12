@@ -280,7 +280,7 @@ export default function LandingPage() {
             ].map((feature, index) => (
               <motion.div key={index} variants={fadeInUp}>
                 <div className="enhanced-card h-full hover:border-[var(--accent)]/50 transition-all duration-300 group">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center mb-6 text-white icon-depth group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center mb-6 text-black icon-depth group-hover:scale-110 transition-transform duration-300">
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
@@ -348,7 +348,7 @@ export default function LandingPage() {
               <Link href="/auth">
                 <div className="enhanced-card hover:border-[var(--accent)] transition-all duration-300 group cursor-pointer interactive">
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center text-white icon-depth group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center text-black icon-depth group-hover:scale-110 transition-transform duration-300">
                       <Users className="h-8 w-8" />
                     </div>
                     <ArrowRight className="h-6 w-6 text-[var(--accent)] group-hover:translate-x-2 transition-transform duration-300" />
@@ -366,7 +366,7 @@ export default function LandingPage() {
               <Link href="/auth">
                 <div className="enhanced-card hover:border-[var(--accent)] transition-all duration-300 group cursor-pointer interactive">
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center text-white icon-depth group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center text-black icon-depth group-hover:scale-110 transition-transform duration-300">
                       <Award className="h-8 w-8" />
                     </div>
                     <ArrowRight className="h-6 w-6 text-[var(--accent)] group-hover:translate-x-2 transition-transform duration-300" />
@@ -401,12 +401,12 @@ export default function LandingPage() {
         
         <div className="relative max-w-6xl mx-auto text-center px-6 lg:px-8">
           <motion.div {...fadeInUp}>
-            <h2 className="text-5xl lg:text-7xl font-bold text-white mb-8 leading-tight">
+            <h2 className="text-5xl lg:text-7xl font-bold text-black mb-8 leading-tight">
               Ready to Shape
               <br />
               the Future?
             </h2>
-            <p className="text-xl lg:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl lg:text-2xl text-black/90 mb-12 max-w-3xl mx-auto leading-relaxed">
               Join the next generation of remote work and unlock unlimited possibilities
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -417,7 +417,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="/jobs">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-[var(--accent)] text-xl px-12 py-6 h-auto rounded-2xl interactive">
+                <Button size="lg" variant="outline" className="border-white text-black hover:bg-white hover:text-[var(--accent)] text-xl px-12 py-6 h-auto rounded-2xl interactive">
                   <Globe className="h-6 w-6 mr-3" />
                   Explore Platform
                 </Button>
@@ -475,13 +475,13 @@ export default function LandingPage() {
               </p>
               <div className="flex space-x-4">
                 <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center cursor-pointer interactive hover:bg-[var(--accent)] transition-all duration-300">
-                  <Globe className="h-5 w-5 text-gray-300 hover:text-white" />
+                  <Globe className="h-5 w-5 text-gray-300 hover:text-black" />
                 </div>
                 <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center cursor-pointer interactive hover:bg-[var(--accent)] transition-all duration-300">
-                  <MessageCircle className="h-5 w-5 text-gray-300 hover:text-white" />
+                  <MessageCircle className="h-5 w-5 text-gray-300 hover:text-black" />
                 </div>
                 <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center cursor-pointer interactive hover:bg-[var(--accent)] transition-all duration-300">
-                  <Users className="h-5 w-5 text-gray-300 hover:text-white" />
+                  <Users className="h-5 w-5 text-gray-300 hover:text-black" />
                 </div>
               </div>
             </div>

@@ -166,7 +166,7 @@ export default function TalentProfilePage() {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto"></div>
-          <p className="text-white/70">Loading profile...</p>
+          <p className="text-[var(--foreground)]/70">Loading profile...</p>
         </div>
       </div>
     )
@@ -177,9 +177,9 @@ export default function TalentProfilePage() {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Card className="glass-card border-white/20 backdrop-blur-sm">
           <CardContent className="p-12 text-center">
-            <User className="h-12 w-12 text-white/40 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">Profile not found</h3>
-            <p className="text-white/60 mb-6">
+            <User className="h-12 w-12 text-[var(--foreground)]/40 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">Profile not found</h3>
+            <p className="text-[var(--foreground)]/60 mb-6">
               The profile you're looking for doesn't exist or has been removed.
             </p>
             <Link href="/talent">
@@ -202,7 +202,7 @@ export default function TalentProfilePage() {
         {isOwnProfile && (
           <div className="fixed top-4 right-4 z-50">
             <Link href="/profile/edit">
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white rounded-full">
+              <Button className="bg-purple-600 hover:bg-purple-700 text-black rounded-full">
                 <Edit3 className="h-4 w-4 mr-2" />
                 Edit Profile
               </Button>
@@ -233,7 +233,7 @@ export default function TalentProfilePage() {
                     <User className="h-8 w-8 text-dozyr-black" />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-bold text-white mb-1">
+                    <h1 className="text-3xl font-bold text-[var(--foreground)] mb-1">
                       {talent.first_name} {talent.last_name}
                     </h1>
                     <p className="text-dozyr-gold text-lg font-medium">{talent.title}</p>
@@ -241,7 +241,7 @@ export default function TalentProfilePage() {
                       {talent.rating && (
                         <div className="flex items-center gap-1">
                           <Star className="h-4 w-4 text-dozyr-gold fill-current" />
-                          <span className="text-white font-medium">{talent.rating}</span>
+                          <span className="text-[var(--foreground)] font-medium">{talent.rating}</span>
                           {talent.completed_projects && (
                             <span className="text-dozyr-light-gray">({talent.completed_projects} projects)</span>
                           )}
@@ -325,13 +325,13 @@ export default function TalentProfilePage() {
                   <CardContent className="space-y-4">
                     {talent.education && (
                       <div>
-                        <h4 className="font-medium text-white mb-1">Education</h4>
+                        <h4 className="font-medium text-[var(--foreground)] mb-1">Education</h4>
                         <p className="text-dozyr-light-gray">{talent.education}</p>
                       </div>
                     )}
                     {talent.certifications && talent.certifications.length > 0 && (
                       <div>
-                        <h4 className="font-medium text-white mb-2">Certifications</h4>
+                        <h4 className="font-medium text-[var(--foreground)] mb-2">Certifications</h4>
                         <div className="flex flex-wrap gap-2">
                           {talent.certifications.map((cert: string, index: number) => (
                             <Badge key={index} variant="outline" className="text-dozyr-light-gray">
@@ -359,35 +359,35 @@ export default function TalentProfilePage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-3 bg-dozyr-medium-gray/20 rounded-lg">
-                      <div className="text-2xl font-bold text-white">${talent.hourly_rate || 'N/A'}</div>
+                      <div className="text-2xl font-bold text-[var(--foreground)]">${talent.hourly_rate || 'N/A'}</div>
                       <div className="text-xs text-dozyr-light-gray">per hour</div>
                     </div>
                     <div className="text-center p-3 bg-dozyr-medium-gray/20 rounded-lg">
-                      <div className="text-2xl font-bold text-white">{talent.completed_projects || '0'}</div>
+                      <div className="text-2xl font-bold text-[var(--foreground)]">{talent.completed_projects || '0'}</div>
                       <div className="text-xs text-dozyr-light-gray">projects</div>
                     </div>
                   </div>
                   <div className="space-y-3 pt-2">
                     <div className="flex items-center justify-between">
                       <span className="text-dozyr-light-gray">Location</span>
-                      <span className="text-white font-medium">{talent.location || 'Not specified'}</span>
+                      <span className="text-[var(--foreground)] font-medium">{talent.location || 'Not specified'}</span>
                     </div>
                     {talent.experience_years && (
                       <div className="flex items-center justify-between">
                         <span className="text-dozyr-light-gray">Experience</span>
-                        <span className="text-white font-medium">{talent.experience_years}+ years</span>
+                        <span className="text-[var(--foreground)] font-medium">{talent.experience_years}+ years</span>
                       </div>
                     )}
                     {talent.response_time && (
                       <div className="flex items-center justify-between">
                         <span className="text-dozyr-light-gray">Response Time</span>
-                        <span className="text-white font-medium">{talent.response_time}</span>
+                        <span className="text-[var(--foreground)] font-medium">{talent.response_time}</span>
                       </div>
                     )}
                     {talent.total_earned && (
                       <div className="flex items-center justify-between">
                         <span className="text-dozyr-light-gray">Total Earned</span>
-                        <span className="text-white font-medium">${talent.total_earned?.toLocaleString()}</span>
+                        <span className="text-[var(--foreground)] font-medium">${talent.total_earned?.toLocaleString()}</span>
                       </div>
                     )}
                   </div>

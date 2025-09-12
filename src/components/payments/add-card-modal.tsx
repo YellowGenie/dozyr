@@ -102,7 +102,7 @@ function CardForm({ onSuccess, onClose }: { onSuccess: () => void; onClose: () =
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-white mb-3">
+        <label className="block text-sm font-medium text-black mb-3">
           Card Information
         </label>
         <div className="bg-dozyr-black border border-dozyr-medium-gray rounded-lg p-4">

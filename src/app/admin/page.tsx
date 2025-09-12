@@ -280,7 +280,7 @@ export default function AdminPage() {
         "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
         isActive
           ? "bg-dozyr-gold text-dozyr-black"
-          : "text-dozyr-light-gray hover:text-white hover:bg-dozyr-medium-gray"
+          : "text-dozyr-light-gray hover:text-[var(--foreground)] hover:bg-dozyr-medium-gray"
       )}
     >
       {icon}
@@ -299,7 +299,7 @@ export default function AdminPage() {
               </span>
             </div>
             <div>
-              <h4 className="font-semibold text-white">
+              <h4 className="font-semibold text-[var(--foreground)]">
                 {userData.first_name} {userData.last_name}
               </h4>
               <p className="text-sm text-dozyr-light-gray">{userData.email}</p>
@@ -347,7 +347,7 @@ export default function AdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h2>
+          <h2 className="text-3xl font-bold text-[var(--foreground)] mb-2">Admin Dashboard</h2>
           <p className="text-dozyr-light-gray">
             Welcome back, {user?.first_name}. Here's what's happening on your platform.
           </p>
@@ -459,7 +459,7 @@ export default function AdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">User Management</h2>
+          <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">User Management</h2>
           <p className="text-dozyr-light-gray">
             Manage user accounts, verifications, and permissions.
           </p>
@@ -475,14 +475,14 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <Users className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{stats?.users?.total_users || 0}</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">{stats?.users?.total_users || 0}</p>
             <p className="text-sm text-dozyr-light-gray">Total Users</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <UserCheck className="h-8 w-8 text-green-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-[var(--foreground)]">
               {stats?.users?.verified_users || 0}
             </p>
             <p className="text-sm text-dozyr-light-gray">Verified</p>
@@ -491,7 +491,7 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <Briefcase className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-[var(--foreground)]">
               {stats?.users?.total_talents || 0}
             </p>
             <p className="text-sm text-dozyr-light-gray">Talents</p>
@@ -500,7 +500,7 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <Shield className="h-8 w-8 text-dozyr-gold mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-[var(--foreground)]">
               {stats?.users?.total_managers || 0}
             </p>
             <p className="text-sm text-dozyr-light-gray">Managers</p>
@@ -543,7 +543,7 @@ export default function AdminPage() {
   const LogsTab = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">System Logs</h2>
+        <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">System Logs</h2>
         <p className="text-dozyr-light-gray">
           Monitor system activity, errors, and performance metrics.
         </p>
@@ -556,7 +556,7 @@ export default function AdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Pricing & Discounts</h2>
+          <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">Pricing & Discounts</h2>
           <p className="text-dozyr-light-gray">
             Manage pricing packages, discounts, and promotional codes.
           </p>
@@ -601,7 +601,7 @@ export default function AdminPage() {
             <div className="space-y-6">
               {/* Active Packages */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-[var(--foreground)] mb-4 flex items-center gap-2">
                   <Package className="h-5 w-5" />
                   Active Packages
                 </h3>
@@ -611,7 +611,7 @@ export default function AdminPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-white">{pkg.name}</h3>
+                      <h3 className="font-semibold text-[var(--foreground)]">{pkg.name}</h3>
                       {!pkg.is_active && (
                         <Badge variant="outline" className="text-xs text-orange-400 border-orange-400">
                           Archived
@@ -663,7 +663,7 @@ export default function AdminPage() {
               {/* Archived Packages */}
               {pricingPackages.filter(pkg => !pkg.is_active).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-[var(--foreground)] mb-4 flex items-center gap-2">
                     <Archive className="h-5 w-5 text-orange-400" />
                     Archived Packages
                   </h3>
@@ -673,7 +673,7 @@ export default function AdminPage() {
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-white">{pkg.name}</h3>
+                              <h3 className="font-semibold text-[var(--foreground)]">{pkg.name}</h3>
                               <Badge variant="outline" className="text-xs text-orange-400 border-orange-400">
                                 Archived
                               </Badge>
@@ -756,7 +756,7 @@ export default function AdminPage() {
             <div className="space-y-6">
               {/* Active Discounts */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-[var(--foreground)] mb-4 flex items-center gap-2">
                   <Tag className="h-5 w-5" />
                   Active Discounts
                 </h3>
@@ -774,7 +774,7 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="text-white font-medium">{discount.code}</p>
+                            <p className="text-[var(--foreground)] font-medium">{discount.code}</p>
                             <Badge variant={
                               discount.status === 'valid' ? 'default' : 
                               discount.status === 'gift' ? 'secondary' : 'destructive'
@@ -791,7 +791,7 @@ export default function AdminPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-white text-sm">
+                          <p className="text-[var(--foreground)] text-sm">
                             {discount.usage_count || 0}
                             {discount.max_uses ? `/${discount.max_uses}` : ''} used
                           </p>
@@ -824,7 +824,7 @@ export default function AdminPage() {
               {/* Archived/Inactive Discounts */}
               {discounts.filter(d => d.archived_at !== null || d.status === 'expired').length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-[var(--foreground)] mb-4 flex items-center gap-2">
                     <Archive className="h-5 w-5 text-orange-400" />
                     Archived & Expired Discounts
                   </h3>
@@ -837,7 +837,7 @@ export default function AdminPage() {
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="text-white font-medium">{discount.code}</p>
+                              <p className="text-[var(--foreground)] font-medium">{discount.code}</p>
                               <Badge variant="outline" className="text-orange-400 border-orange-400">
                                 {discount.archived_at ? 'Archived' : discount.status}
                               </Badge>
@@ -851,7 +851,7 @@ export default function AdminPage() {
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <p className="text-white text-sm">
+                            <p className="text-[var(--foreground)] text-sm">
                               {discount.usage_count || 0}
                               {discount.max_uses ? `/${discount.max_uses}` : ''} used
                             </p>
@@ -925,7 +925,7 @@ export default function AdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Email Templates</h2>
+          <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">Email Templates</h2>
           <p className="text-dozyr-light-gray">
             Manage email templates and monitor email delivery.
           </p>
@@ -955,7 +955,7 @@ export default function AdminPage() {
               <Card key={index} className="border-dozyr-medium-gray">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-white">{template.name}</h3>
+                    <h3 className="font-semibold text-[var(--foreground)]">{template.name}</h3>
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="ghost">
                         <Edit3 className="h-3 w-3" />
@@ -985,28 +985,28 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <Mail className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">1,234</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">1,234</p>
             <p className="text-sm text-dozyr-light-gray">Emails Sent</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <Eye className="h-8 w-8 text-green-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">98.5%</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">98.5%</p>
             <p className="text-sm text-dozyr-light-gray">Delivery Rate</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <TrendingUp className="h-8 w-8 text-dozyr-gold mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">76.2%</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">76.2%</p>
             <p className="text-sm text-dozyr-light-gray">Open Rate</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <AlertTriangle className="h-8 w-8 text-red-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">18</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">18</p>
             <p className="text-sm text-dozyr-light-gray">Failed</p>
           </CardContent>
         </Card>
@@ -1018,7 +1018,7 @@ export default function AdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">Invoice Management</h2>
+          <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">Invoice Management</h2>
           <p className="text-dozyr-light-gray">
             Create and manage invoices, track payments.
           </p>
@@ -1034,28 +1034,28 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <Receipt className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{stats?.revenue?.total_invoices || 0}</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">{stats?.revenue?.total_invoices || 0}</p>
             <p className="text-sm text-dozyr-light-gray">Total Invoices</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <DollarSign className="h-8 w-8 text-green-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">${(stats?.revenue?.total_revenue || 0).toLocaleString()}</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">${(stats?.revenue?.total_revenue || 0).toLocaleString()}</p>
             <p className="text-sm text-dozyr-light-gray">Total Revenue</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <TrendingUp className="h-8 w-8 text-dozyr-gold mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">${(stats?.revenue?.pending_revenue || 0).toLocaleString()}</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">${(stats?.revenue?.pending_revenue || 0).toLocaleString()}</p>
             <p className="text-sm text-dozyr-light-gray">Pending</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <AlertTriangle className="h-8 w-8 text-red-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">${(stats?.revenue?.overdue_revenue || 0).toLocaleString()}</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">${(stats?.revenue?.overdue_revenue || 0).toLocaleString()}</p>
             <p className="text-sm text-dozyr-light-gray">Overdue</p>
           </CardContent>
         </Card>
@@ -1088,12 +1088,12 @@ export default function AdminPage() {
                     <Receipt className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{invoice.number}</p>
+                    <p className="text-[var(--foreground)] font-medium">{invoice.number}</p>
                     <p className="text-dozyr-light-gray text-sm">{invoice.user}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-white font-medium">${invoice.amount}</p>
+                  <p className="text-[var(--foreground)] font-medium">${invoice.amount}</p>
                   <Badge 
                     variant={invoice.status === 'paid' ? 'default' : invoice.status === 'overdue' ? 'destructive' : 'secondary'}
                   >
@@ -1111,7 +1111,7 @@ export default function AdminPage() {
   const AnalyticsTab = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Advanced Analytics</h2>
+        <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">Advanced Analytics</h2>
         <p className="text-dozyr-light-gray">
           Detailed analytics, user behavior, and platform insights.
         </p>
@@ -1122,7 +1122,7 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <Users className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">2,456</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">2,456</p>
             <p className="text-sm text-dozyr-light-gray">Active Users</p>
             <p className="text-xs text-green-400 mt-1">+12.5% from last month</p>
           </CardContent>
@@ -1130,7 +1130,7 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <Briefcase className="h-8 w-8 text-green-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">1,234</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">1,234</p>
             <p className="text-sm text-dozyr-light-gray">Jobs Posted</p>
             <p className="text-xs text-green-400 mt-1">+8.3% from last month</p>
           </CardContent>
@@ -1138,7 +1138,7 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <MessageSquare className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">15,678</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">15,678</p>
             <p className="text-sm text-dozyr-light-gray">Messages Sent</p>
             <p className="text-xs text-green-400 mt-1">+23.1% from last month</p>
           </CardContent>
@@ -1146,7 +1146,7 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <DollarSign className="h-8 w-8 text-dozyr-gold mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">$89,456</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">$89,456</p>
             <p className="text-sm text-dozyr-light-gray">Revenue</p>
             <p className="text-xs text-green-400 mt-1">+15.7% from last month</p>
           </CardContent>
@@ -1163,7 +1163,7 @@ export default function AdminPage() {
   const SettingsTab = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Platform Settings</h2>
+        <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">Platform Settings</h2>
         <p className="text-dozyr-light-gray">
           Configure platform-wide settings and preferences.
         </p>

@@ -636,7 +636,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                   <HelpCircle className="h-5 w-5 text-dozyr-gold" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-semibold text-white">
+                  <h1 className="text-xl font-semibold text-[var(--foreground)]">
                     {selectedItem ? selectedItem.title : 'Help Center'}
                   </h1>
                   <p className="text-sm text-dozyr-light-gray">
@@ -648,7 +648,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                 {selectedItem && (
                   <button
                     onClick={handleBack}
-                    className="px-3 py-2 text-sm text-dozyr-light-gray hover:text-white transition-colors"
+                    className="px-3 py-2 text-sm text-dozyr-light-gray hover:text-[var(--foreground)] transition-colors"
                   >
                     ← Back
                   </button>
@@ -675,13 +675,13 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                         placeholder="Search help articles..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-dozyr-black border border-dozyr-medium-gray rounded-lg text-white placeholder-dozyr-light-gray focus:border-dozyr-gold focus:outline-none transition-colors"
+                        className="w-full pl-10 pr-4 py-2 bg-dozyr-black border border-dozyr-medium-gray rounded-lg text-[var(--foreground)] placeholder-dozyr-light-gray focus:border-dozyr-gold focus:outline-none transition-colors"
                       />
                     </div>
 
                     {/* Role Filter */}
                     <div className="mb-6">
-                      <h3 className="text-sm font-medium text-white mb-3">Filter by Role</h3>
+                      <h3 className="text-sm font-medium text-[var(--foreground)] mb-3">Filter by Role</h3>
                       <div className="grid grid-cols-2 gap-2">
                         {roles.map((role) => (
                           <button
@@ -690,7 +690,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                             className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                               selectedRole === role.id
                                 ? 'bg-dozyr-gold text-black'
-                                : 'bg-white/5 text-dozyr-light-gray hover:bg-white/10 hover:text-white'
+                                : 'bg-white/5 text-dozyr-light-gray hover:bg-white/10 hover:text-black'
                             }`}
                           >
                             {role.name} ({role.count})
@@ -701,14 +701,14 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
 
                     {/* Category Filter */}
                     <div>
-                      <h3 className="text-sm font-medium text-white mb-3">Categories</h3>
+                      <h3 className="text-sm font-medium text-[var(--foreground)] mb-3">Categories</h3>
                       <div className="space-y-1">
                         <button
                           onClick={() => setSelectedCategory(null)}
                           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                             !selectedCategory
                               ? 'bg-dozyr-gold/15 text-dozyr-gold'
-                              : 'text-dozyr-light-gray hover:bg-white/5 hover:text-white'
+                              : 'text-dozyr-light-gray hover:bg-white/5 hover:text-black'
                           }`}
                         >
                           <Book className="h-4 w-4" />
@@ -724,7 +724,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                                 selectedCategory === category.id
                                   ? 'bg-dozyr-gold/15 text-dozyr-gold'
-                                  : 'text-dozyr-light-gray hover:bg-white/5 hover:text-white'
+                                  : 'text-dozyr-light-gray hover:bg-white/5 hover:text-black'
                               }`}
                             >
                               <Icon className="h-4 w-4" />
@@ -741,7 +741,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                     {Object.keys(groupedItems).length === 0 ? (
                       <div className="text-center py-12">
                         <Search className="h-12 w-12 text-dozyr-light-gray/50 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-white mb-2">No articles found</h3>
+                        <h3 className="text-lg font-medium text-black mb-2">No articles found</h3>
                         <p className="text-dozyr-light-gray">
                           Try adjusting your search terms or role filter.
                         </p>
@@ -750,7 +750,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                       <div className="space-y-8">
                         {Object.entries(groupedItems).map(([category, items]) => (
                           <div key={category}>
-                            <h2 className="text-lg font-semibold text-white mb-4 capitalize">
+                            <h2 className="text-lg font-semibold text-black mb-4 capitalize">
                               {category.replace('-', ' ')}
                             </h2>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -771,7 +771,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-2 mb-2">
-                                          <h3 className="font-medium text-white text-sm leading-snug">
+                                          <h3 className="font-medium text-black text-sm leading-snug">
                                             {item.title}
                                           </h3>
                                           <ArrowRight className="h-4 w-4 text-dozyr-light-gray/50 flex-shrink-0" />
@@ -837,7 +837,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                     {/* Steps */}
                     {selectedItem.content.steps && (
                       <div className="mb-8">
-                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
                           <CheckCircle className="h-5 w-5 text-dozyr-gold" />
                           Step-by-Step Guide
                         </h3>
@@ -849,7 +849,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                                   {index + 1}
                                 </div>
                                 <div className="flex-1">
-                                  <h4 className="font-medium text-white mb-2">{step.title}</h4>
+                                  <h4 className="font-medium text-black mb-2">{step.title}</h4>
                                   <p className="text-sm text-dozyr-light-gray mb-2">{step.description}</p>
                                   {step.action && (
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-dozyr-gold/10 text-dozyr-gold rounded-lg text-xs font-medium">
@@ -868,7 +868,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                     {/* Tips */}
                     {selectedItem.content.tips && (
                       <div className="mb-8">
-                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
                           <Star className="h-5 w-5 text-dozyr-gold" />
                           Pro Tips
                         </h3>
@@ -886,14 +886,14 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                     {/* FAQs */}
                     {selectedItem.content.faqs && (
                       <div className="mb-8">
-                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
                           <MessageSquare className="h-5 w-5 text-dozyr-gold" />
                           Frequently Asked Questions
                         </h3>
                         <div className="space-y-4">
                           {selectedItem.content.faqs.map((faq, index) => (
                             <div key={index} className="glass-card bg-white/5 p-4 rounded-lg">
-                              <h4 className="font-medium text-white mb-2">{faq.question}</h4>
+                              <h4 className="font-medium text-black mb-2">{faq.question}</h4>
                               <p className="text-sm text-dozyr-light-gray leading-relaxed">{faq.answer}</p>
                             </div>
                           ))}
@@ -908,7 +908,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                           <MessageSquare className="h-5 w-5 text-dozyr-gold" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-medium text-white mb-2">Still need help?</h3>
+                          <h3 className="font-medium text-black mb-2">Still need help?</h3>
                           <p className="text-sm text-dozyr-light-gray mb-4">
                             Can't find what you're looking for? Our support team is here to help.
                           </p>
@@ -916,7 +916,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                             <button className="px-4 py-2 bg-dozyr-gold text-black font-medium text-sm rounded-lg hover:bg-dozyr-gold/90 transition-colors">
                               Contact Support
                             </button>
-                            <button className="px-4 py-2 bg-white/5 text-white font-medium text-sm rounded-lg hover:bg-white/10 transition-colors">
+                            <button className="px-4 py-2 bg-white/5 text-black font-medium text-sm rounded-lg hover:bg-white/10 transition-colors">
                               Browse More Articles
                             </button>
                           </div>

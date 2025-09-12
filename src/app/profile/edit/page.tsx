@@ -109,7 +109,7 @@ export default function EditProfilePage() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto"></div>
-              <p className="text-white/70">Loading your profile...</p>
+              <p className="text-black/70">Loading your profile...</p>
             </div>
           </div>
         </DashboardLayout>
@@ -130,8 +130,8 @@ export default function EditProfilePage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Edit Profile</h1>
-              <p className="text-white/70">Create your stunning professional profile</p>
+              <h1 className="text-3xl font-bold text-black mb-2">Edit Profile</h1>
+              <p className="text-black/70">Create your stunning professional profile</p>
             </div>
             <div className="flex items-center gap-4">
               <Button variant="outline" onClick={() => router.push('/profile')} disabled={isSaving}>
@@ -163,7 +163,7 @@ export default function EditProfilePage() {
             <div className="col-span-3">
               <Card className="glass-card sticky top-6">
                 <CardHeader>
-                  <CardTitle className="text-white">Profile Sections</CardTitle>
+                  <CardTitle className="text-black">Profile Sections</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <nav className="space-y-2">
@@ -186,7 +186,7 @@ export default function EditProfilePage() {
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all interactive ${
                             activeTab === tab.id
                               ? 'bg-[var(--accent)] text-black accent-shadow'
-                              : 'text-white hover:bg-white/5'
+                              : 'text-black hover:bg-white/5'
                           }`}
                         >
                           <Icon className={`h-5 w-5 icon-depth ${activeTab === tab.id ? '' : 'text-[var(--accent)]'}`} />
@@ -212,16 +212,16 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <User className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Basic Information
                         </CardTitle>
-                        <p className="text-white/60">Tell the world about yourself</p>
+                        <p className="text-black/60">Tell the world about yourself</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <Label htmlFor="title" className="text-white">Professional Title *</Label>
+                            <Label htmlFor="title" className="text-black">Professional Title *</Label>
                             <Input
                               placeholder="e.g., Senior Full Stack Developer"
                               className="mt-2 glass-card"
@@ -229,7 +229,7 @@ export default function EditProfilePage() {
                             />
                           </div>
                           <div>
-                            <Label htmlFor="hourly_rate" className="text-white">Hourly Rate ($)</Label>
+                            <Label htmlFor="hourly_rate" className="text-black">Hourly Rate ($)</Label>
                             <Input
                               type="number"
                               placeholder="e.g., 75"
@@ -240,19 +240,19 @@ export default function EditProfilePage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="bio" className="text-white">Professional Bio *</Label>
+                          <Label htmlFor="bio" className="text-black">Professional Bio *</Label>
                           <Textarea
                             placeholder="Tell the world about yourself, your expertise, and what makes you unique..."
                             className="mt-2 min-h-32 glass-card"
                             defaultValue={profile?.bio}
                           />
-                          <p className="text-white/50 text-sm mt-1">
+                          <p className="text-black/50 text-sm mt-1">
                             Minimum 50 characters recommended
                           </p>
                         </div>
 
                         <div>
-                          <Label className="text-white">What You're Passionate About</Label>
+                          <Label className="text-black">What You're Passionate About</Label>
                           <div className="flex flex-wrap gap-2 mt-2 mb-3">
                             {profile?.passions?.map((passion, index) => (
                               <Badge key={index} className="bg-[var(--accent-muted)] text-[var(--accent)] border-[var(--accent)]/30">
@@ -292,11 +292,11 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <Award className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Skills & Expertise
                         </CardTitle>
-                        <p className="text-white/60">Showcase your technical and professional skills</p>
+                        <p className="text-black/60">Showcase your technical and professional skills</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="flex flex-wrap gap-2 mb-3">
@@ -318,7 +318,7 @@ export default function EditProfilePage() {
                             placeholder="Skill name (e.g., React)"
                             className="glass-card"
                           />
-                          <select className="glass-card bg-transparent border border-white/20 rounded-lg px-3 py-2 text-white">
+                          <select className="glass-card bg-transparent border border-white/20 rounded-lg px-3 py-2 text-black">
                             <option value="beginner">Beginner</option>
                             <option value="intermediate">Intermediate</option>
                             <option value="advanced">Advanced</option>
@@ -344,31 +344,31 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <Briefcase className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Work Experience
                         </CardTitle>
-                        <p className="text-white/60">Share your professional journey</p>
+                        <p className="text-black/60">Share your professional journey</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         {profile?.experience?.map((exp, index) => (
                           <div key={index} className="p-4 glass-card rounded-lg border border-white/10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="font-semibold text-white">{exp.position}</h3>
+                                <h3 className="font-semibold text-black">{exp.position}</h3>
                                 <p className="text-[var(--accent)]">{exp.company}</p>
-                                <p className="text-white/60 text-sm">{exp.start_date} - {exp.end_date || 'Present'}</p>
+                                <p className="text-black/60 text-sm">{exp.start_date} - {exp.end_date || 'Present'}</p>
                               </div>
                               <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                            <p className="text-white/80 text-sm">{exp.description}</p>
+                            <p className="text-black/80 text-sm">{exp.description}</p>
                           </div>
                         ))}
                         
                         <div className="space-y-4 p-4 glass-card rounded-lg border-2 border-dashed border-white/20">
-                          <h4 className="font-medium text-white">Add New Experience</h4>
+                          <h4 className="font-medium text-black">Add New Experience</h4>
                           <div className="grid md:grid-cols-2 gap-4">
                             <Input placeholder="Job Title" className="glass-card" />
                             <Input placeholder="Company Name" className="glass-card" />
@@ -399,33 +399,33 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <GraduationCap className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Education
                         </CardTitle>
-                        <p className="text-white/60">Your academic background</p>
+                        <p className="text-black/60">Your academic background</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         {profile?.education?.map((edu, index) => (
                           <div key={index} className="p-4 glass-card rounded-lg border border-white/10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="font-semibold text-white">{edu.degree}</h3>
+                                <h3 className="font-semibold text-black">{edu.degree}</h3>
                                 <p className="text-[var(--accent)]">{edu.school}</p>
-                                <p className="text-white/60 text-sm">{edu.graduation_year}</p>
+                                <p className="text-black/60 text-sm">{edu.graduation_year}</p>
                               </div>
                               <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                             {edu.field_of_study && (
-                              <p className="text-white/80 text-sm">Field of Study: {edu.field_of_study}</p>
+                              <p className="text-black/80 text-sm">Field of Study: {edu.field_of_study}</p>
                             )}
                           </div>
                         ))}
                         
                         <div className="space-y-4 p-4 glass-card rounded-lg border-2 border-dashed border-white/20">
-                          <h4 className="font-medium text-white">Add Education</h4>
+                          <h4 className="font-medium text-black">Add Education</h4>
                           <div className="grid md:grid-cols-2 gap-4">
                             <Input placeholder="Degree (e.g., Bachelor of Science)" className="glass-card" />
                             <Input placeholder="School/University" className="glass-card" />
@@ -452,19 +452,19 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <Globe className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Portfolio Projects
                         </CardTitle>
-                        <p className="text-white/60">Showcase your best work</p>
+                        <p className="text-black/60">Showcase your best work</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         {profile?.portfolio?.map((project, index) => (
                           <div key={index} className="p-4 glass-card rounded-lg border border-white/10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="font-semibold text-white">{project.title}</h3>
-                                <p className="text-white/80 text-sm mt-2">{project.description}</p>
+                                <h3 className="font-semibold text-black">{project.title}</h3>
+                                <p className="text-black/80 text-sm mt-2">{project.description}</p>
                               </div>
                               <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
                                 <Trash2 className="h-4 w-4" />
@@ -472,7 +472,7 @@ export default function EditProfilePage() {
                             </div>
                             <div className="flex flex-wrap gap-2 mt-3">
                               {project.technologies?.map((tech, idx) => (
-                                <Badge key={idx} className="bg-white/10 text-white/80 border-white/20 text-xs">
+                                <Badge key={idx} className="bg-white/10 text-black/80 border-white/20 text-xs">
                                   {tech}
                                 </Badge>
                               ))}
@@ -495,7 +495,7 @@ export default function EditProfilePage() {
                         ))}
                         
                         <div className="space-y-4 p-4 glass-card rounded-lg border-2 border-dashed border-white/20">
-                          <h4 className="font-medium text-white">Add New Project</h4>
+                          <h4 className="font-medium text-black">Add New Project</h4>
                           <div className="space-y-4">
                             <Input placeholder="Project Title" className="glass-card" />
                             <Textarea
@@ -528,20 +528,20 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <CheckCircle className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Certifications
                         </CardTitle>
-                        <p className="text-white/60">Professional certifications and credentials</p>
+                        <p className="text-black/60">Professional certifications and credentials</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         {profile?.certifications?.map((cert, index) => (
                           <div key={index} className="p-4 glass-card rounded-lg border border-white/10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="font-semibold text-white">{cert.name}</h3>
+                                <h3 className="font-semibold text-black">{cert.name}</h3>
                                 <p className="text-[var(--accent)]">{cert.issuer}</p>
-                                <p className="text-white/60 text-sm">{cert.date_obtained}</p>
+                                <p className="text-black/60 text-sm">{cert.date_obtained}</p>
                               </div>
                               <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
                                 <Trash2 className="h-4 w-4" />
@@ -557,7 +557,7 @@ export default function EditProfilePage() {
                         ))}
                         
                         <div className="space-y-4 p-4 glass-card rounded-lg border-2 border-dashed border-white/20">
-                          <h4 className="font-medium text-white">Add Certification</h4>
+                          <h4 className="font-medium text-black">Add Certification</h4>
                           <div className="grid md:grid-cols-2 gap-4">
                             <Input placeholder="Certification Name" className="glass-card" />
                             <Input placeholder="Issuing Organization" className="glass-card" />
@@ -584,30 +584,30 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <Star className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Achievements & Awards
                         </CardTitle>
-                        <p className="text-white/60">Highlight your accomplishments</p>
+                        <p className="text-black/60">Highlight your accomplishments</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         {profile?.achievements?.map((achievement, index) => (
                           <div key={index} className="p-4 glass-card rounded-lg border border-white/10">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="font-semibold text-white">{achievement.title}</h3>
-                                <p className="text-white/60 text-sm">{achievement.date}</p>
+                                <h3 className="font-semibold text-black">{achievement.title}</h3>
+                                <p className="text-black/60 text-sm">{achievement.date}</p>
                               </div>
                               <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                            <p className="text-white/80 text-sm">{achievement.description}</p>
+                            <p className="text-black/80 text-sm">{achievement.description}</p>
                           </div>
                         ))}
                         
                         <div className="space-y-4 p-4 glass-card rounded-lg border-2 border-dashed border-white/20">
-                          <h4 className="font-medium text-white">Add Achievement</h4>
+                          <h4 className="font-medium text-black">Add Achievement</h4>
                           <div className="space-y-4">
                             <Input placeholder="Achievement Title" className="glass-card" />
                             <Textarea
@@ -636,11 +636,11 @@ export default function EditProfilePage() {
                   >
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <Link className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Social Links
                         </CardTitle>
-                        <p className="text-white/60">Connect your professional profiles</p>
+                        <p className="text-black/60">Connect your professional profiles</p>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         {profile?.social_links?.map((link, index) => (
@@ -654,8 +654,8 @@ export default function EditProfilePage() {
                                   {link.platform === 'website' && <Globe className="h-4 w-4 text-[var(--accent)]" />}
                                 </div>
                                 <div>
-                                  <h3 className="font-medium text-white capitalize">{link.platform}</h3>
-                                  <p className="text-white/60 text-sm">{link.url}</p>
+                                  <h3 className="font-medium text-black capitalize">{link.platform}</h3>
+                                  <p className="text-black/60 text-sm">{link.url}</p>
                                 </div>
                               </div>
                               <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
@@ -666,9 +666,9 @@ export default function EditProfilePage() {
                         ))}
                         
                         <div className="space-y-4 p-4 glass-card rounded-lg border-2 border-dashed border-white/20">
-                          <h4 className="font-medium text-white">Add Social Link</h4>
+                          <h4 className="font-medium text-black">Add Social Link</h4>
                           <div className="grid md:grid-cols-2 gap-4">
-                            <select className="glass-card bg-transparent border border-white/20 rounded-lg px-3 py-2 text-white">
+                            <select className="glass-card bg-transparent border border-white/20 rounded-lg px-3 py-2 text-black">
                               <option value="">Select Platform</option>
                               <option value="linkedin">LinkedIn</option>
                               <option value="github">GitHub</option>
@@ -699,7 +699,7 @@ export default function EditProfilePage() {
                     {/* Profile Theme */}
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <Palette className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Profile Theme
                         </CardTitle>
@@ -717,7 +717,7 @@ export default function EditProfilePage() {
                               className="relative p-4 rounded-lg border-2 transition-all interactive glass-card hover:border-[var(--accent)]"
                             >
                               <div className={`w-full h-20 rounded bg-gradient-to-r ${theme.preview} mb-3 depth-2`} />
-                              <div className="text-sm font-medium text-white">{theme.label}</div>
+                              <div className="text-sm font-medium text-black">{theme.label}</div>
                             </button>
                           ))}
                         </div>
@@ -727,11 +727,11 @@ export default function EditProfilePage() {
                     {/* Privacy Settings */}
                     <Card className="glass-card">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
+                        <CardTitle className="flex items-center gap-2 text-black">
                           <Lock className="h-5 w-5 text-[var(--accent)] icon-depth" />
                           Privacy Settings
                         </CardTitle>
-                        <p className="text-white/60 text-sm">
+                        <p className="text-black/60 text-sm">
                           Control what information is visible on your public profile
                         </p>
                       </CardHeader>
@@ -743,8 +743,8 @@ export default function EditProfilePage() {
                               <Unlock className="h-5 w-5 text-black" />
                             </div>
                             <div>
-                              <h3 className="font-semibold text-white">Public Profile</h3>
-                              <p className="text-sm text-white/60">
+                              <h3 className="font-semibold text-black">Public Profile</h3>
+                              <p className="text-sm text-black/60">
                                 Your profile can be viewed by anyone with the link
                               </p>
                             </div>
