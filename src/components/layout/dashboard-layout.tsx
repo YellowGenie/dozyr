@@ -25,7 +25,8 @@ import {
   FileText,
   Star,
   FileSignature,
-  Wallet
+  Wallet,
+  HelpCircle
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -60,10 +61,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const getNavigationItems = () => {
     const baseItems = [
       { href: '/dashboard', icon: Home, label: 'Dashboard' },
-      { href: '/profile', icon: User, label: 'Profile' },
       { href: '/messages', icon: MessageSquare, label: 'Messages' },
       { href: '/interviews', icon: Star, label: 'Interviews' },
-      { href: '/settings', icon: Settings, label: 'Settings' },
     ]
 
     if (user?.role === 'talent') {
@@ -72,12 +71,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/jobs', icon: Briefcase, label: 'Find Jobs' },
         { href: '/applications', icon: BarChart3, label: 'Applications' },
         { href: '/contracts', icon: FileSignature, label: 'Contracts', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
-        { href: '/profile', icon: User, label: 'Basic Profile' },
         { href: '/profile/edit', icon: Edit3, label: 'Edit Profile' },
         { href: `/talent/${user.id}`, icon: Eye, label: 'Public Profile', external: true },
         { href: '/messages', icon: MessageSquare, label: 'Messages' },
         { href: '/interviews', icon: Star, label: 'Interviews' },
-        { href: '/settings', icon: Settings, label: 'Settings' },
       ]
     }
 
@@ -89,7 +86,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/my-jobs', icon: BarChart3, label: 'My Jobs', badge: newProposalsCount > 0 ? newProposalsCount : undefined },
         { href: '/contracts', icon: FileSignature, label: 'Contracts', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
         { href: '/payments', icon: CreditCard, label: 'Payments' },
-        ...baseItems.slice(1), // Profile, Messages, Interviews, Settings
+        { href: '/messages', icon: MessageSquare, label: 'Messages' },
+        { href: '/interviews', icon: Star, label: 'Interviews' },
       ]
     }
 
@@ -102,7 +100,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/admin/contracts', icon: FileSignature, label: 'Contracts' },
         { href: '/admin/escrows', icon: Wallet, label: 'Escrows' },
         { href: '/admin/notifications', icon: Mail, label: 'Notifications' },
-        ...baseItems.slice(1), // Profile, Messages, Interviews, Settings
+        { href: '/messages', icon: MessageSquare, label: 'Messages' },
+        { href: '/interviews', icon: Star, label: 'Interviews' },
       ]
     }
 
@@ -126,10 +125,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <Link href={href} onClick={handleClick}>
         <div
           className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all cursor-pointer",
+            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer",
             isActive
-              ? "bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] shadow-lg border border-[var(--accent)]/30"
-              : "text-gray-600 hover:text-[var(--accent)] hover:bg-purple-50/80 border border-transparent hover:border-[var(--accent)]/20"
+              ? "bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] shadow-lg border border-[var(--primary)]/30"
+              : "text-gray-700 bg-white/60 border border-gray-200/60 hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 hover:shadow-sm"
           )}
         >
           {isActive ? (
@@ -166,14 +165,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </>
           ) : (
             <>
-              <Icon className="h-5 w-5 icon-depth text-[var(--accent)]" />
-              <span className="font-medium">{label}</span>
+              <Icon className="h-5 w-5 text-[var(--primary)] transition-colors duration-200" />
+              <span className="font-medium transition-colors duration-200">{label}</span>
               {badge && badge > 0 && (
-                <span className="ml-auto bg-red-500 text-gray-800 text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
+                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
                   {badge > 99 ? '99+' : badge}
                 </span>
               )}
-              {external && <Eye className="h-4 w-4 ml-auto opacity-50" />}
+              {external && <Eye className="h-4 w-4 ml-auto opacity-50 text-[var(--primary)]" />}
             </>
           )}
         </div>
@@ -211,14 +210,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* User Info */}
           <div className="p-6 border-b border-gray-200 flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden">
+            <div className="flex items-center gap-4">
+              <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                 {user?.profile_image && user.profile_image.trim() !== '' ? (
                   <img
                     key={`profile-${user.profile_image}-${Date.now()}`}
                     src={`${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt="Profile"
-                    className="w-full h-full object-cover rounded-full border-2 border-[var(--accent)]"
+                    className="w-full h-full object-cover rounded-full border-2 border-[var(--primary)]"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                       const fallback = e.currentTarget.nextElementSibling as HTMLElement
@@ -229,16 +228,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 ) : null}
                 <div 
-                  className="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center absolute inset-0"
+                  className="w-full h-full bg-[var(--primary)] rounded-full flex items-center justify-center absolute inset-0"
                   style={{ display: user?.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
                 >
-                  <span className="text-gray-800 font-bold text-sm">
+                  <span className="text-white font-bold text-lg">
                     {user ? generateInitials(user.first_name, user.last_name) : 'U'}
                   </span>
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 truncate">
+                <p className="font-semibold text-gray-800 truncate text-base">
                   {user ? `${user.first_name} ${user.last_name}` : 'User'}
                 </p>
                 <p className="text-sm text-gray-500 capitalize">
@@ -255,16 +254,41 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             ))}
           </nav>
 
-          {/* Logout */}
-          <div className="p-6 border-t border-gray-200 flex-shrink-0">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-400/10"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-5 w-5 mr-3" />
-              Logout
-            </Button>
+          {/* Footer Actions */}
+          <div className="p-4 border-t border-gray-200 flex-shrink-0">
+            <div className="flex items-center justify-center gap-2">
+              <Link href="/profile">
+                <motion.div
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                  title="Profile"
+                >
+                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                </motion.div>
+              </Link>
+              
+              <Link href="/settings">
+                <motion.div
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                  title="Settings"
+                >
+                  <Settings className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                </motion.div>
+              </Link>
+              
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-50 hover:bg-red-500 transition-all duration-300 group cursor-pointer"
+                onClick={handleLogout}
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" />
+              </motion.div>
+            </div>
           </div>
         </div>
       </aside>
@@ -298,14 +322,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* User Info */}
           <div className="p-6 border-b border-gray-200 flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden">
+            <div className="flex items-center gap-4">
+              <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                 {user?.profile_image && user.profile_image.trim() !== '' ? (
                   <img
                     key={`profile-${user.profile_image}-${Date.now()}`}
                     src={`${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt="Profile"
-                    className="w-full h-full object-cover rounded-full border-2 border-[var(--accent)]"
+                    className="w-full h-full object-cover rounded-full border-2 border-[var(--primary)]"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                       const fallback = e.currentTarget.nextElementSibling as HTMLElement
@@ -316,16 +340,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   />
                 ) : null}
                 <div 
-                  className="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center absolute inset-0"
+                  className="w-full h-full bg-[var(--primary)] rounded-full flex items-center justify-center absolute inset-0"
                   style={{ display: user?.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
                 >
-                  <span className="text-gray-800 font-bold text-sm">
+                  <span className="text-white font-bold text-lg">
                     {user ? generateInitials(user.first_name, user.last_name) : 'U'}
                   </span>
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 truncate">
+                <p className="font-semibold text-gray-800 truncate text-base">
                   {user ? `${user.first_name} ${user.last_name}` : 'User'}
                 </p>
                 <p className="text-sm text-gray-500 capitalize">
@@ -342,16 +366,46 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             ))}
           </nav>
 
-          {/* Logout */}
-          <div className="p-6 border-t border-gray-200 flex-shrink-0">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-400/10"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-5 w-5 mr-3" />
-              Logout
-            </Button>
+          {/* Footer Actions */}
+          <div className="p-4 border-t border-gray-200 flex-shrink-0">
+            <div className="flex items-center justify-center gap-2">
+              <Link href="/profile">
+                <motion.div
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                  title="Profile"
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                </motion.div>
+              </Link>
+              
+              <Link href="/settings">
+                <motion.div
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                  title="Settings"
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <Settings className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                </motion.div>
+              </Link>
+              
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-50 hover:bg-red-500 transition-all duration-300 group cursor-pointer"
+                onClick={() => {
+                  setIsSidebarOpen(false)
+                  handleLogout()
+                }}
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" />
+              </motion.div>
+            </div>
           </div>
         </div>
       </motion.aside>
@@ -377,10 +431,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
+              <div className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]" title="Notifications">
+                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-              </Button>
+              </div>
+              
+              <div 
+                className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]" 
+                title="Help & Support"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-help', {
+                    detail: { initialRole: user?.role }
+                  }))
+                }}
+              >
+                <HelpCircle className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+              </div>
               
               <Link href="/profile">
                 <div className="relative w-8 h-8 rounded-full cursor-pointer overflow-hidden">

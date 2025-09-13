@@ -93,15 +93,15 @@ export function NotificationManager() {
         onAction={handleModalAction}
       />
 
-      {/* Chatbot Notifications */}
-      <AdminNotificationChatbot
+      {/* Chatbot Notifications - Disabled */}
+      {/* <AdminNotificationChatbot
         notifications={chatbotNotifications}
         isVisible={isChatbotVisible}
         onToggle={toggleChatbot}
         onDismiss={handleChatbotDismiss}
         onView={markAsViewed}
         onAction={handleChatbotAction}
-      />
+      /> */}
     </>
   )
 }

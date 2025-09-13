@@ -66,15 +66,6 @@ export function HelpProvider({ children }: HelpProviderProps) {
     <>
       {children}
       
-      {/* Floating Help Trigger - Only show for logged in users, not on home page */}
-      {shouldShowHelpButton && (
-        <HelpTrigger
-          variant="floating"
-          size="lg"
-          showPulse={false}
-          className="hidden lg:block"
-        />
-      )}
 
       {/* Help System Modal */}
       <HelpSystem

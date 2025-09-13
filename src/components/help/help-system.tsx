@@ -79,18 +79,18 @@ interface HelpSystemProps {
 }
 
 const categoryColors = {
-  'getting-started': 'bg-green-500/10 text-green-400 border-green-500/20',
-  'features': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  'account': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  'payments': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  'support': 'bg-red-500/10 text-red-400 border-red-500/20',
+  'getting-started': 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20',
+  'features': 'bg-[var(--primary-light)]/10 text-[var(--primary-light)] border-[var(--primary-light)]/20',
+  'account': 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/20',
+  'payments': 'bg-[var(--primary-lighter)]/10 text-[var(--primary-lighter)] border-[var(--primary-lighter)]/20',
+  'support': 'bg-[var(--primary-dark)]/10 text-[var(--primary-dark)] border-[var(--primary-dark)]/20',
   'advanced': 'bg-gray-500/10 text-gray-400 border-gray-500/20'
 }
 
 const difficultyColors = {
-  'beginner': 'bg-green-500/10 text-green-400',
-  'intermediate': 'bg-yellow-500/10 text-yellow-400',
-  'advanced': 'bg-red-500/10 text-red-400'
+  'beginner': 'bg-[var(--primary)]/10 text-[var(--primary)]',
+  'intermediate': 'bg-[var(--primary-light)]/10 text-[var(--primary-light)]',
+  'advanced': 'bg-[var(--primary-dark)]/10 text-[var(--primary-dark)]'
 }
 
 export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: HelpSystemProps) {
@@ -621,25 +621,19 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="glass-card bg-dozyr-dark-gray/95 border border-white/20 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden depth-4"
-            style={{
-              background: 'linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%)',
-              backdropFilter: 'blur(24px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
-            }}
+            className="bg-white border border-gray-200 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-dozyr-gold/25 to-dozyr-gold/10 flex items-center justify-center">
-                  <HelpCircle className="h-5 w-5 text-dozyr-gold" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 flex items-center justify-center">
+                  <HelpCircle className="h-5 w-5 text-[var(--primary)]" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-semibold text-[var(--foreground)]">
+                  <h1 className="text-xl font-semibold text-gray-900">
                     {selectedItem ? selectedItem.title : 'Help Center'}
                   </h1>
-                  <p className="text-sm text-dozyr-light-gray">
+                  <p className="text-sm text-gray-600">
                     {selectedItem ? `${selectedItem.category} • ${selectedItem.difficulty}` : 'Find answers and get support'}
                   </p>
                 </div>
@@ -648,16 +642,16 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                 {selectedItem && (
                   <button
                     onClick={handleBack}
-                    className="px-3 py-2 text-sm text-dozyr-light-gray hover:text-[var(--foreground)] transition-colors"
+                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     ← Back
                   </button>
                 )}
                 <button
                   onClick={handleClose}
-                  className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors"
+                  className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
                 >
-                  <X className="h-5 w-5 text-dozyr-light-gray" />
+                  <X className="h-5 w-5 text-gray-500" />
                 </button>
               </div>
             </div>
@@ -666,22 +660,22 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
               {!selectedItem && (
                 <>
                   {/* Sidebar */}
-                  <div className="w-80 border-r border-white/10 p-6 overflow-y-auto">
+                  <div className="w-80 border-r border-gray-200 p-6 overflow-y-auto bg-gray-50">
                     {/* Search */}
                     <div className="relative mb-6">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dozyr-light-gray h-4 w-4" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input
                         type="text"
                         placeholder="Search help articles..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-dozyr-black border border-dozyr-medium-gray rounded-lg text-[var(--foreground)] placeholder-dozyr-light-gray focus:border-dozyr-gold focus:outline-none transition-colors"
+                        className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:border-[var(--primary)] focus:outline-none transition-colors"
                       />
                     </div>
 
                     {/* Role Filter */}
                     <div className="mb-6">
-                      <h3 className="text-sm font-medium text-[var(--foreground)] mb-3">Filter by Role</h3>
+                      <h3 className="text-sm font-medium text-gray-900 mb-3">Filter by Role</h3>
                       <div className="grid grid-cols-2 gap-2">
                         {roles.map((role) => (
                           <button
@@ -689,8 +683,8 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                             onClick={() => setSelectedRole(role.id as any)}
                             className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                               selectedRole === role.id
-                                ? 'bg-dozyr-gold text-black'
-                                : 'bg-white/5 text-dozyr-light-gray hover:bg-white/10 hover:text-black'
+                                ? 'bg-[var(--primary)] text-white'
+                                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                             }`}
                           >
                             {role.name} ({role.count})
@@ -701,14 +695,14 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
 
                     {/* Category Filter */}
                     <div>
-                      <h3 className="text-sm font-medium text-[var(--foreground)] mb-3">Categories</h3>
+                      <h3 className="text-sm font-medium text-gray-900 mb-3">Categories</h3>
                       <div className="space-y-1">
                         <button
                           onClick={() => setSelectedCategory(null)}
                           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                             !selectedCategory
-                              ? 'bg-dozyr-gold/15 text-dozyr-gold'
-                              : 'text-dozyr-light-gray hover:bg-white/5 hover:text-black'
+                              ? 'bg-[var(--primary)]/10 text-[var(--primary)]'
+                              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                           }`}
                         >
                           <Book className="h-4 w-4" />
@@ -723,8 +717,8 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                               onClick={() => setSelectedCategory(category.id)}
                               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all ${
                                 selectedCategory === category.id
-                                  ? 'bg-dozyr-gold/15 text-dozyr-gold'
-                                  : 'text-dozyr-light-gray hover:bg-white/5 hover:text-black'
+                                  ? 'bg-[var(--primary)]/10 text-[var(--primary)]'
+                                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                               }`}
                             >
                               <Icon className="h-4 w-4" />
@@ -740,9 +734,9 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                   <div className="flex-1 p-6 overflow-y-auto">
                     {Object.keys(groupedItems).length === 0 ? (
                       <div className="text-center py-12">
-                        <Search className="h-12 w-12 text-dozyr-light-gray/50 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-black mb-2">No articles found</h3>
-                        <p className="text-dozyr-light-gray">
+                        <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No articles found</h3>
+                        <p className="text-gray-600">
                           Try adjusting your search terms or role filter.
                         </p>
                       </div>
@@ -750,7 +744,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                       <div className="space-y-8">
                         {Object.entries(groupedItems).map(([category, items]) => (
                           <div key={category}>
-                            <h2 className="text-lg font-semibold text-black mb-4 capitalize">
+                            <h2 className="text-lg font-semibold text-gray-900 mb-4 capitalize">
                               {category.replace('-', ' ')}
                             </h2>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -762,21 +756,21 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     whileHover={{ y: -2 }}
-                                    className="glass-card bg-white/5 p-4 rounded-xl cursor-pointer transition-all hover:bg-white/10 hover:shadow-lg"
+                                    className="bg-white border border-gray-200 p-4 rounded-xl cursor-pointer transition-all hover:border-[var(--primary)] hover:shadow-lg"
                                     onClick={() => handleItemSelect(item)}
                                   >
                                     <div className="flex items-start gap-3">
-                                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-dozyr-gold/25 to-dozyr-gold/10 flex items-center justify-center flex-shrink-0">
-                                        <Icon className="h-5 w-5 text-dozyr-gold" />
+                                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary)]/10 flex items-center justify-center flex-shrink-0">
+                                        <Icon className="h-5 w-5 text-[var(--primary)]" />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-2 mb-2">
-                                          <h3 className="font-medium text-black text-sm leading-snug">
+                                          <h3 className="font-medium text-gray-900 text-sm leading-snug">
                                             {item.title}
                                           </h3>
-                                          <ArrowRight className="h-4 w-4 text-dozyr-light-gray/50 flex-shrink-0" />
+                                          <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
                                         </div>
-                                        <p className="text-xs text-dozyr-light-gray line-clamp-2 mb-3">
+                                        <p className="text-xs text-gray-600 line-clamp-2 mb-3">
                                           {item.description}
                                         </p>
                                         <div className="flex items-center gap-2 flex-wrap">
@@ -791,7 +785,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                                             {item.difficulty}
                                           </Badge>
                                           {item.estimatedTime && (
-                                            <span className="text-xs text-dozyr-light-gray">
+                                            <span className="text-xs text-gray-500">
                                               {item.estimatedTime}
                                             </span>
                                           )}
@@ -829,7 +823,7 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                           </span>
                         )}
                       </div>
-                      <p className="text-dozyr-light-gray leading-relaxed">
+                      <p className="text-gray-600 leading-relaxed">
                         {selectedItem.content.overview}
                       </p>
                     </div>
@@ -902,21 +896,21 @@ export function HelpSystem({ isOpen, onClose, initialQuery = '', initialRole }: 
                     )}
 
                     {/* Contact Support */}
-                    <div className="mt-12 p-6 glass-card bg-gradient-to-r from-dozyr-gold/10 to-dozyr-gold/5 rounded-xl border border-dozyr-gold/20">
+                    <div className="mt-12 p-6 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--primary)]/5 rounded-xl border border-[var(--primary)]/20">
                       <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-dozyr-gold/20 flex items-center justify-center">
-                          <MessageSquare className="h-5 w-5 text-dozyr-gold" />
+                        <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center">
+                          <MessageSquare className="h-5 w-5 text-[var(--primary)]" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-medium text-black mb-2">Still need help?</h3>
-                          <p className="text-sm text-dozyr-light-gray mb-4">
+                          <h3 className="font-medium text-gray-900 mb-2">Still need help?</h3>
+                          <p className="text-sm text-gray-600 mb-4">
                             Can't find what you're looking for? Our support team is here to help.
                           </p>
                           <div className="flex gap-3">
-                            <button className="px-4 py-2 bg-dozyr-gold text-black font-medium text-sm rounded-lg hover:bg-dozyr-gold/90 transition-colors">
+                            <button className="px-4 py-2 bg-[var(--primary)] text-white font-medium text-sm rounded-lg hover:bg-[var(--primary-dark)] transition-colors">
                               Contact Support
                             </button>
-                            <button className="px-4 py-2 bg-white/5 text-black font-medium text-sm rounded-lg hover:bg-white/10 transition-colors">
+                            <button className="px-4 py-2 bg-gray-100 text-gray-700 font-medium text-sm rounded-lg hover:bg-gray-200 transition-colors border border-gray-200">
                               Browse More Articles
                             </button>
                           </div>

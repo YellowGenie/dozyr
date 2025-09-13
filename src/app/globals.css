@@ -1,38 +1,50 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Geist:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Clash+Display:wght@200;300;400;500;600;700;800;900&family=Syncopate:wght@400;700&display=swap');
 
 :root {
-  /* Main Colors - Modern White Theme */
+  /* Main Colors - Professional Theme */
   --background: #ffffff;
-  --foreground: #1a1a1a;
-  --background-secondary: #f8f9fa;
-  --foreground-secondary: #333333;
-  --muted: #e9ecef;
-  --muted-foreground: #6c757d;
+  --foreground: #0f0f0f;
+  --background-secondary: #fafafa;
+  --foreground-secondary: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
   
-  /* Cool Purple Accent */
-  --accent: #7c3aed;
-  --accent-dark: #5b21b6;
-  --accent-light: #a855f7;
-  --accent-muted: rgba(124, 58, 237, 0.1);
-  --accent-hover: rgba(124, 58, 237, 0.15);
+  /* Professional Single-Color System - Darker Sophisticated Teal */
+  --primary: #0e7490;
+  --primary-dark: #155e75;
+  --primary-darker: #164e63;
+  --primary-light: #0891b2;
+  --primary-lighter: #06b6d4;
+  --primary-lightest: #22d3ee;
   
-  /* Glass Effect Variables - Light Theme */
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(124, 58, 237, 0.15);
-  --glass-highlight: rgba(124, 58, 237, 0.08);
-  --glass-shadow: rgba(0, 0, 0, 0.1);
+  /* Neutral Accent Colors */
+  --accent: #0e7490;
+  --accent-dark: #155e75;
+  --accent-light: #0891b2;
   
-  /* Depth & Shadows - Light Theme */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.15);
-  --shadow-accent: 0 4px 24px rgba(124, 58, 237, 0.2);
+  /* Glass and interaction colors */
+  --accent-muted: rgba(14, 116, 144, 0.1);
+  --accent-hover: rgba(14, 116, 144, 0.15);
   
-  /* Card & Surface Colors */
+  /* Glass Effect Variables - Professional Theme */
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(14, 116, 144, 0.15);
+  --glass-highlight: rgba(14, 116, 144, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.10);
+  
+  /* Professional Depth & Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08);
+  --shadow-primary: 0 4px 20px rgba(14, 116, 144, 0.20);
+  --shadow-accent: 0 4px 15px rgba(8, 145, 178, 0.15);
+  
+  /* Professional Card & Surface Colors */
   --card-bg: #ffffff;
-  --card-border: rgba(124, 58, 237, 0.1);
-  --hover-bg: rgba(124, 58, 237, 0.05);
+  --card-border: rgba(14, 116, 144, 0.10);
+  --hover-bg: linear-gradient(135deg, rgba(14, 116, 144, 0.03), rgba(8, 145, 178, 0.02));
 }
 
 @theme inline {
@@ -49,7 +61,83 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
+}
+
+/* Professional Typography System */
+.font-heading {
+  font-family: 'Clash Display', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-feature-settings: 'ss01', 'ss02';
+}
+
+.font-display {
+  font-family: 'Clash Display', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  font-feature-settings: 'ss01', 'ss02', 'cv01';
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.font-body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 1.7;
+  font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
+}
+
+/* Responsive Text sizes with breathing room */
+.text-hero {
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 640px) {
+  .text-hero {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    line-height: 1.1;
+  }
+}
+
+.text-display {
+  font-size: clamp(1.75rem, 5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 640px) {
+  .text-display {
+    font-size: clamp(1.5rem, 7vw, 2.5rem);
+    line-height: 1.2;
+  }
+}
+
+.text-feature {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .text-feature {
+    font-size: clamp(0.95rem, 4vw, 1.25rem);
+    line-height: 1.5;
+  }
 }
 
 /* Modern Glass Effects - Light Theme */
@@ -179,26 +267,106 @@ body {
   transform: translateY(1px);
 }
 
-/* Enhanced card hover effects */
+/* Revolutionary Card Hover Effects */
 .enhanced-card {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid var(--card-border);
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 2px solid var(--card-border);
   background: var(--card-bg);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 20px;
+  padding: 32px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .enhanced-card {
+    padding: 24px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .enhanced-card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+}
+
+.enhanced-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 107, 107, 0.03),
+    transparent,
+    rgba(78, 205, 196, 0.03),
+    transparent,
+    rgba(255, 217, 61, 0.03),
+    transparent
+  );
+  transition: transform 0.8s ease;
+  transform: translateX(-100%) translateY(-100%) rotate(30deg);
+  pointer-events: none;
+}
+
+.enhanced-card:hover::before {
+  transform: translateX(0%) translateY(0%) rotate(30deg);
 }
 
 .enhanced-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--accent);
-  box-shadow: var(--shadow-xl), var(--shadow-accent);
-  background: linear-gradient(135deg, var(--card-bg), var(--hover-bg));
+  transform: translateY(-8px) scale(1.02);
+  border: 2px solid;
+  border-image: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent)) 1;
+  box-shadow: 
+    var(--shadow-primary),
+    0 0 40px rgba(255, 107, 107, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.95), 
+    rgba(255, 107, 107, 0.02),
+    rgba(78, 205, 196, 0.02)
+  );
+}
+
+/* Playful Glass Card Effects */
+.glass-card {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.glass-card:hover::after {
+  left: 100%;
 }
 
 .glass-card:hover {
-  border-color: var(--accent-light);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
+  border: 2px solid var(--secondary);
+  box-shadow: var(--shadow-secondary);
+  transform: translateY(-6px) rotateX(2deg);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .glass-scrolled {
@@ -258,41 +426,94 @@ body {
   transform: translateY(0);
 }
 
-/* Button enhancements */
+/* Revolutionary Button Designs */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  position: relative;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: #ffffff;
   border: none;
-  box-shadow: var(--shadow-accent);
+  box-shadow: var(--shadow-primary);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-weight: 600;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 16px;
+  padding: 16px 32px;
+  font-weight: 700;
+  font-family: 'Clash Display', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--accent-light), var(--accent));
-  box-shadow: var(--shadow-lg), var(--shadow-accent);
-  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-lighter));
+  box-shadow: 
+    var(--shadow-primary),
+    0 0 30px rgba(30, 64, 175, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px) scale(1.05);
 }
 
 .btn-secondary {
+  position: relative;
   background: var(--card-bg);
   color: var(--foreground);
-  border: 2px solid var(--card-border);
+  border: 2px solid;
+  border-image: linear-gradient(45deg, var(--primary), var(--accent)) 1;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
-  padding: 10px 24px;
-  font-weight: 500;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 16px;
+  padding: 14px 32px;
+  font-weight: 600;
+  font-family: 'Clash Display', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+}
+
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(30, 64, 175, 0.05),
+    rgba(100, 116, 139, 0.05)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.btn-secondary:hover::before {
+  opacity: 1;
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent);
-  background: var(--hover-bg);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  border-image: linear-gradient(45deg, var(--primary-light), var(--accent-light)) 1;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-accent);
+  color: var(--primary-dark);
 }
 
 /* Icon depth */
@@ -408,40 +629,50 @@ body {
 .dozyr-brand {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dozyr-text {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 1.75rem;
+  font-family: 'Syncopate', 'Clash Display', 'Inter', system-ui, sans-serif;
+  font-size: 2.2rem;
   font-weight: 700;
-  color: #1a1a1a;
-  letter-spacing: -0.025em;
+  color: var(--primary);
+  letter-spacing: 0.05em;
   line-height: 1;
   margin: 0;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  text-transform: uppercase;
 }
 
-.dozyr-tagline {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #6b7280;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-top: 2px;
-  line-height: 1;
+.dozyr-text::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary), var(--primary-light));
+  border-radius: 2px;
+  transform: translateY(-50%) scaleY(0);
+  transition: transform 0.3s ease;
+  transform-origin: center;
 }
 
 .dozyr-brand:hover .dozyr-text {
-  color: var(--accent);
+  color: var(--primary-dark);
+  transform: translateX(4px);
 }
 
-.dozyr-brand:hover .dozyr-tagline {
-  color: var(--accent);
+.dozyr-brand:hover .dozyr-text::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+/* Remove tagline styles since we're not using it anymore */
+.dozyr-tagline {
+  display: none;
 }
 
 @keyframes gradient-shift {
@@ -470,9 +701,9 @@ body {
   }
 }
 
-/* Modern Layout & Spacing Improvements */
+/* Revolutionary Layout & Spacing */
 .modern-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -485,34 +716,46 @@ body {
 
 @media (min-width: 1024px) {
   .modern-container {
-    padding: 0 4rem;
+    padding: 0 6rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .modern-container {
+    padding: 0 8rem;
   }
 }
 
 /* Enhanced spacing utilities */
 .section-padding {
-  padding: 6rem 0;
+  padding: 8rem 0;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: 10rem 0;
+  }
 }
 
 .card-spacing {
-  padding: 2rem;
-  margin: 1.5rem 0;
+  padding: 3rem;
+  margin: 2rem 0;
 }
 
 .modern-grid {
   display: grid;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 @media (min-width: 768px) {
   .modern-grid {
-    gap: 3rem;
+    gap: 4rem;
   }
 }
 
 @media (min-width: 1024px) {
   .modern-grid {
-    gap: 4rem;
+    gap: 5rem;
   }
 }
 
