@@ -26,7 +26,8 @@ import {
   Star,
   FileSignature,
   Wallet,
-  HelpCircle
+  HelpCircle,
+  Bot
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -35,6 +36,7 @@ import { generateInitials, cn } from '@/lib/utils'
 import { Omnisearch } from '@/components/search/Omnisearch'
 import { useProposalNotifications } from '@/hooks/useProposalNotifications'
 import { useContractNotifications } from '@/hooks/useContractNotifications'
+import { AIAssistant } from '@/components/ai/ai-assistant'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -45,6 +47,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false)
   const { newProposalsCount } = useProposalNotifications()
   const { unreadCount: contractNotificationsCount } = useContractNotifications()
   // Removed old search - now using Omnisearch component
@@ -448,33 +451,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <HelpCircle className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
               </div>
               
-              <Link href="/profile">
-                <div className="relative w-8 h-8 rounded-full cursor-pointer overflow-hidden">
-                  {user?.profile_image && user.profile_image.trim() !== '' ? (
-                    <img
-                      src={user.profile_image}
-                      alt="Profile"
-                      className="w-full h-full object-cover rounded-full border-2 border-[var(--accent)]"
-                      onError={(e) => {
-                        // Hide broken image and show initials fallback
-                        e.currentTarget.style.display = 'none'
-                        const fallback = e.currentTarget.nextElementSibling as HTMLElement
-                        if (fallback) {
-                          fallback.style.display = 'flex'
-                        }
-                      }}
-                    />
-                  ) : null}
-                  <div 
-                    className="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center absolute inset-0"
-                    style={{ display: user?.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
-                  >
-                    <span className="text-gray-800 font-bold text-sm">
-                      {user ? generateInitials(user.first_name, user.last_name) : 'U'}
-                    </span>
-                  </div>
-                </div>
-              </Link>
+              <div 
+                className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]" 
+                title="AI Assistant"
+                onClick={() => setIsAIAssistantOpen(true)}
+              >
+                <Bot className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+              </div>
             </div>
           </div>
         </header>
@@ -484,6 +467,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {children}
         </main>
       </div>
+
+      {/* AI Assistant */}
+      <AIAssistant
+        isOpen={isAIAssistantOpen}
+        onClose={() => setIsAIAssistantOpen(false)}
+      />
     </div>
   )
 }

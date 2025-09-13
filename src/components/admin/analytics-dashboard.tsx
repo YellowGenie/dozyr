@@ -76,8 +76,12 @@ const MetricCard = ({ title, value, change, changeLabel, icon, trend, color = 't
               </p>
             )}
           </div>
-          <div className={cn("text-3xl opacity-20", color)}>
-            {icon}
+          <div className="relative">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/20 flex items-center justify-center border border-[var(--primary)]/20">
+              <div className={cn("text-2xl", color)}>
+                {icon}
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -304,7 +308,9 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                   {additionalMetrics.server_uptime}%
                 </h3>
               </div>
-              <Activity className="h-8 w-8 text-green-400 opacity-20" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-400/10 to-green-400/20 flex items-center justify-center border border-green-400/20">
+                <Activity className="h-6 w-6 text-green-400" />
+              </div>
             </div>
             <div className="w-full bg-dozyr-medium-gray rounded-full h-2">
               <div 
@@ -326,7 +332,9 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                   {additionalMetrics.api_response_time}
                 </h3>
               </div>
-              <BarChart3 className="h-8 w-8 text-blue-400 opacity-20" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400/10 to-blue-400/20 flex items-center justify-center border border-blue-400/20">
+                <BarChart3 className="h-6 w-6 text-blue-400" />
+              </div>
             </div>
             <p className="text-xs text-dozyr-light-gray">
               Avg response time is excellent
@@ -345,7 +353,9 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                   {additionalMetrics.error_rate}%
                 </h3>
               </div>
-              <PieChart className="h-8 w-8 text-yellow-400 opacity-20" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-400/10 to-yellow-400/20 flex items-center justify-center border border-yellow-400/20">
+                <PieChart className="h-6 w-6 text-yellow-400" />
+              </div>
             </div>
             <div className="flex items-center gap-1 text-sm text-green-400">
               <TrendingDown className="h-3 w-3" />
@@ -365,7 +375,9 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                   {additionalMetrics.user_satisfaction}/5.0
                 </h3>
               </div>
-              <Target className="h-8 w-8 text-dozyr-gold opacity-20" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/20 flex items-center justify-center border border-[var(--primary)]/20">
+                <Target className="h-6 w-6 text-[var(--primary)]" />
+              </div>
             </div>
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
