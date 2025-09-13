@@ -23,7 +23,9 @@ import {
   Edit3,
   Eye,
   FileText,
-  Star
+  Star,
+  FileSignature,
+  Wallet
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -31,6 +33,7 @@ import { useAuthStore } from '@/store/auth'
 import { generateInitials, cn } from '@/lib/utils'
 import { Omnisearch } from '@/components/search/Omnisearch'
 import { useProposalNotifications } from '@/hooks/useProposalNotifications'
+import { useContractNotifications } from '@/hooks/useContractNotifications'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -42,6 +45,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { newProposalsCount } = useProposalNotifications()
+  const { unreadCount: contractNotificationsCount } = useContractNotifications()
   // Removed old search - now using Omnisearch component
 
   const handleLogout = async () => {
@@ -67,6 +71,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         ...baseItems.slice(0, 1), // Dashboard
         { href: '/jobs', icon: Briefcase, label: 'Find Jobs' },
         { href: '/applications', icon: BarChart3, label: 'Applications' },
+        { href: '/contracts', icon: FileSignature, label: 'Contracts', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
         { href: '/profile', icon: User, label: 'Basic Profile' },
         { href: '/profile/edit', icon: Edit3, label: 'Edit Profile' },
         { href: `/talent/${user.id}`, icon: Eye, label: 'Public Profile', external: true },
@@ -82,6 +87,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/jobs/post', icon: Briefcase, label: 'Post Jobs' },
         { href: '/talent', icon: Users, label: 'Find Talent' },
         { href: '/my-jobs', icon: BarChart3, label: 'My Jobs', badge: newProposalsCount > 0 ? newProposalsCount : undefined },
+        { href: '/contracts', icon: FileSignature, label: 'Contracts', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
         { href: '/payments', icon: CreditCard, label: 'Payments' },
         ...baseItems.slice(1), // Profile, Messages, Interviews, Settings
       ]
@@ -93,6 +99,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/admin/users', icon: Users, label: 'Users' },
         { href: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
         { href: '/admin/proposals', icon: FileText, label: 'Proposals' },
+        { href: '/admin/contracts', icon: FileSignature, label: 'Contracts' },
+        { href: '/admin/escrows', icon: Wallet, label: 'Escrows' },
         { href: '/admin/notifications', icon: Mail, label: 'Notifications' },
         ...baseItems.slice(1), // Profile, Messages, Interviews, Settings
       ]

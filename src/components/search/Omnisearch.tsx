@@ -36,6 +36,24 @@ export function Omnisearch({ className = '' }: OmnisearchProps) {
   const [inputPosition, setInputPosition] = useState<{ top: number; left: number; width: number } | null>(null)
   const [mounted, setMounted] = useState(false)
 
+  // Click outside to close
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !inputRef.current?.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, setIsOpen])
+
   // Component mounted check for portal
   useEffect(() => {
     setMounted(true)
@@ -56,42 +74,52 @@ export function Omnisearch({ className = '' }: OmnisearchProps) {
     }
   }, [isOpen])
 
-  // Click outside to close
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !inputRef.current?.contains(event.target as Node)
-      ) {
-        setIsOpen(false)
-      }
-    }
+  return (
+    <div className={`relative ${className}`}>
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dozyr-light-gray h-4 w-4 z-10" />
+        <Input
+          ref={inputRef}
+          type="text"
+          placeholder="Search everything... (Ctrl+/)"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            setIsOpen(true)
+          }}
+          onFocus={() => setIsOpen(true)}
+          className="pl-10 pr-10 h-10 bg-dozyr-black border border-dozyr-medium-gray rounded-lg text-black placeholder-dozyr-light-gray focus:border-dozyr-gold focus:outline-none w-full transition-all duration-200"
+        />
+        {!isOpen && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1 text-dozyr-light-gray text-xs">
+            <Command className="h-3 w-3" />
+            <span>/</span>
+          </div>
+        )}
+      </div>
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen, setIsOpen])
-
-  const dropdownContent = isOpen && inputPosition && mounted ? (
-    <motion.div
-      ref={dropdownRef}
-      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="fixed glass-card backdrop-blur-xl bg-dozyr-dark-gray/90 border border-white/20 rounded-xl shadow-2xl z-[9999] max-h-96 overflow-hidden depth-4"
-      style={{
-        top: inputPosition.top + 8,
-        left: inputPosition.left,
-        width: inputPosition.width,
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
-      }}
-    >
+      {/* Portal for dropdown to prevent layout shifts */}
+      {mounted && isOpen && inputPosition && (
+        <AnimatePresence>
+          {createPortal(
+            <motion.div
+              ref={dropdownRef}
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed glass-card backdrop-blur-xl bg-dozyr-dark-gray/90 border border-white/20 rounded-xl shadow-2xl z-[9999] max-h-96 overflow-hidden depth-4"
+              style={{
+                top: inputPosition.top + 8,
+                left: inputPosition.left,
+                width: inputPosition.width,
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+              }}
+            >
             {query.trim() === '' ? (
               // Empty state with tips
               <div className="p-6 text-center">
@@ -214,42 +242,11 @@ export function Omnisearch({ className = '' }: OmnisearchProps) {
                 </div>
               </div>
             )}
-    </motion.div>
-  ) : null
-
-  return (
-    <>
-      <div className={`relative ${className}`}>
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dozyr-light-gray h-4 w-4 z-10" />
-          <Input
-            ref={inputRef}
-            type="text"
-            placeholder="Search everything... (Ctrl+/)"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setIsOpen(true)
-            }}
-            onFocus={() => setIsOpen(true)}
-            className="pl-10 pr-10 h-10 bg-dozyr-black border border-dozyr-medium-gray rounded-lg text-black placeholder-dozyr-light-gray focus:border-dozyr-gold focus:outline-none w-full transition-all duration-200"
-          />
-          {!isOpen && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1 text-dozyr-light-gray text-xs">
-              <Command className="h-3 w-3" />
-              <span>/</span>
-            </div>
+            </motion.div>,
+            document.body
           )}
-        </div>
-      </div>
-
-      {/* Portal for dropdown to prevent layout shifts */}
-      {mounted && (
-        <AnimatePresence>
-          {dropdownContent && createPortal(dropdownContent, document.body)}
         </AnimatePresence>
       )}
-    </>
+    </div>
   )
 }
