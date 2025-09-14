@@ -267,15 +267,24 @@ body {
   transform: translateY(1px);
 }
 
-/* Revolutionary Card Hover Effects */
+/* Enhanced Card Base Styles */
 .enhanced-card {
   position: relative;
-  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: 2px solid var(--card-border);
   background: var(--card-bg);
   border-radius: 20px;
   padding: 32px;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.enhanced-card:hover {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(14, 116, 144, 0.02)
+  );
+  border-color: rgba(14, 116, 144, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 @media (max-width: 768px) {
@@ -292,81 +301,11 @@ body {
   }
 }
 
-.enhanced-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(255, 107, 107, 0.03),
-    transparent,
-    rgba(78, 205, 196, 0.03),
-    transparent,
-    rgba(255, 217, 61, 0.03),
-    transparent
-  );
-  transition: transform 0.8s ease;
-  transform: translateX(-100%) translateY(-100%) rotate(30deg);
-  pointer-events: none;
-}
-
-.enhanced-card:hover::before {
-  transform: translateX(0%) translateY(0%) rotate(30deg);
-}
-
-.enhanced-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  border: 2px solid;
-  border-image: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent)) 1;
-  box-shadow: 
-    var(--shadow-primary),
-    0 0 40px rgba(255, 107, 107, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.95), 
-    rgba(255, 107, 107, 0.02),
-    rgba(78, 205, 196, 0.02)
-  );
-}
-
-/* Playful Glass Card Effects */
+/* Glass Card Base Styles */
 .glass-card {
   position: relative;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   border-radius: 24px;
   overflow: hidden;
-}
-
-.glass-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  transition: left 0.6s ease;
-  pointer-events: none;
-}
-
-.glass-card:hover::after {
-  left: 100%;
-}
-
-.glass-card:hover {
-  border: 2px solid var(--secondary);
-  box-shadow: var(--shadow-secondary);
-  transform: translateY(-6px) rotateX(2deg);
-  background: rgba(255, 255, 255, 0.95);
 }
 
 .glass-scrolled {
