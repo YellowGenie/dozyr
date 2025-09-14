@@ -92,10 +92,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           onClose()
         }
 
+        // Block Shift+/ (help shortcut)
+        if (e.shiftKey && e.key === '/') {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+
         // Block common browser shortcuts that might interfere
         if (e.ctrlKey || e.metaKey) {
-          const blockedCtrlKeys = ['t', 'n', 'w', 'r', 'l', 'd', 'f', 'h', 'j', 'k', 'o', 'p', 's', 'u', 'shift+t']
-          if (blockedCtrlKeys.includes(e.key.toLowerCase())) {
+          const blockedCtrlKeys = ['t', 'n', 'w', 'r', 'l', 'd', 'f', 'h', 'j', 'k', 'o', 'p', 's', 'u', '/', 'shift+t']
+          if (blockedCtrlKeys.includes(e.key.toLowerCase()) || e.key === '/') {
             e.preventDefault()
             e.stopPropagation()
           }
@@ -465,10 +471,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 </Button>
               </div>
               <p className="text-xs text-gray-500 mt-2 text-center">
-                Powered by ChatGPT 3.5 Turbo - Your live AI assistant
-              </p>
-              <p className="text-xs text-gray-400 mt-1 text-center">
-                Keyboard shortcuts are disabled while typing
+                Powered by Yellow Genie Ltd. Chat
               </p>
             </div>
           </motion.div>

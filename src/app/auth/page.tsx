@@ -4,20 +4,23 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Eye, 
-  EyeOff, 
-  LogIn, 
-  Mail, 
-  Lock, 
-  User, 
-  ArrowLeft, 
+import {
+  Eye,
+  EyeOff,
+  LogIn,
+  Mail,
+  Lock,
+  User,
+  ArrowLeft,
   UserPlus,
   Briefcase,
   Zap,
   Shield,
   Sparkles,
-  Globe
+  Globe,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle
 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -53,6 +56,8 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [registerStep, setRegisterStep] = useState(1)
+  const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const { login, register: registerUser, isLoading, error } = useAuthStore()
   const router = useRouter()
 
@@ -63,11 +68,78 @@ export default function AuthPage() {
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      role: 'talent'
+      role: undefined, // Don't pre-select a role
+      first_name: '',
+      last_name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
     }
   })
 
   const selectedRole = registerForm.watch('role')
+  const firstName = registerForm.watch('first_name')
+  const lastName = registerForm.watch('last_name')
+  const email = registerForm.watch('email')
+  const password = registerForm.watch('password')
+  const confirmPassword = registerForm.watch('confirmPassword')
+
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        return !!selectedRole
+      case 2:
+        return !!(firstName && lastName && firstName.length >= 2 && lastName.length >= 2)
+      case 3:
+        return !!(email && email.includes('@') && email.length > 0)
+      case 4:
+        return !!(password && confirmPassword && password.length >= 6 && password === confirmPassword)
+      default:
+        return false
+    }
+  }
+
+  const nextStep = () => {
+    if (validateStep(registerStep)) {
+      if (!completedSteps.includes(registerStep)) {
+        setCompletedSteps(prev => [...prev, registerStep])
+      }
+      if (registerStep < 4) {
+        setRegisterStep(registerStep + 1)
+      }
+    }
+  }
+
+  const prevStep = () => {
+    if (registerStep > 1) {
+      setRegisterStep(registerStep - 1)
+    }
+  }
+
+  const goToStep = (step: number) => {
+    if (step <= registerStep || completedSteps.includes(step - 1)) {
+      setRegisterStep(step)
+    }
+  }
+
+  // Remove auto-advance - let users manually proceed
+
+  // Reset to step 1 when switching to register tab
+  useEffect(() => {
+    if (activeTab === 'register') {
+      setRegisterStep(1)
+      setCompletedSteps([])
+      // Clear the form values to avoid pre-population
+      registerForm.reset({
+        role: undefined,
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      })
+    }
+  }, [activeTab, registerForm])
 
   const onLoginSubmit = async (data: LoginForm) => {
     try {
@@ -252,154 +324,396 @@ export default function AuthPage() {
                         <p className="text-gray-600">Start your journey with Dozyr today</p>
                       </div>
 
-                      <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-6">
-                        <div className="space-y-3">
-                          <label className="text-sm font-medium text-gray-800">Join as</label>
-                          <div className="grid grid-cols-2 gap-4">
-                            <label className="relative cursor-pointer">
-                              <input
-                                {...registerForm.register('role')}
-                                type="radio"
-                                value="talent"
-                                className="sr-only peer"
-                                disabled={isLoading}
-                              />
-                              <div 
-                                className="enhanced-card p-6 rounded-xl border transition-all"
-                                style={{
-                                  borderColor: selectedRole === 'talent' ? 'var(--accent)' : 'var(--card-border)',
-                                  backgroundColor: selectedRole === 'talent' ? 'var(--accent-muted)' : 'transparent',
-                                  boxShadow: selectedRole === 'talent' ? 'var(--shadow-accent)' : 'var(--shadow-sm)',
-                                  borderWidth: selectedRole === 'talent' ? '2px' : '1px'
+                      {/* Progress Steps */}
+                      <div className="mb-8">
+                        <div className="flex justify-between items-center mb-4">
+                          {[1, 2, 3, 4].map((step) => {
+                            const isCurrentStep = step === registerStep
+                            const isCompleted = completedSteps.includes(step)
+                            const isValid = validateStep(step)
+                            const isAccessible = step <= registerStep || completedSteps.includes(step - 1)
+
+                            return (
+                              <motion.div
+                                key={step}
+                                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${
+                                  isCurrentStep && isValid
+                                    ? 'border-green-500 bg-green-500 text-white cursor-pointer'
+                                    : isCurrentStep
+                                    ? 'border-[var(--accent)] bg-[var(--accent)] text-black cursor-pointer'
+                                    : isCompleted
+                                    ? 'border-green-500 bg-green-500 text-white cursor-pointer'
+                                    : isAccessible
+                                    ? 'border-[var(--accent)] bg-[var(--accent-muted)] text-[var(--accent)] cursor-pointer hover:bg-[var(--accent)] hover:text-black'
+                                    : 'border-gray-300 bg-white text-gray-400 cursor-not-allowed'
+                                }`}
+                                onClick={() => isAccessible && goToStep(step)}
+                                whileHover={{ scale: isAccessible ? 1.1 : 1 }}
+                                whileTap={{ scale: isAccessible ? 0.95 : 1 }}
+                                animate={{
+                                  scale: isCurrentStep && isValid ? [1, 1.1, 1] : 1,
                                 }}
+                                transition={{ duration: 0.3 }}
                               >
-                                <div className="text-center">
-                                  <User className="h-8 w-8 mx-auto mb-3 text-[var(--accent)]" />
-                                  <span className="font-semibold text-gray-800 block mb-1">Talent</span>
-                                  <p className="text-xs text-gray-600">Find amazing opportunities</p>
-                                </div>
+                                {isCompleted || (isCurrentStep && isValid) ? (
+                                  <CheckCircle className="w-5 h-5" />
+                                ) : (
+                                  <span className="text-sm font-semibold">{step}</span>
+                                )}
+                              </motion.div>
+                            )
+                          })}
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <motion.div
+                            className={`absolute left-0 top-0 h-full rounded-full transition-colors duration-300 ${
+                              validateStep(registerStep)
+                                ? 'bg-gradient-to-r from-green-500 to-green-600'
+                                : 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-dark)]'
+                            }`}
+                            initial={{ width: "0%" }}
+                            animate={{
+                              width: `${(completedSteps.length + (validateStep(registerStep) ? 0.5 : 0)) * 25}%`
+                            }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Multi-step Form Container */}
+                      <div className="relative overflow-hidden">
+                        <motion.div
+                          className="flex"
+                          animate={{ x: `-${(registerStep - 1) * 100}%` }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                        >
+                          {/* Step 1: Role Selection */}
+                          <div className="w-full flex-shrink-0 px-2">
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: registerStep === 1 ? 1 : 0.3, scale: registerStep === 1 ? 1 : 0.8 }}
+                              transition={{ duration: 0.3 }}
+                              className="space-y-4"
+                            >
+                              <div className="text-center mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Choose Your Role</h3>
+                                <p className="text-sm text-gray-600">How would you like to use Dozyr?</p>
                               </div>
-                            </label>
-                            <label className="relative cursor-pointer">
-                              <input
-                                {...registerForm.register('role')}
-                                type="radio"
-                                value="manager"
-                                className="sr-only peer"
-                                disabled={isLoading}
-                              />
-                              <div 
-                                className="enhanced-card p-6 rounded-xl border transition-all"
-                                style={{
-                                  borderColor: selectedRole === 'manager' ? 'var(--accent)' : 'var(--card-border)',
-                                  backgroundColor: selectedRole === 'manager' ? 'var(--accent-muted)' : 'transparent',
-                                  boxShadow: selectedRole === 'manager' ? 'var(--shadow-accent)' : 'var(--shadow-sm)',
-                                  borderWidth: selectedRole === 'manager' ? '2px' : '1px'
-                                }}
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <label className="relative cursor-pointer group">
+                                  <input
+                                    {...registerForm.register('role')}
+                                    type="radio"
+                                    value="talent"
+                                    className="sr-only peer"
+                                    disabled={isLoading}
+                                  />
+                                  <motion.div
+                                    className="enhanced-card p-6 rounded-xl border transition-all group-hover:scale-105 h-32 flex flex-col justify-center"
+                                    style={{
+                                      borderColor: selectedRole === 'talent' ? 'var(--accent)' : 'var(--card-border)',
+                                      backgroundColor: selectedRole === 'talent' ? 'var(--accent-muted)' : 'transparent',
+                                      boxShadow: selectedRole === 'talent' ? 'var(--shadow-accent)' : 'var(--shadow-sm)',
+                                      borderWidth: selectedRole === 'talent' ? '2px' : '1px'
+                                    }}
+                                    whileHover={{ y: -4 }}
+                                  >
+                                    <div className="text-center">
+                                      <User className="h-8 w-8 mx-auto mb-3 text-[var(--accent)]" />
+                                      <span className="font-semibold text-gray-800 block mb-1">Talent</span>
+                                      <p className="text-xs text-gray-600">Find amazing opportunities</p>
+                                    </div>
+                                  </motion.div>
+                                </label>
+
+                                <label className="relative cursor-pointer group">
+                                  <input
+                                    {...registerForm.register('role')}
+                                    type="radio"
+                                    value="manager"
+                                    className="sr-only peer"
+                                    disabled={isLoading}
+                                  />
+                                  <motion.div
+                                    className="enhanced-card p-6 rounded-xl border transition-all group-hover:scale-105 h-32 flex flex-col justify-center"
+                                    style={{
+                                      borderColor: selectedRole === 'manager' ? 'var(--accent)' : 'var(--card-border)',
+                                      backgroundColor: selectedRole === 'manager' ? 'var(--accent-muted)' : 'transparent',
+                                      boxShadow: selectedRole === 'manager' ? 'var(--shadow-accent)' : 'var(--shadow-sm)',
+                                      borderWidth: selectedRole === 'manager' ? '2px' : '1px'
+                                    }}
+                                    whileHover={{ y: -4 }}
+                                  >
+                                    <div className="text-center">
+                                      <Briefcase className="h-8 w-8 mx-auto mb-3 text-[var(--accent)]" />
+                                      <span className="font-semibold text-gray-800 block mb-1">Manager</span>
+                                      <p className="text-xs text-gray-600">Hire exceptional talent</p>
+                                    </div>
+                                  </motion.div>
+                                </label>
+                              </div>
+                            </motion.div>
+                          </div>
+
+                          {/* Step 2: Personal Information */}
+                          <div className="w-full flex-shrink-0 px-2">
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: registerStep === 2 ? 1 : 0.3, scale: registerStep === 2 ? 1 : 0.8 }}
+                              transition={{ duration: 0.3 }}
+                              className="space-y-4"
+                            >
+                              <div className="text-center mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Personal Information</h3>
+                                <p className="text-sm text-gray-600">Tell us about yourself</p>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <motion.div
+                                  className="space-y-2"
+                                  initial={{ x: -20, opacity: 0 }}
+                                  animate={{ x: 0, opacity: 1 }}
+                                  transition={{ delay: 0.1 }}
+                                >
+                                  <label className="text-sm font-medium text-gray-800">First Name</label>
+                                  <Input
+                                    {...registerForm.register('first_name')}
+                                    placeholder="First name"
+                                    className={`h-12 text-lg transition-all focus:scale-105 ${
+                                      firstName && firstName.length >= 2
+                                        ? 'border-green-500 focus:border-green-500'
+                                        : firstName && firstName.length > 0
+                                        ? 'border-red-300 focus:border-red-500'
+                                        : ''
+                                    }`}
+                                    disabled={isLoading}
+                                  />
+                                  {registerForm.formState.errors.first_name && (
+                                    <p className="text-red-400 text-xs">{registerForm.formState.errors.first_name.message}</p>
+                                  )}
+                                </motion.div>
+
+                                <motion.div
+                                  className="space-y-2"
+                                  initial={{ x: 20, opacity: 0 }}
+                                  animate={{ x: 0, opacity: 1 }}
+                                  transition={{ delay: 0.2 }}
+                                >
+                                  <label className="text-sm font-medium text-gray-800">Last Name</label>
+                                  <Input
+                                    {...registerForm.register('last_name')}
+                                    placeholder="Last name"
+                                    className={`h-12 text-lg transition-all focus:scale-105 ${
+                                      lastName && lastName.length >= 2
+                                        ? 'border-green-500 focus:border-green-500'
+                                        : lastName && lastName.length > 0
+                                        ? 'border-red-300 focus:border-red-500'
+                                        : ''
+                                    }`}
+                                    disabled={isLoading}
+                                  />
+                                  {registerForm.formState.errors.last_name && (
+                                    <p className="text-red-400 text-xs">{registerForm.formState.errors.last_name.message}</p>
+                                  )}
+                                </motion.div>
+                              </div>
+                            </motion.div>
+                          </div>
+
+                          {/* Step 3: Email */}
+                          <div className="w-full flex-shrink-0 px-2">
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: registerStep === 3 ? 1 : 0.3, scale: registerStep === 3 ? 1 : 0.8 }}
+                              transition={{ duration: 0.3 }}
+                              className="space-y-4"
+                            >
+                              <div className="text-center mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Address</h3>
+                                <p className="text-sm text-gray-600">We'll send you important updates</p>
+                              </div>
+
+                              <motion.div
+                                className="space-y-2"
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.1 }}
                               >
-                                <div className="text-center">
-                                  <Briefcase className="h-8 w-8 mx-auto mb-3 text-[var(--accent)]" />
-                                  <span className="font-semibold text-gray-800 block mb-1">Manager</span>
-                                  <p className="text-xs text-gray-600">Hire exceptional talent</p>
+                                <label className="text-sm font-medium text-gray-800">Email Address</label>
+                                <div className="relative">
+                                  <Mail className="input-icon" />
+                                  <Input
+                                    {...registerForm.register('email')}
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    className={`pl-12 h-12 text-lg transition-all focus:scale-105 ${
+                                      email && email.includes('@') && email.length > 3
+                                        ? 'border-green-500 focus:border-green-500'
+                                        : email && email.length > 0
+                                        ? 'border-red-300 focus:border-red-500'
+                                        : ''
+                                    }`}
+                                    disabled={isLoading}
+                                  />
                                 </div>
+                                {registerForm.formState.errors.email && (
+                                  <p className="text-red-400 text-xs">{registerForm.formState.errors.email.message}</p>
+                                )}
+                              </motion.div>
+                            </motion.div>
+                          </div>
+
+                          {/* Step 4: Password */}
+                          <div className="w-full flex-shrink-0 px-2">
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: registerStep === 4 ? 1 : 0.3, scale: registerStep === 4 ? 1 : 0.8 }}
+                              transition={{ duration: 0.3 }}
+                              className="space-y-4"
+                            >
+                              <div className="text-center mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Secure Your Account</h3>
+                                <p className="text-sm text-gray-600">Create a strong password</p>
                               </div>
-                            </label>
-                          </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-800">First Name</label>
-                            <Input
-                              {...registerForm.register('first_name')}
-                              placeholder="First name"
-                              className="h-12 text-lg"
-                              disabled={isLoading}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-800">Last Name</label>
-                            <Input
-                              {...registerForm.register('last_name')}
-                              placeholder="Last name"
-                              className="h-12 text-lg"
-                              disabled={isLoading}
-                            />
-                          </div>
-                        </div>
+                              <div className="space-y-4">
+                                <motion.div
+                                  className="space-y-2"
+                                  initial={{ y: 20, opacity: 0 }}
+                                  animate={{ y: 0, opacity: 1 }}
+                                  transition={{ delay: 0.1 }}
+                                >
+                                  <label className="text-sm font-medium text-gray-800">Password</label>
+                                  <div className="relative">
+                                    <Lock className="input-icon" />
+                                    <Input
+                                      {...registerForm.register('password')}
+                                      type={showPassword ? 'text' : 'password'}
+                                      placeholder="Create a password"
+                                      className={`pl-12 pr-12 h-12 text-lg transition-all focus:scale-105 ${
+                                        password && password.length >= 6
+                                          ? 'border-green-500 focus:border-green-500'
+                                          : password && password.length > 0
+                                          ? 'border-red-300 focus:border-red-500'
+                                          : ''
+                                      }`}
+                                      disabled={isLoading}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowPassword(!showPassword)}
+                                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--accent)] hover:text-[var(--accent-dark)] z-10"
+                                      disabled={isLoading}
+                                    >
+                                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                    </button>
+                                  </div>
+                                  {registerForm.formState.errors.password && (
+                                    <p className="text-red-400 text-xs">{registerForm.formState.errors.password.message}</p>
+                                  )}
+                                </motion.div>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-800">Email Address</label>
-                          <div className="relative">
-                            <Mail className="input-icon" />
-                            <Input
-                              {...registerForm.register('email')}
-                              type="email"
-                              placeholder="Enter your email"
-                              className="pl-12 h-12 text-lg"
-                              disabled={isLoading}
-                            />
+                                <motion.div
+                                  className="space-y-2"
+                                  initial={{ y: 20, opacity: 0 }}
+                                  animate={{ y: 0, opacity: 1 }}
+                                  transition={{ delay: 0.2 }}
+                                >
+                                  <label className="text-sm font-medium text-gray-800">Confirm Password</label>
+                                  <div className="relative">
+                                    <Lock className="input-icon" />
+                                    <Input
+                                      {...registerForm.register('confirmPassword')}
+                                      type={showConfirmPassword ? 'text' : 'password'}
+                                      placeholder="Confirm your password"
+                                      className={`pl-12 pr-12 h-12 text-lg transition-all focus:scale-105 ${
+                                        confirmPassword && password && confirmPassword === password
+                                          ? 'border-green-500 focus:border-green-500'
+                                          : confirmPassword && confirmPassword.length > 0
+                                          ? 'border-red-300 focus:border-red-500'
+                                          : ''
+                                      }`}
+                                      disabled={isLoading}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--accent)] hover:text-[var(--accent-dark)] z-10"
+                                      disabled={isLoading}
+                                    >
+                                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                    </button>
+                                  </div>
+                                  {registerForm.formState.errors.confirmPassword && (
+                                    <p className="text-red-400 text-xs">{registerForm.formState.errors.confirmPassword.message}</p>
+                                  )}
+                                </motion.div>
+                              </div>
+                            </motion.div>
                           </div>
-                        </div>
+                        </motion.div>
+                      </div>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-800">Password</label>
-                          <div className="relative">
-                            <Lock className="input-icon" />
-                            <Input
-                              {...registerForm.register('password')}
-                              type={showPassword ? 'text' : 'password'}
-                              placeholder="Create a password"
-                              className="pl-12 pr-12 h-12 text-lg"
-                              disabled={isLoading}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--accent)] hover:text-[var(--accent-dark)] z-10"
-                              disabled={isLoading}
-                            >
-                              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                            </button>
-                          </div>
-                        </div>
+                      {/* Navigation Buttons */}
+                      <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                        <motion.button
+                          type="button"
+                          onClick={prevStep}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                            registerStep === 1
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-gray-600 hover:text-[var(--accent)] hover:bg-gray-100'
+                          }`}
+                          disabled={registerStep === 1}
+                          whileHover={{ scale: registerStep === 1 ? 1 : 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          Previous
+                        </motion.button>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-800">Confirm Password</label>
-                          <div className="relative">
-                            <Lock className="input-icon" />
-                            <Input
-                              {...registerForm.register('confirmPassword')}
-                              type={showConfirmPassword ? 'text' : 'password'}
-                              placeholder="Confirm your password"
-                              className="pl-12 pr-12 h-12 text-lg"
-                              disabled={isLoading}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--accent)] hover:text-[var(--accent-dark)] z-10"
-                              disabled={isLoading}
-                            >
-                              {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                            </button>
-                          </div>
-                        </div>
-
-                        <Button type="submit" className="w-full h-12 btn-primary text-lg font-semibold" disabled={isLoading}>
-                          {isLoading ? (
-                            <div className="flex items-center gap-3">
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
-                              Creating account...
-                            </div>
-                          ) : (
-                            <>
-                              <Sparkles className="h-5 w-5 mr-3" />
-                              Create Account
-                            </>
-                          )}
-                        </Button>
-                      </form>
+                        {registerStep < 4 ? (
+                          <motion.button
+                            type="button"
+                            onClick={nextStep}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                              validateStep(registerStep)
+                                ? 'bg-[var(--accent)] text-black hover:bg-[var(--accent-dark)]'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                            disabled={!validateStep(registerStep)}
+                            whileHover={{ scale: validateStep(registerStep) ? 1.05 : 1 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            Next
+                            <ChevronRight className="w-4 h-4" />
+                          </motion.button>
+                        ) : (
+                          <motion.button
+                            type="button"
+                            onClick={registerForm.handleSubmit(onRegisterSubmit)}
+                            className="flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-black rounded-lg font-semibold hover:bg-[var(--accent-dark)] transition-all"
+                            disabled={isLoading || !validateStep(4)}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {isLoading ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                                Creating account...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="h-4 w-4" />
+                                Create Account
+                              </>
+                            )}
+                          </motion.button>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

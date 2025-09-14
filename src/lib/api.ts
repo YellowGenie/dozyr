@@ -934,6 +934,25 @@ class ApiClient {
     })
   }
 
+  async updateUserRole(userId: string, role: 'talent' | 'manager' | 'admin'): Promise<User> {
+    return this.request(`/admin/users/${userId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify({ role }),
+    })
+  }
+
+  async deactivateUser(userId: string): Promise<{ message: string }> {
+    return this.request(`/admin/users/${userId}/deactivate`, {
+      method: 'POST',
+    })
+  }
+
+  async reactivateUser(userId: string): Promise<{ message: string }> {
+    return this.request(`/admin/users/${userId}/reactivate`, {
+      method: 'POST',
+    })
+  }
+
   async getUserActivityLogs(userId: string, limit?: number): Promise<{
     logs: Array<{
       id: string;

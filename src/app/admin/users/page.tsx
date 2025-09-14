@@ -100,11 +100,13 @@ export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState<UserFilters>({})
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [originalUser, setOriginalUser] = useState<User | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false)
   const [isViewUserDialogOpen, setIsViewUserDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isSuspendDialogOpen, setIsSuspendDialogOpen] = useState(false)
   const [newUserData, setNewUserData] = useState<UserFormData>({
     email: '',
     first_name: '',
@@ -152,8 +154,12 @@ export default function AdminUsersPage() {
 
     // Verified filter
     if (filters.verified && filters.verified !== 'all') {
-      const isVerified = filters.verified === 'verified'
-      filtered = filtered.filter(user => user.is_verified === isVerified)
+      if (filters.verified === 'suspended') {
+        filtered = filtered.filter(user => !user.is_active)
+      } else {
+        const isVerified = filters.verified === 'verified'
+        filtered = filtered.filter(user => user.is_verified === isVerified)
+      }
     }
 
     setFilteredUsers(filtered)
@@ -193,18 +199,33 @@ export default function AdminUsersPage() {
   }
 
   const handleUpdateUser = async () => {
-    if (!selectedUser) return
+    if (!selectedUser || !originalUser) return
     try {
       setIsSubmitting(true)
-      await api.updateUserProfile(selectedUser.id, {
-        first_name: selectedUser.first_name,
-        last_name: selectedUser.last_name,
-        email: selectedUser.email,
-        role: selectedUser.role,
-        is_verified: selectedUser.is_verified
-      })
+
+      // Check if only the role changed
+      const roleChanged = selectedUser.role !== originalUser.role
+      const otherFieldsChanged =
+        selectedUser.first_name !== originalUser.first_name ||
+        selectedUser.last_name !== originalUser.last_name ||
+        selectedUser.email !== originalUser.email
+
+      if (roleChanged && !otherFieldsChanged) {
+        // Only role changed, use specific role update endpoint
+        await api.updateUserRole(selectedUser.id, selectedUser.role)
+      } else {
+        // Other fields changed, use general update endpoint
+        await api.updateUserProfile(selectedUser.id, {
+          first_name: selectedUser.first_name,
+          last_name: selectedUser.last_name,
+          email: selectedUser.email,
+          role: selectedUser.role
+        })
+      }
+
       setIsEditDialogOpen(false)
       setSelectedUser(null)
+      setOriginalUser(null)
       await loadUsers()
     } catch (err: any) {
       setError(err.message || 'Failed to update user')
@@ -238,6 +259,32 @@ export default function AdminUsersPage() {
       await loadUsers()
     } catch (err: any) {
       setError(err.message || 'Failed to delete user')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSuspendUser = async () => {
+    if (!selectedUser || !currentUser) return
+
+    // Prevent self-suspension
+    if (selectedUser.id === currentUser.id) {
+      setError('You cannot suspend your own account')
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+      if (selectedUser.is_active) {
+        await api.deactivateUser(selectedUser.id)
+      } else {
+        await api.reactivateUser(selectedUser.id)
+      }
+      setIsSuspendDialogOpen(false)
+      setSelectedUser(null)
+      await loadUsers()
+    } catch (err: any) {
+      setError(err.message || 'Failed to update user status')
     } finally {
       setIsSubmitting(false)
     }
@@ -288,11 +335,11 @@ export default function AdminUsersPage() {
       </Card>
       <Card>
         <CardContent className="p-4 text-center">
-          <AlertTriangle className="h-8 w-8 text-orange-400 mx-auto mb-2" />
+          <Ban className="h-8 w-8 text-orange-400 mx-auto mb-2" />
           <p className="text-2xl font-bold text-[var(--foreground)]">
-            {users.filter(u => !u.is_verified).length}
+            {users.filter(u => !u.is_active).length}
           </p>
-          <p className="text-sm text-dozyr-light-gray">Pending</p>
+          <p className="text-sm text-dozyr-light-gray">Suspended</p>
         </CardContent>
       </Card>
     </div>
@@ -440,9 +487,15 @@ export default function AdminUsersPage() {
                   <Badge variant={getUserRoleBadgeVariant(selectedUser.role)}>
                     {selectedUser.role}
                   </Badge>
-                  <Badge variant={selectedUser.is_verified ? 'default' : 'destructive'}>
-                    {selectedUser.is_verified ? 'Verified' : 'Unverified'}
-                  </Badge>
+                  {!selectedUser.is_active ? (
+                    <Badge variant="secondary" className="bg-orange-500/20 text-orange-600 border-orange-300">
+                      Suspended
+                    </Badge>
+                  ) : (
+                    <Badge variant={selectedUser.is_verified ? 'default' : 'destructive'}>
+                      {selectedUser.is_verified ? 'Verified' : 'Unverified'}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>
@@ -701,6 +754,72 @@ export default function AdminUsersPage() {
     </Dialog>
   )
 
+  const SuspendUserDialog = () => (
+    <Dialog open={isSuspendDialogOpen} onOpenChange={setIsSuspendDialogOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{selectedUser?.is_active ? 'Suspend User' : 'Reactivate User'}</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className={`w-12 h-12 ${selectedUser?.is_active ? 'bg-orange-500/20' : 'bg-green-500/20'} rounded-full flex items-center justify-center`}>
+              <Ban className={`h-6 w-6 ${selectedUser?.is_active ? 'text-orange-400' : 'text-green-400'}`} />
+            </div>
+            <div>
+              <h3 className="font-semibold text-[var(--foreground)]">
+                {selectedUser?.is_active ? 'Suspend Account' : 'Reactivate Account'}
+              </h3>
+              <p className="text-sm text-dozyr-light-gray">
+                {selectedUser?.is_active ? 'User will be temporarily disabled' : 'User will regain access'}
+              </p>
+            </div>
+          </div>
+          <p className="text-dozyr-light-gray">
+            {selectedUser?.is_active ? (
+              <>Are you sure you want to suspend{' '}
+              <span className="text-[var(--foreground)] font-medium">
+                {selectedUser?.first_name} {selectedUser?.last_name}
+              </span>
+              ? They will not be able to log in until reactivated.</>
+            ) : (
+              <>Are you sure you want to reactivate{' '}
+              <span className="text-[var(--foreground)] font-medium">
+                {selectedUser?.first_name} {selectedUser?.last_name}
+              </span>
+              ? They will regain access to their account.</>
+            )}
+          </p>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setIsSuspendDialogOpen(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={selectedUser?.is_active ? "destructive" : "default"}
+            onClick={handleSuspendUser}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                {selectedUser?.is_active ? 'Suspending...' : 'Reactivating...'}
+              </>
+            ) : (
+              <>
+                <Ban className="mr-2 h-4 w-4" />
+                {selectedUser?.is_active ? 'Suspend User' : 'Reactivate User'}
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+
   return (
     <ProtectedRoute requiredRole={['admin']}>
       <DashboardLayout>
@@ -786,6 +905,7 @@ export default function AdminUsersPage() {
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="verified">Verified</SelectItem>
                       <SelectItem value="unverified">Unverified</SelectItem>
+                      <SelectItem value="suspended">Suspended</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -875,11 +995,19 @@ export default function AdminUsersPage() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getUserStatusIcon(user)}
-                            <span className="text-sm">
-                              {user.is_verified ? 'Verified' : 'Unverified'}
-                            </span>
+                          <div className="flex flex-col gap-1">
+                            {!user.is_active ? (
+                              <Badge variant="secondary" className="w-fit bg-orange-500/20 text-orange-600 border-orange-300">
+                                Suspended
+                              </Badge>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                {getUserStatusIcon(user)}
+                                <span className="text-sm">
+                                  {user.is_verified ? 'Verified' : 'Unverified'}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="text-sm text-dozyr-light-gray">
@@ -904,7 +1032,8 @@ export default function AdminUsersPage() {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setSelectedUser(user)
+                                  setSelectedUser({ ...user })
+                                  setOriginalUser({ ...user })
                                   setIsEditDialogOpen(true)
                                 }}
                               >
@@ -930,13 +1059,29 @@ export default function AdminUsersPage() {
                                 Reset Password
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-400">
-                                <Ban className="mr-2 h-4 w-4" />
-                                Suspend User
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 className="text-red-400"
                                 onClick={() => {
+                                  // Prevent self-suspension
+                                  if (user.id === currentUser?.id) {
+                                    setError('You cannot suspend your own account')
+                                    return
+                                  }
+                                  setSelectedUser(user)
+                                  setIsSuspendDialogOpen(true)
+                                }}
+                              >
+                                <Ban className="mr-2 h-4 w-4" />
+                                {user.is_active ? 'Suspend User' : 'Reactivate User'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-400"
+                                onClick={() => {
+                                  // Prevent self-deletion
+                                  if (user.id === currentUser?.id) {
+                                    setError('You cannot delete your own account')
+                                    return
+                                  }
                                   setSelectedUser(user)
                                   setIsDeleteDialogOpen(true)
                                 }}
@@ -961,6 +1106,7 @@ export default function AdminUsersPage() {
           <EditUserDialog />
           <ResetPasswordDialog />
           <DeleteUserDialog />
+          <SuspendUserDialog />
         </div>
       </DashboardLayout>
     </ProtectedRoute>

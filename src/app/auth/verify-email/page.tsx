@@ -121,10 +121,21 @@ export default function VerifyEmailPage() {
     try {
       await verifyEmailCode(verificationCode)
       setIsVerified(true)
-      
+
+      // Force refresh the auth state after verification
+      const updatedUser = useAuthStore.getState().user
+      console.log('User after verification:', updatedUser)
+
+      // Direct redirect to role-specific dashboard to avoid the main dashboard redirect loop
       setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000)
+        if (updatedUser?.role === 'talent') {
+          router.replace('/dashboard/talent')
+        } else if (updatedUser?.role === 'manager') {
+          router.replace('/dashboard/manager')
+        } else {
+          router.replace('/dashboard')
+        }
+      }, 800)
     } catch (error) {
       // Error is handled by the store
       console.error('Verification failed:', error)

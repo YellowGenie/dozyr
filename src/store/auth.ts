@@ -194,15 +194,26 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ isLoading: true, error: null })
           const response = await api.verifyEmailCode(code)
-          
+
           // Update the current user's email_verified status
           const currentUser = get().user
           if (currentUser) {
+            const updatedUser = { ...currentUser, email_verified: true }
             set({
-              user: { ...currentUser, email_verified: true },
+              user: updatedUser,
               isLoading: false,
               error: null
             })
+
+            // Force a fresh user profile fetch to ensure backend sync
+            try {
+              const freshUser = await api.getProfile()
+              set({ user: freshUser })
+              console.log('Fresh user data after verification:', freshUser)
+            } catch (profileError) {
+              console.warn('Failed to refresh profile after verification:', profileError)
+              // Keep the manually updated user if API call fails
+            }
           }
         } catch (error: any) {
           set({
