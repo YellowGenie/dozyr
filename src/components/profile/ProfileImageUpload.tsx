@@ -291,6 +291,10 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
 
   const hasProfileImage = user?.profile_image && user.profile_image.trim() !== ''
 
+  // Debug logging
+  console.log('ProfileImageUpload - hasProfileImage:', hasProfileImage)
+  console.log('ProfileImageUpload - user.profile_image:', user?.profile_image)
+
   // Add cache busting for updated images
   const getImageSrc = () => {
     if (!hasProfileImage) return ''

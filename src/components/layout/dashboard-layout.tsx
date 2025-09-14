@@ -103,6 +103,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/admin/contracts', icon: FileSignature, label: 'Contracts' },
         { href: '/admin/escrows', icon: Wallet, label: 'Escrows' },
         { href: '/admin/notifications', icon: Mail, label: 'Notifications' },
+        { href: '/admin/ai-management', icon: Bot, label: 'AI Management' },
         { href: '/messages', icon: MessageSquare, label: 'Messages' },
         { href: '/interviews', icon: Star, label: 'Interviews' },
       ]

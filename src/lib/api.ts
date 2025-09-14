@@ -210,9 +210,37 @@ class ApiClient {
 
   async uploadProfileImage(file: File): Promise<{ image_url: string }> {
     const formData = new FormData()
-    formData.append('profile_image', file)
-    
-    const response = await fetch(`${this.baseURL}/auth/profile/image`, {
+    formData.append('profilePicture', file)
+
+    const response = await fetch(`${this.baseURL}/files/upload/profile-picture`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.token}`
+      },
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error)
+    }
+
+    const result = await response.json()
+    return { image_url: result.file.url }
+  }
+
+  async deleteProfileImage(): Promise<{ message: string }> {
+    return this.request('/auth/profile/image', {
+      method: 'DELETE',
+    })
+  }
+
+  // File upload methods
+  async uploadDocument(file: File): Promise<{ file: { fileName: string, originalName: string, url: string, size: number } }> {
+    const formData = new FormData()
+    formData.append('document', file)
+
+    const response = await fetch(`${this.baseURL}/files/upload/document`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.token}`
@@ -228,8 +256,28 @@ class ApiClient {
     return response.json()
   }
 
-  async deleteProfileImage(): Promise<{ message: string }> {
-    return this.request('/auth/profile/image', {
+  async uploadAttachment(file: File): Promise<{ file: { fileName: string, originalName: string, url: string, size: number } }> {
+    const formData = new FormData()
+    formData.append('attachment', file)
+
+    const response = await fetch(`${this.baseURL}/files/upload/attachment`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.token}`
+      },
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error)
+    }
+
+    return response.json()
+  }
+
+  async deleteFile(category: 'profiles' | 'documents' | 'attachments', fileName: string): Promise<{ message: string }> {
+    return this.request(`/files/${category}/${fileName}`, {
       method: 'DELETE',
     })
   }

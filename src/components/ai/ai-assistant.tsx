@@ -19,17 +19,11 @@ interface AIAssistantProps {
 }
 
 export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
-  const { user } = useAuthStore()
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: `Hello ${user?.first_name || 'there'}! I'm your AI assistant. I can help you navigate Dozyr, answer questions about your projects, or assist with various tasks. What would you like to know?`,
-      sender: 'ai',
-      timestamp: new Date()
-    }
-  ])
+  const { user, token } = useAuthStore()
+  const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -47,78 +41,242 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }
   }, [isOpen])
 
-  const generateAIResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase()
-    
-    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-      return "Hello! How can I assist you with Dozyr today?"
+  // Load welcome message when component opens
+  useEffect(() => {
+    if (isOpen && messages.length === 0 && token) {
+      loadWelcomeMessage()
     }
-    
-    if (message.includes('help') || message.includes('support')) {
-      return "I'm here to help! I can assist you with navigating the platform, understanding features, managing your profile, or answering questions about jobs and contracts. What specific area would you like help with?"
-    }
-    
-    if (message.includes('profile') || message.includes('account')) {
-      return "For profile management, you can visit the Profile section in the sidebar or click the profile icon. You can update your information, skills, portfolio, and preferences there. Need help with a specific profile feature?"
-    }
-    
-    if (message.includes('job') || message.includes('work') || message.includes('project')) {
-      if (user?.role === 'talent') {
-        return "As a talent, you can find jobs in the 'Find Jobs' section, track your applications, and manage contracts. Would you like help with job searching, application tips, or contract management?"
-      } else if (user?.role === 'manager') {
-        return "As a manager, you can post jobs, find talent, and manage your hiring process. Check out 'Post Jobs' to create listings or 'Find Talent' to browse candidates. Need help with any specific hiring task?"
+  }, [isOpen, token])
+
+  // Handle keyboard shortcuts - disable global shortcuts when input is focused
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if the AI chat input is focused
+      const isInputFocused = inputRef.current && document.activeElement === inputRef.current
+
+      if (isOpen && isInputFocused) {
+        // Prevent global shortcuts when AI chat input is focused
+        // Allow only basic text editing shortcuts
+        const allowedKeys = [
+          'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+          'Home', 'End', 'Tab', 'Enter', 'Escape'
+        ]
+
+        const isTextEditingShortcut = (
+          (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x', 'z', 'y'].includes(e.key.toLowerCase())
+        )
+
+        const isAllowedKey = allowedKeys.includes(e.key) || isTextEditingShortcut
+
+        // If it's not an allowed key and it's a shortcut (Ctrl/Cmd + key), prevent it
+        if (!isAllowedKey && (e.ctrlKey || e.metaKey || e.altKey)) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+
+        // Special handling for common shortcuts that should be blocked
+        const blockedShortcuts = [
+          'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+          'Tab' // Prevent tabbing away from input when focused
+        ]
+
+        if (blockedShortcuts.includes(e.key) && e.key !== 'Tab') {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+
+        // Special handling for Escape to close the AI chat
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
+          onClose()
+        }
+
+        // Block common browser shortcuts that might interfere
+        if (e.ctrlKey || e.metaKey) {
+          const blockedCtrlKeys = ['t', 'n', 'w', 'r', 'l', 'd', 'f', 'h', 'j', 'k', 'o', 'p', 's', 'u', 'shift+t']
+          if (blockedCtrlKeys.includes(e.key.toLowerCase())) {
+            e.preventDefault()
+            e.stopPropagation()
+          }
+        }
+
+        // Block Alt+key combinations that might trigger browser menus
+        if (e.altKey && e.key.length === 1) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
       }
     }
-    
-    if (message.includes('message') || message.includes('chat') || message.includes('communication')) {
-      return "You can access all your conversations in the Messages section. This includes communications with clients, talent, or team members. Need help with messaging features or notification settings?"
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown, true) // Use capture phase
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown, true)
+      }
     }
-    
-    if (message.includes('payment') || message.includes('money') || message.includes('invoice')) {
-      return "For payment-related queries, check the Payments section where you can view transaction history, manage payment methods, and handle invoicing. Is there a specific payment issue I can help with?"
+  }, [isOpen, onClose])
+
+  const formatMessage = (content: string) => {
+    // Split content by newlines first, then process
+    const lines = content.split('\n').map(line => line.trim()).filter(line => line)
+
+    const elements: JSX.Element[] = []
+    let currentList: string[] = []
+    let currentListType: 'numbered' | 'bullet' | null = null
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+
+      // Check if it's a numbered list item
+      if (/^\d+\.\s/.test(line)) {
+        if (currentListType !== 'numbered') {
+          // Flush any existing list
+          if (currentList.length > 0) {
+            elements.push(createList(currentList, currentListType, elements.length))
+            currentList = []
+          }
+          currentListType = 'numbered'
+        }
+        currentList.push(line.replace(/^\d+\.\s*/, ''))
+      }
+      // Check if it's a bullet point
+      else if (/^[-•]\s/.test(line)) {
+        if (currentListType !== 'bullet') {
+          // Flush any existing list
+          if (currentList.length > 0) {
+            elements.push(createList(currentList, currentListType, elements.length))
+            currentList = []
+          }
+          currentListType = 'bullet'
+        }
+        currentList.push(line.replace(/^[-•]\s*/, ''))
+      }
+      // Regular text
+      else {
+        // Flush any existing list
+        if (currentList.length > 0) {
+          elements.push(createList(currentList, currentListType, elements.length))
+          currentList = []
+          currentListType = null
+        }
+
+        // Handle bold text and create paragraph
+        const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        elements.push(
+          <p
+            key={elements.length}
+            className="text-sm leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: formattedLine }}
+          />
+        )
+      }
     }
-    
-    if (message.includes('contract') || message.includes('agreement')) {
-      return "Contracts are managed in the Contracts section where you can view active agreements, track milestones, and handle contract-related communications. What aspect of contract management can I help you with?"
+
+    // Flush any remaining list
+    if (currentList.length > 0) {
+      elements.push(createList(currentList, currentListType, elements.length))
     }
-    
-    if (message.includes('interview') || message.includes('meeting')) {
-      return "The Interviews section helps you schedule and manage video calls with potential collaborators. You can view upcoming interviews, join calls, and review past sessions. Need help setting up an interview?"
+
+    return elements
+  }
+
+  const createList = (items: string[], type: 'numbered' | 'bullet' | null, key: number) => {
+    if (type === 'numbered') {
+      return (
+        <ol key={key} className="list-decimal list-inside space-y-0.5 my-1 pl-1">
+          {items.map((item, itemIndex) => (
+            <li key={itemIndex} className="text-sm leading-relaxed pl-1">
+              <span dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+            </li>
+          ))}
+        </ol>
+      )
+    } else {
+      return (
+        <ul key={key} className="list-disc list-inside space-y-0.5 my-1 pl-1">
+          {items.map((item, itemIndex) => (
+            <li key={itemIndex} className="text-sm leading-relaxed pl-1">
+              <span dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+            </li>
+          ))}
+        </ul>
+      )
     }
-    
-    if (message.includes('notification') || message.includes('alert')) {
-      return "You can manage notifications in your Settings. This includes email preferences, push notifications, and activity alerts. Check the notification bell in the header for recent updates!"
+  }
+
+  const loadWelcomeMessage = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api/v1'}/ai/welcome`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        const welcomeMessage: Message = {
+          id: '1',
+          content: data.data.message,
+          sender: 'ai',
+          timestamp: new Date()
+        }
+        setMessages([welcomeMessage])
+      } else {
+        // Fallback message
+        const fallbackMessage: Message = {
+          id: '1',
+          content: `Hello ${user?.first_name || 'there'}! I'm your Dozyr AI assistant. How can I help you today?`,
+          sender: 'ai',
+          timestamp: new Date()
+        }
+        setMessages([fallbackMessage])
+      }
+    } catch (error) {
+      console.error('Error loading welcome message:', error)
+      // Fallback message
+      const fallbackMessage: Message = {
+        id: '1',
+        content: `Hello ${user?.first_name || 'there'}! I'm your Dozyr AI assistant. How can I help you today?`,
+        sender: 'ai',
+        timestamp: new Date()
+      }
+      setMessages([fallbackMessage])
+    } finally {
+      setIsLoading(false)
     }
-    
-    if (message.includes('search') || message.includes('find')) {
-      return "Use the search bar at the top to quickly find jobs, talent, messages, or any content on the platform. You can filter results by type and use keywords for better matches. Try searching for something specific!"
+  }
+
+  const sendMessageToAI = async (message: string): Promise<string> => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api/v1'}/ai/chat`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        return data.data.response
+      } else {
+        return "I'm sorry, I'm having trouble processing your request right now. Please try again in a moment."
+      }
+    } catch (error) {
+      console.error('Error sending message to AI:', error)
+      return "I'm sorry, I'm experiencing technical difficulties. Please try again later or contact support if the issue persists."
     }
-    
-    if (message.includes('dashboard') || message.includes('overview')) {
-      return "Your dashboard provides an overview of your activity, recent updates, and quick access to important features. It's personalized based on your role and recent activity. What would you like to see on your dashboard?"
-    }
-    
-    if (message.includes('settings') || message.includes('preferences')) {
-      return "In Settings, you can customize your account preferences, privacy settings, notification preferences, and security options. Access it through the settings icon in the sidebar footer."
-    }
-    
-    if (message.includes('thank') || message.includes('thanks')) {
-      return "You're welcome! I'm always here to help. Feel free to ask me anything about Dozyr anytime!"
-    }
-    
-    // Default responses
-    const defaultResponses = [
-      "That's an interesting question! Could you provide more details so I can give you a more specific answer?",
-      "I'd be happy to help with that! Can you tell me more about what you're trying to accomplish?",
-      "Let me help you with that. Could you clarify what specific aspect you need assistance with?",
-      "I understand you're looking for help. What would be the most useful information I could provide right now?"
-    ]
-    
-    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)]
   }
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() || !token) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -127,22 +285,34 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       timestamp: new Date()
     }
 
+    const messageToSend = inputValue
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
     setIsTyping(true)
 
-    // Simulate AI thinking time
-    setTimeout(() => {
+    try {
+      const aiResponseText = await sendMessageToAI(messageToSend)
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: generateAIResponse(inputValue),
+        content: aiResponseText,
         sender: 'ai',
         timestamp: new Date()
       }
-      
+
       setMessages(prev => [...prev, aiResponse])
+    } catch (error) {
+      console.error('Error getting AI response:', error)
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I'm sorry, I'm experiencing technical difficulties. Please try again later.",
+        sender: 'ai',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorResponse])
+    } finally {
       setIsTyping(false)
-    }, 1000 + Math.random() * 2000) // Random delay between 1-3 seconds
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -172,6 +342,9 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 h-full w-96 bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col"
+            style={{
+              '--ai-message-spacing': '0.75rem'
+            } as React.CSSProperties}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)]">
@@ -198,7 +371,15 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
+              {isLoading && messages.length === 0 ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="flex items-center gap-3 text-[var(--primary)]">
+                    <Bot className="h-6 w-6 animate-pulse" />
+                    <span className="text-sm">Loading AI assistant...</span>
+                  </div>
+                </div>
+              ) : (
+                messages.map((message) => (
                 <motion.div
                   key={message.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -206,10 +387,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                    className={`max-w-[85%] rounded-lg px-4 py-3 ${
                       message.sender === 'user'
                         ? 'bg-[var(--primary)] text-white'
-                        : 'bg-gray-100 text-gray-800 border'
+                        : 'bg-gray-50 text-gray-800 border border-gray-200 shadow-sm'
                     }`}
                   >
                     {message.sender === 'ai' && (
@@ -218,7 +399,11 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                         <span className="text-xs font-medium text-[var(--primary)]">AI Assistant</span>
                       </div>
                     )}
-                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <div className="ai-message-content">
+                      <div className="space-y-1">
+                        {formatMessage(message.content)}
+                      </div>
+                    </div>
                     <div className="flex justify-end mt-1">
                       <span className={`text-xs ${
                         message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
@@ -228,8 +413,9 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                     </div>
                   </div>
                 </motion.div>
-              ))}
-              
+                ))
+              )}
+
               {/* Typing Indicator */}
               {isTyping && (
                 <motion.div
@@ -279,7 +465,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 </Button>
               </div>
               <p className="text-xs text-gray-500 mt-2 text-center">
-                AI responses are simulated and for demonstration purposes
+                Powered by ChatGPT 3.5 Turbo - Your live AI assistant
+              </p>
+              <p className="text-xs text-gray-400 mt-1 text-center">
+                Keyboard shortcuts are disabled while typing
               </p>
             </div>
           </motion.div>

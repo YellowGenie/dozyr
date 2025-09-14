@@ -110,10 +110,10 @@ export function AdminNotificationProvider({ children }: AdminNotificationProvide
   const [isChatbotVisible, setIsChatbotVisible] = useState(false)
   
   // Computed values
-  const unreadCount = notifications.filter(n => !n.viewed_at).length
-  const chatbotNotifications = notifications.filter(n => 
+  const unreadCount = notifications?.filter(n => !n.viewed_at).length || 0
+  const chatbotNotifications = notifications?.filter(n =>
     n.notification_type === 'chatbot' || n.notification_type === 'both'
-  )
+  ) || []
 
   // Fetch active notifications
   const fetchNotifications = useCallback(async () => {

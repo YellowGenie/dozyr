@@ -249,8 +249,8 @@ export default function ProfilePage() {
           
           // Update the auth store directly by setting the user
           // Instead of calling updateProfile (which makes another API call)
-          const { set } = useAuthStore.getState()
-          set({ user: updatedUser })
+          const { setUser } = useAuthStore.getState()
+          setUser(updatedUser)
           
           console.log('Profile refreshed with image:', updatedUser.profile_image)
           
