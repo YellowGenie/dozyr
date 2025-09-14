@@ -23,7 +23,7 @@ class ApiClient {
   private token: string | null = null
 
   constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005/api/v1'
+    this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api/v1'
     
     // Initialize token from localStorage if available
     if (typeof window !== 'undefined') {
@@ -534,7 +534,14 @@ class ApiClient {
   }
 
   // Jobs
-  async getJobs(filters?: JobFilters): Promise<{ jobs: Job[] }> {
+  async getJobs(filters?: JobFilters & { page?: number, limit?: number }): Promise<{
+    jobs: Job[],
+    total: number,
+    page: number,
+    totalPages: number,
+    hasNextPage?: boolean,
+    hasPrevPage?: boolean
+  }> {
     const params = new URLSearchParams()
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
@@ -547,8 +554,16 @@ class ApiClient {
         }
       })
     }
-    
+
     const endpoint = `/jobs${params.toString() ? `?${params.toString()}` : ''}`
+    return this.request(endpoint)
+  }
+
+  async getFeaturedJobs(limit?: number): Promise<{ jobs: Job[] }> {
+    const params = new URLSearchParams()
+    if (limit) params.set('limit', String(limit))
+
+    const endpoint = `/jobs/featured${params.toString() ? `?${params.toString()}` : ''}`
     return this.request(endpoint)
   }
 
@@ -557,8 +572,13 @@ class ApiClient {
     return response.job
   }
 
-  async searchJobs(query: string, filters?: JobFilters): Promise<{ jobs: Job[] }> {
-    const params = new URLSearchParams({ query })
+  async searchJobs(query: string, filters?: JobFilters & { page?: number, limit?: number }): Promise<{
+    jobs: Job[],
+    total: number,
+    page: number,
+    totalPages: number
+  }> {
+    const params = new URLSearchParams({ search_query: query })
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== '') {
@@ -570,7 +590,7 @@ class ApiClient {
         }
       })
     }
-    
+
     return this.request(`/jobs/search?${params.toString()}`)
   }
 

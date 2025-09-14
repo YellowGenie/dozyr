@@ -4,9 +4,18 @@ import { api } from '@/lib/api'
 
 interface JobState {
   jobs: Job[]
+  featuredJobs: Job[]
   currentJob: Job | null
   isLoading: boolean
+  isFeaturedLoading: boolean
   error: string | null
+  pagination: {
+    page: number
+    totalPages: number
+    total: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
+  }
   searchFilters: {
     query?: string
     location?: string
@@ -18,9 +27,12 @@ interface JobState {
 }
 
 interface JobActions {
-  loadJobs: () => Promise<void>
+  loadJobs: (page?: number, limit?: number) => Promise<void>
+  loadFeaturedJobs: () => Promise<void>
   loadJob: (id: string) => Promise<void>
   searchJobs: (query: string, filters?: any) => Promise<void>
+  loadNextPage: () => Promise<void>
+  loadPrevPage: () => Promise<void>
   applyToJob: (jobId: string, coverLetter?: string) => Promise<void>
   saveJob: (jobId: string) => Promise<void>
   unsaveJob: (jobId: string) => Promise<void>
@@ -33,24 +45,56 @@ type JobStore = JobState & JobActions
 export const useJobStore = create<JobStore>()((set, get) => ({
   // State
   jobs: [],
+  featuredJobs: [],
   currentJob: null,
   isLoading: false,
+  isFeaturedLoading: false,
   error: null,
+  pagination: {
+    page: 1,
+    totalPages: 1,
+    total: 0,
+    hasNextPage: false,
+    hasPrevPage: false
+  },
   searchFilters: {},
 
   // Actions
-  loadJobs: async () => {
+  loadJobs: async (page = 1, limit = 20) => {
     try {
       set({ isLoading: true, error: null })
-      const response = await api.getJobs()
-      set({ 
+      const response = await api.getJobs({ page, limit })
+      set({
         jobs: response.jobs || [],
-        isLoading: false 
+        pagination: {
+          page: response.page || 1,
+          totalPages: response.totalPages || 1,
+          total: response.total || 0,
+          hasNextPage: response.hasNextPage || false,
+          hasPrevPage: response.hasPrevPage || false
+        },
+        isLoading: false
       })
     } catch (error: any) {
-      set({ 
+      set({
         error: error.message || 'Failed to load jobs',
-        isLoading: false 
+        isLoading: false
+      })
+    }
+  },
+
+  loadFeaturedJobs: async () => {
+    try {
+      set({ isFeaturedLoading: true, error: null })
+      const response = await api.getFeaturedJobs(10)
+      set({
+        featuredJobs: response.jobs || [],
+        isFeaturedLoading: false
+      })
+    } catch (error: any) {
+      set({
+        error: error.message || 'Failed to load featured jobs',
+        isFeaturedLoading: false
       })
     }
   },
@@ -74,16 +118,47 @@ export const useJobStore = create<JobStore>()((set, get) => ({
   searchJobs: async (query: string, filters?: any) => {
     try {
       set({ isLoading: true, error: null, searchFilters: { query, ...filters } })
-      const response = await api.searchJobs(query, filters)
-      set({ 
+      const response = await api.searchJobs(query, { ...filters, page: filters?.page || 1, limit: 20 })
+      set({
         jobs: response.jobs || [],
-        isLoading: false 
+        pagination: {
+          page: response.page || 1,
+          totalPages: response.totalPages || 1,
+          total: response.total || 0,
+          hasNextPage: (response.page || 1) < (response.totalPages || 1),
+          hasPrevPage: (response.page || 1) > 1
+        },
+        isLoading: false
       })
     } catch (error: any) {
-      set({ 
+      set({
         error: error.message || 'Failed to search jobs',
-        isLoading: false 
+        isLoading: false
       })
+    }
+  },
+
+  loadNextPage: async () => {
+    const { pagination, searchFilters, loadJobs, searchJobs } = get()
+    if (pagination.hasNextPage) {
+      const nextPage = pagination.page + 1
+      if (searchFilters.query) {
+        await searchJobs(searchFilters.query, { ...searchFilters, page: nextPage })
+      } else {
+        await loadJobs(nextPage)
+      }
+    }
+  },
+
+  loadPrevPage: async () => {
+    const { pagination, searchFilters, loadJobs, searchJobs } = get()
+    if (pagination.hasPrevPage) {
+      const prevPage = pagination.page - 1
+      if (searchFilters.query) {
+        await searchJobs(searchFilters.query, { ...searchFilters, page: prevPage })
+      } else {
+        await loadJobs(prevPage)
+      }
     }
   },
 

@@ -59,66 +59,16 @@ export default function TalentDashboardPage() {
       } catch (err) {
         console.error('Failed to load dashboard data:', err)
         setError(err.message)
-        // Use fallback data if API fails
+        // Set empty state when API fails
         setDashboardData({
           stats: {
-            applications_sent: 12,
-            interviews_scheduled: 3,
-            jobs_completed: 8,
-            total_earned: 24500
+            applications_sent: 0,
+            interviews_scheduled: 0,
+            jobs_completed: 0,
+            total_earned: 0
           },
-          recent_applications: [
-            {
-              id: '1',
-              job_title: 'Senior React Developer',
-              company_name: 'TechCorp Inc.',
-              applied_at: '2024-01-15',
-              status: 'under_review'
-            },
-            {
-              id: '2',
-              job_title: 'Full Stack Engineer',
-              company_name: 'StartupXYZ',
-              applied_at: '2024-01-14',
-              status: 'interview_scheduled'
-            },
-            {
-              id: '3',
-              job_title: 'Frontend Developer',
-              company_name: 'WebAgency Pro',
-              applied_at: '2024-01-13',
-              status: 'rejected'
-            }
-          ],
-          recommended_jobs: [
-            {
-              id: '1',
-              title: 'React Native Developer',
-              company_name: 'MobileFirst',
-              location: 'Remote',
-              salary_range: '$80k - $120k',
-              match_score: 95,
-              posted_at: '2 days ago'
-            },
-            {
-              id: '2',
-              title: 'Senior Frontend Engineer',
-              company_name: 'UIUXCorp',
-              location: 'Remote',
-              salary_range: '$100k - $140k',
-              match_score: 88,
-              posted_at: '1 day ago'
-            },
-            {
-              id: '3',
-              title: 'JavaScript Developer',
-              company_name: 'CodeFactory',
-              location: 'Remote',
-              salary_range: '$70k - $100k',
-              match_score: 82,
-              posted_at: '3 days ago'
-            }
-          ]
+          recent_applications: [],
+          recommended_jobs: []
         })
       } finally {
         setLoading(false)
@@ -276,21 +226,29 @@ export default function TalentDashboardPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {recentApplications.map((application) => (
-                    <div key={application.id} className="flex items-center justify-between p-4 bg-dozyr-dark-gray rounded-lg">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-[var(--foreground)] truncate">{application.job_title}</h4>
-                        <p className="text-sm text-dozyr-light-gray">{application.company_name}</p>
-                        <p className="text-xs text-dozyr-light-gray">Applied {application.applied_at}</p>
+                  {recentApplications.length > 0 ? (
+                    recentApplications.map((application) => (
+                      <div key={application.id} className="flex items-center justify-between p-4 bg-dozyr-dark-gray rounded-lg">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-[var(--foreground)] truncate">{application.job_title}</h4>
+                          <p className="text-sm text-dozyr-light-gray">{application.company_name}</p>
+                          <p className="text-xs text-dozyr-light-gray">Applied {application.applied_at}</p>
+                        </div>
+                        <div className="ml-4">
+                          <Badge className={getStatusColor(application.status)}>
+                            {getStatusIcon(application.status)}
+                            <span className="ml-1 capitalize">{application.status.replace('_', ' ')}</span>
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="ml-4">
-                        <Badge className={getStatusColor(application.status)}>
-                          {getStatusIcon(application.status)}
-                          <span className="ml-1 capitalize">{application.status.replace('_', ' ')}</span>
-                        </Badge>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Briefcase className="h-12 w-12 text-dozyr-medium-gray mx-auto mb-4" />
+                      <p className="text-dozyr-light-gray">No applications yet</p>
+                      <p className="text-sm text-dozyr-medium-gray">Start applying to jobs to see your application history here</p>
                     </div>
-                  ))}
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -308,35 +266,43 @@ export default function TalentDashboardPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {recommendedJobs.map((job) => (
-                    <div key={job.id} className="p-4 bg-dozyr-dark-gray rounded-lg hover:bg-dozyr-medium-gray/50 transition-colors cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-[var(--foreground)] truncate">{job.title}</h4>
-                          <div className="flex items-center gap-4 text-sm text-dozyr-light-gray mt-1">
-                            <div className="flex items-center gap-1">
-                              <Building className="h-3 w-3" />
-                              {job.company_name}
+                  {recommendedJobs.length > 0 ? (
+                    recommendedJobs.map((job) => (
+                      <div key={job.id} className="p-4 bg-dozyr-dark-gray rounded-lg hover:bg-dozyr-medium-gray/50 transition-colors cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-[var(--foreground)] truncate">{job.title}</h4>
+                            <div className="flex items-center gap-4 text-sm text-dozyr-light-gray mt-1">
+                              <div className="flex items-center gap-1">
+                                <Building className="h-3 w-3" />
+                                {job.company_name}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                {job.location}
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {job.location}
+                          </div>
+                          <div className="ml-4 text-right">
+                            <div className="flex items-center gap-1 text-dozyr-gold">
+                              <Star className="h-3 w-3 fill-current" />
+                              <span className="text-xs font-medium">{job.match_score}% match</span>
                             </div>
                           </div>
                         </div>
-                        <div className="ml-4 text-right">
-                          <div className="flex items-center gap-1 text-dozyr-gold">
-                            <Star className="h-3 w-3 fill-current" />
-                            <span className="text-xs font-medium">{job.match_score}% match</span>
-                          </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-dozyr-gold">{job.salary_range}</span>
+                          <span className="text-xs text-dozyr-light-gray">{job.posted_at}</span>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-dozyr-gold">{job.salary_range}</span>
-                        <span className="text-xs text-dozyr-light-gray">{job.posted_at}</span>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Star className="h-12 w-12 text-dozyr-medium-gray mx-auto mb-4" />
+                      <p className="text-dozyr-light-gray">No recommended jobs</p>
+                      <p className="text-sm text-dozyr-medium-gray">Complete your profile to get personalized job recommendations</p>
                     </div>
-                  ))}
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
