@@ -1168,7 +1168,7 @@ export default function AdminPage() {
           Configure platform-wide settings and preferences.
         </p>
       </div>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Coming Soon</CardTitle>

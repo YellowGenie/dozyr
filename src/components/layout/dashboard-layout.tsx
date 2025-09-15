@@ -27,7 +27,8 @@ import {
   FileSignature,
   Wallet,
   HelpCircle,
-  Bot
+  Bot,
+  DollarSign
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -102,6 +103,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/admin/proposals', icon: FileText, label: 'Proposals' },
         { href: '/admin/contracts', icon: FileSignature, label: 'Contracts' },
         { href: '/admin/escrows', icon: Wallet, label: 'Escrows' },
+        { href: '/admin/payments', icon: DollarSign, label: 'Payments' },
         { href: '/admin/notifications', icon: Mail, label: 'Notifications' },
         { href: '/admin/ai-management', icon: Bot, label: 'AI Management' },
         { href: '/messages', icon: MessageSquare, label: 'Messages' },
