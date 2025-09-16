@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   Search,
@@ -33,25 +33,30 @@ const fadeInUp = {
 }
 
 const JobCard = ({ job }: { job: Job }) => {
+  const router = useRouter()
   const jobUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/jobs/${job.id}`
-  
+
+  const handleViewDetails = () => {
+    router.push(`/jobs/${job.id}`)
+  }
+
   return (
     <motion.div {...fadeInUp}>
-      <Card className="hover:shadow-lg transition-all duration-300 border-dozyr-medium-gray hover:border-dozyr-gold/50">
+      <Card className="hover:shadow-lg transition-all duration-300 border-muted hover:border-[var(--accent)]/50">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                <Building className="h-4 w-4 text-dozyr-gold flex-shrink-0" />
-                <span className="text-sm text-dozyr-light-gray truncate">{job.company_name}</span>
+                <Building className="h-4 w-4 text-[var(--accent)] flex-shrink-0" />
+                <span className="text-sm text-foreground/70 truncate">{job.company_name}</span>
                 {job.featured && (
-                  <Badge className="bg-dozyr-orange text-black text-xs">Featured</Badge>
+                  <Badge className="bg-orange-500 text-black text-xs">Featured</Badge>
                 )}
               </div>
               <CardTitle className="text-xl font-bold text-black mb-2 line-clamp-2">
                 {job.title}
               </CardTitle>
-              <div className="flex items-center gap-4 text-sm text-dozyr-light-gray mb-3">
+              <div className="flex items-center gap-4 text-sm text-foreground/70 mb-3">
                 <div className="flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   <span>{job.location}</span>
@@ -69,27 +74,27 @@ const JobCard = ({ job }: { job: Job }) => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-dozyr-light-gray text-sm line-clamp-3">
+          <p className="text-foreground/70 text-sm line-clamp-3">
             {job.description}
           </p>
           
           {job.skills && job.skills.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {job.skills.slice(0, 4).map((skill, index) => (
-                <Badge key={index} variant="secondary" className="bg-dozyr-dark-gray text-dozyr-light-gray text-xs">
+                <Badge key={index} variant="secondary" className="bg-muted text-foreground/70 text-xs">
                   {skill}
                 </Badge>
               ))}
               {job.skills.length > 4 && (
-                <Badge variant="secondary" className="bg-dozyr-dark-gray text-dozyr-light-gray text-xs">
+                <Badge variant="secondary" className="bg-muted text-foreground/70 text-xs">
                   +{job.skills.length - 4} more
                 </Badge>
               )}
             </div>
           )}
           
-          <div className="flex items-center justify-between pt-4 border-t border-dozyr-medium-gray">
-            <div className="flex items-center gap-4 text-sm text-dozyr-light-gray">
+          <div className="flex items-center justify-between pt-4 border-t border-muted">
+            <div className="flex items-center gap-4 text-sm text-foreground/70">
               <div className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
                 <span>{job.applicant_count || 0} applicants</span>
@@ -101,7 +106,7 @@ const JobCard = ({ job }: { job: Job }) => {
                 <BookmarkPlus className="h-3 w-3 mr-1" />
                 Save
               </Button>
-              <Button size="sm" className="h-8 btn-primary">
+              <Button size="sm" className="h-8 btn-primary" onClick={handleViewDetails}>
                 <ExternalLink className="h-3 w-3 mr-1" />
                 View Details
               </Button>
@@ -163,7 +168,7 @@ export default function SearchableJobsPage() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-bold text-[var(--foreground)] mb-1">Browse Jobs</h1>
-            <p className="text-dozyr-light-gray text-sm">Discover opportunities that match your skills</p>
+            <p className="text-foreground/70 text-sm">Discover opportunities that match your skills</p>
           </div>
           <Button
             variant="outline"
@@ -180,7 +185,7 @@ export default function SearchableJobsPage() {
           <CardContent className="p-4">
             <form onSubmit={handleSearch} className="flex gap-3">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dozyr-light-gray h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/60 h-4 w-4" />
                 <Input
                   placeholder="Search jobs, skills, companies..."
                   value={searchTerm}
@@ -189,7 +194,7 @@ export default function SearchableJobsPage() {
                 />
               </div>
               <div className="w-48 relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dozyr-light-gray h-4 w-4" />
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/60 h-4 w-4" />
                 <Input
                   placeholder="Location"
                   value={locationFilter}
@@ -209,22 +214,22 @@ export default function SearchableJobsPage() {
       <div className="space-y-6">
         {/* Jobs Header with count and pagination info */}
         {!isLoading && jobs.length > 0 && (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <PaginationInfo
               currentPage={pagination.page}
               totalPages={pagination.totalPages}
               total={pagination.total}
               limit={20}
             />
-            <div className="text-sm text-dozyr-light-gray">
-              Page {pagination.page} of {pagination.totalPages}
+            <div className="text-sm text-foreground/70">
+              Page {pagination.page} of {pagination.totalPages || 1}
             </div>
           </div>
         )}
 
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-dozyr-gold"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)]"></div>
           </div>
         ) : jobs.length > 0 ? (
           <>
@@ -240,31 +245,37 @@ export default function SearchableJobsPage() {
                 }
               }}
             >
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+              {jobs.map((job, index) => (
+                <JobCard key={job.id || `job-${index}`} job={job} />
               ))}
             </motion.div>
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="flex justify-center pt-6">
-                <Pagination
-                  currentPage={pagination.page}
-                  totalPages={pagination.totalPages}
-                  hasNextPage={pagination.hasNextPage}
-                  hasPrevPage={pagination.hasPrevPage}
-                  onPageChange={handlePageChange}
-                />
+            <div className="flex justify-center pt-6">
+              <div className="flex flex-col items-center gap-4">
+                {pagination.totalPages > 1 && (
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    hasNextPage={pagination.hasNextPage}
+                    hasPrevPage={pagination.hasPrevPage}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+                <div className="text-sm text-foreground/60 bg-muted/50 px-4 py-2 rounded-lg">
+                  Showing {((pagination.page - 1) * 20) + 1}-{Math.min(pagination.page * 20, pagination.total)} of {pagination.total} jobs
+                  {pagination.totalPages > 1 && ` • ${pagination.totalPages} pages total`}
+                </div>
               </div>
-            )}
+            </div>
           </>
         ) : (
           <motion.div {...fadeInUp}>
             <Card className="py-12">
               <CardContent className="text-center">
-                <Search className="h-16 w-16 text-dozyr-light-gray mx-auto mb-4" />
+                <Search className="h-16 w-16 text-foreground/40 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-[var(--foreground)] mb-2">No jobs found</h3>
-                <p className="text-dozyr-light-gray mb-4">
+                <p className="text-foreground/70 mb-4">
                   Try adjusting your search criteria or removing some filters.
                 </p>
                 <Button

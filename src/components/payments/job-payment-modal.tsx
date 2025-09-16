@@ -22,9 +22,10 @@ const cardElementOptions = {
   style: {
     base: {
       fontSize: '16px',
-      color: '#ffffff',
+      color: 'var(--foreground)',
+      backgroundColor: 'transparent',
       '::placeholder': {
-        color: '#9CA3AF',
+        color: 'rgb(156, 163, 175)',
       },
     },
     invalid: {
@@ -38,13 +39,14 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
   const stripe = useStripe()
   const elements = useElements()
   const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [paymentIntent, setPaymentIntent] = useState<any>(null)
 
   const createPaymentIntent = async () => {
     try {
       const token = localStorage.getItem('auth_token')
-      
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/create-payment-intent`, {
         method: 'POST',
         headers: {
@@ -61,6 +63,12 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
       }
 
       const data = await response.json()
+
+      // Handle free posting case
+      if (data.free_posting) {
+        return { free_posting: true }
+      }
+
       setPaymentIntent(data)
       return data
     } catch (err) {
@@ -125,66 +133,86 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
     }
   })
 
+  // Show free posting message if it's free
+  if (paymentIntent?.free_posting) {
+    return (
+      <div className="space-y-6 text-center">
+        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-6">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="h-12 w-12 bg-green-500/20 rounded-full flex items-center justify-center">
+              <Briefcase className="h-6 w-6 text-green-400" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-green-400 mb-2">Job Posting is Free!</h3>
+          <p className="text-green-200">
+            Great news! Job posting is currently free on our platform.
+            Your job post is being created now...
+          </p>
+        </div>
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-dozyr-gold"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Payment Summary */}
-      <div className="bg-dozyr-dark-gray rounded-lg p-4 border border-dozyr-medium-gray">
+      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/20">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Briefcase className="h-4 w-4 text-dozyr-gold" />
-            <span className="text-sm font-medium text-black">Job Posting Fee</span>
+            <Briefcase className="h-4 w-4 text-[var(--accent)]" />
+            <span className="text-sm font-medium text-[var(--foreground)]">Job Posting Fee</span>
           </div>
-          <div className="flex items-center gap-1 text-dozyr-gold font-bold">
+          <div className="flex items-center gap-1 text-[var(--accent)] font-bold">
             <DollarSign className="h-4 w-4" />
-            0.01
+            FREE
           </div>
         </div>
-        <p className="text-xs text-dozyr-light-gray">
+        <p className="text-xs text-[var(--foreground)]/60">
           "{jobTitle}"
         </p>
       </div>
 
       {/* Important Notice */}
-      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+      <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-medium text-yellow-400 mb-1">One-Time Fee</h4>
-            <p className="text-sm text-yellow-200">
-              This $0.01 fee helps us maintain our platform and ensure quality job postings. 
-              Your card will be saved securely for future job posts.
+            <h4 className="font-medium text-green-400 mb-1">Currently Free!</h4>
+            <p className="text-sm text-green-200">
+              Job posting is currently free on our platform.
+              No payment required - just click the button below to post your job!
             </p>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-black mb-3">
-            Card Information
-          </label>
-          <div className="bg-dozyr-black border border-dozyr-medium-gray rounded-lg p-4">
-            <CardElement options={cardElementOptions} />
-          </div>
-          {error && (
-            <p className="text-red-400 text-sm mt-2">{error}</p>
-          )}
-        </div>
-
-        <div className="flex items-center justify-end gap-3">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            disabled={!stripe || loading}
-            className="bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/90"
-          >
-            {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Pay $0.01 & Post Job
-          </Button>
-        </div>
-      </form>
+      <div className="flex items-center justify-end gap-3">
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          onClick={async () => {
+            if (submitting) return // Prevent multiple submissions
+            setSubmitting(true)
+            try {
+              await onSuccess('free_posting')
+              onClose()
+            } catch (error) {
+              console.error('Error posting job:', error)
+              setSubmitting(false)
+            }
+          }}
+          disabled={loading || submitting}
+          className="bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90 transition-colors"
+        >
+          {(loading || submitting) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          {submitting ? 'Posting...' : 'Post Job for Free'}
+        </Button>
+      </div>
     </div>
   )
 }
@@ -211,14 +239,14 @@ export function JobPaymentModal({ isOpen, onClose, onPaymentSuccess, jobTitle }:
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <Card>
+            <Card className="bg-white border-white/20 shadow-2xl backdrop-blur-xl [&.enhanced-card]:hover:bg-white [&.enhanced-card]:hover:border-white/20 [&.enhanced-card]:hover:shadow-2xl">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-dozyr-gold/20 rounded-lg flex items-center justify-center">
-                      <CreditCard className="h-5 w-5 text-dozyr-gold" />
+                    <div className="h-10 w-10 bg-[var(--accent)]/20 rounded-lg flex items-center justify-center">
+                      <CreditCard className="h-5 w-5 text-[var(--accent)]" />
                     </div>
-                    <CardTitle>Complete Payment to Post Job</CardTitle>
+                    <CardTitle className="text-[var(--foreground)]">Post Your Job</CardTitle>
                   </div>
                   <Button variant="ghost" size="icon" onClick={onClose}>
                     <X className="h-5 w-5" />

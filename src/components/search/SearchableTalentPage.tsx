@@ -77,7 +77,9 @@ export default function SearchableTalentPage() {
   const [talents, setTalents] = useState([])
   const [allTalents, setAllTalents] = useState([]) // Store all talents for filtering
   const [filteredTalents, setFilteredTalents] = useState([]) // Store filtered results
+  const [featuredTalents, setFeaturedTalents] = useState([]) // Store featured talents
   const [loading, setLoading] = useState(true)
+  const [featuredLoading, setFeaturedLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const searchParams = useSearchParams()
   const [showFilters, setShowFilters] = useState(false)
@@ -92,6 +94,25 @@ export default function SearchableTalentPage() {
   })
   
 
+  // Load featured talents for the carousel
+  useEffect(() => {
+    const fetchFeaturedTalents = async () => {
+      try {
+        const response = await api.searchTalent({ sort: 'featured', limit: 20, _t: Date.now() })
+        const featured = (response.talents || []).filter((talent: any) => talent.is_featured)
+        console.log('Fetched featured talents:', featured.length, 'featured')
+        setFeaturedTalents(featured)
+      } catch (error) {
+        console.error('Failed to fetch featured talents:', error)
+        setFeaturedTalents([])
+      } finally {
+        setFeaturedLoading(false)
+      }
+    }
+
+    fetchFeaturedTalents()
+  }, [])
+
   // Load all talents once on component mount and handle URL search
   useEffect(() => {
     const fetchTalents = async () => {
@@ -101,10 +122,12 @@ export default function SearchableTalentPage() {
         if (urlSearchQuery) {
           setSearchQuery(urlSearchQuery)
         }
-        
-        const response = await api.searchTalent({})
+
+        // Add timestamp to avoid caching issues
+        const response = await api.searchTalent({ _t: Date.now() })
         const talentData = response.talents || []
-        
+
+        console.log('Fetched talents:', talentData.length, 'talents')
         setAllTalents(talentData)
       } catch (error) {
         console.error('Failed to fetch talents:', error)
@@ -245,140 +268,395 @@ export default function SearchableTalentPage() {
     return pages
   }
 
+  const FeaturedTalentCard = ({ talent }: { talent: any }) => (
+    <motion.div
+      className="flex-shrink-0 w-80 group"
+    >
+      <Card className="h-full relative overflow-hidden bg-gradient-to-br from-yellow-50 to-white border-0 shadow-xl hover:shadow-2xl transition-all duration-500">
+        {/* Featured Banner */}
+        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 px-4 py-2 z-10">
+          <div className="flex items-center justify-center gap-2 text-black font-bold text-sm">
+            <Crown className="h-4 w-4" />
+            FEATURED TALENT
+            <Crown className="h-4 w-4" />
+          </div>
+        </div>
+
+        <CardContent className="p-6 pt-16 relative z-10">
+          <div className="space-y-5">
+            {/* Profile Header */}
+            <div className="flex items-start gap-4">
+              <div className="relative">
+                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-yellow-400 to-amber-500 p-0.5">
+                  <div className="w-full h-full rounded-2xl overflow-hidden bg-white">
+                    {talent.user?.profile_image ? (
+                      <img
+                        src={talent.user.profile_image}
+                        alt={`${talent.user.first_name} ${talent.user.last_name}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center text-white font-bold text-3xl">
+                        {talent.user?.first_name?.[0]}{talent.user?.last_name?.[0]}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Premium verified badge with golden theme */}
+                {talent.user?.email_verified && (
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-r from-yellow-400 to-amber-500 border-2 border-white rounded-full shadow-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-bold text-xl text-gray-900 truncate leading-tight">
+                      {talent.user?.first_name} {talent.user?.last_name}
+                    </h3>
+                    <p className="text-[var(--accent)] font-bold text-base truncate mt-1">
+                      {talent.title || 'Featured Freelancer'}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <MapPin className="h-4 w-4 text-amber-600" />
+                      <span className="text-gray-600 text-sm font-medium">
+                        {talent.location || 'Remote'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    {talent.rating > 0 ? (
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(talent.rating)
+                                  ? 'text-yellow-500 fill-yellow-500'
+                                  : 'text-gray-200'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-base text-gray-800 font-bold">
+                          {talent.rating.toFixed(1)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-400 mb-2">
+                        No reviews yet
+                      </div>
+                    )}
+
+                    {talent.hourly_rate ? (
+                      <div className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-base font-bold px-3 py-2 rounded-xl shadow-lg">
+                        ${talent.hourly_rate}/hr
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-400 bg-gray-100 px-3 py-2 rounded-xl">
+                        Rate TBD
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio */}
+            {talent.bio ? (
+              <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 font-medium">
+                {talent.bio}
+              </p>
+            ) : (
+              <p className="text-gray-400 text-sm italic">
+                No bio available yet
+              </p>
+            )}
+
+            {/* Skills */}
+            <div className="space-y-2">
+              {talent.skills && talent.skills.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {talent.skills.slice(0, 4).map((skill: any, index: number) => (
+                    <Badge
+                      key={index}
+                      className="bg-gradient-to-r from-[var(--accent)]/20 to-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/30 text-sm font-semibold px-3 py-1.5 hover:from-[var(--accent)]/30 hover:to-[var(--accent)]/20 transition-all duration-200"
+                    >
+                      {typeof skill === 'string' ? skill : skill.name}
+                    </Badge>
+                  ))}
+                  {talent.skills.length > 4 && (
+                    <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-sm font-semibold px-3 py-1.5">
+                      +{talent.skills.length - 4}
+                    </Badge>
+                  )}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-400 italic">
+                  Skills to be added
+                </div>
+              )}
+            </div>
+
+            {/* Enhanced Stats Bar */}
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-amber-600" />
+                    <div>
+                      <div className="text-lg font-bold text-gray-900">{talent.jobs_completed || 0}</div>
+                      <div className="text-xs text-gray-600 font-medium">Jobs</div>
+                    </div>
+                  </div>
+
+                  {talent.success_rate > 0 && (
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                      <div>
+                        <div className="text-lg font-bold text-gray-900">{talent.success_rate}%</div>
+                        <div className="text-xs text-gray-600 font-medium">Success</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className={`h-3 w-3 rounded-full ${
+                    talent.availability === 'available'
+                      ? 'bg-green-400 animate-pulse'
+                      : talent.availability === 'busy'
+                      ? 'bg-yellow-400'
+                      : 'bg-gray-300'
+                  }`} />
+                  <span className="text-sm text-gray-700 font-semibold capitalize">
+                    {talent.availability || 'Available'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Premium Action Button */}
+            <Link href={`/talent/${talent.user?.id}`} target="_blank" rel="noopener noreferrer" className="block">
+              <Button className="w-full h-12 text-base font-bold bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 hover:from-amber-500 hover:via-yellow-600 hover:to-amber-500 text-black border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <Eye className="h-5 w-5 mr-2" />
+                View Featured Profile
+                <Crown className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  )
+
   const TalentCard = ({ talent }: { talent: any }) => (
     <motion.div
       variants={fadeInUp}
       whileHover="hover"
+      className="group"
     >
-      <motion.div variants={cardHover}>
-        <Card className="group hover:shadow-2xl transition-all duration-300 glass-card border-white/10 hover:border-[var(--accent)]/30 depth-2 bg-gradient-to-br from-white/5 to-transparent">
-          <CardHeader className="pb-4">
+      <Card className="relative overflow-hidden h-full bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-2xl transition-all duration-500">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Featured badge */}
+        {talent.is_featured && (
+          <div className="absolute top-4 right-4 z-10">
+            <Badge className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black text-xs px-2 py-1 font-semibold border-0 shadow-md">
+              ⭐ Featured
+            </Badge>
+          </div>
+        )}
+
+        <CardContent className="p-6 relative z-10">
+          <div className="space-y-5">
+            {/* Profile Header */}
             <div className="flex items-start gap-4">
-              {/* Profile Image */}
               <div className="relative">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[var(--accent)]/50 flex-shrink-0">
-                  {talent.user?.profile_image ? (
-                    <img
-                      src={talent.user.profile_image}
-                      alt={`${talent.user.first_name} ${talent.user.last_name}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center text-black font-bold text-lg">
-                      {talent.user?.first_name?.[0]}{talent.user?.last_name?.[0]}
-                    </div>
-                  )}
+                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] p-0.5">
+                  <div className="w-full h-full rounded-2xl overflow-hidden bg-white">
+                    {talent.user?.profile_image ? (
+                      <img
+                        src={talent.user.profile_image}
+                        alt={`${talent.user.first_name} ${talent.user.last_name}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center text-white font-bold text-2xl">
+                        {talent.user?.first_name?.[0]}{talent.user?.last_name?.[0]}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                
-                {/* Online Status */}
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-black rounded-full"></div>
+
+                {/* Verified badge instead of online indicator */}
+                {talent.user?.email_verified && (
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 border-2 border-white rounded-full shadow-sm flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-lg text-black truncate">
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900 truncate leading-tight">
                       {talent.user?.first_name} {talent.user?.last_name}
                     </h3>
-                    <p className="text-[var(--accent)] font-medium text-sm truncate">
-                      {talent.title || 'Professional'}
+                    <p className="text-[var(--accent)] font-semibold text-sm truncate mt-0.5">
+                      {talent.title || 'Freelancer'}
                     </p>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <MapPin className="h-3 w-3 text-gray-400" />
+                      <span className="text-gray-500 text-xs truncate">
+                        {talent.location || 'Remote'}
+                      </span>
+                    </div>
                   </div>
-                  
-                  {/* Rating and Price */}
-                  <div className="text-right flex-shrink-0 ml-2">
-                    {talent.rating > 0 && (
-                      <div className="flex items-center gap-1 mb-1">
-                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                        <span className="text-sm text-black font-medium">{talent.rating.toFixed(1)}</span>
+
+                  <div className="text-right">
+                    {talent.rating > 0 ? (
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-3 w-3 ${
+                                i < Math.floor(talent.rating)
+                                  ? 'text-yellow-400 fill-yellow-400'
+                                  : 'text-gray-200'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-700 font-medium">
+                          {talent.rating.toFixed(1)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-400 mb-1">
+                        No reviews yet
                       </div>
                     )}
-                    {talent.hourly_rate && (
-                      <div className="text-sm font-bold text-[var(--accent)]">
+
+                    {talent.hourly_rate ? (
+                      <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white text-sm font-bold px-2 py-1 rounded-lg">
                         ${talent.hourly_rate}/hr
                       </div>
+                    ) : (
+                      <div className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
+                        Rate TBD
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
             </div>
-          </CardHeader>
-          
-          <CardContent className="space-y-4">
+
             {/* Bio */}
-            {talent.bio && (
-              <p className="text-black/70 text-sm line-clamp-2 leading-relaxed">
+            {talent.bio ? (
+              <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
                 {talent.bio}
               </p>
+            ) : (
+              <p className="text-gray-400 text-sm italic">
+                No bio available yet
+              </p>
             )}
-            
+
             {/* Skills */}
-            {talent.skills && talent.skills.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {talent.skills.slice(0, 4).map((skill: any, index: number) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
-                    className="bg-[var(--accent)]/10 text-[var(--accent)] text-xs px-2 py-1 hover:bg-[var(--accent)]/20 transition-colors"
-                  >
-                    {typeof skill === 'string' ? skill : skill.name}
-                  </Badge>
-                ))}
-                {talent.skills.length > 4 && (
-                  <Badge 
-                    variant="secondary" 
-                    className="bg-white/10 text-black/60 text-xs"
-                  >
-                    +{talent.skills.length - 4} more
-                  </Badge>
-                )}
-              </div>
-            )}
-            
-            {/* Stats */}
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
-              <div className="flex items-center gap-4 text-xs text-black/50">
-                {talent.jobs_completed > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Award className="h-3 w-3" />
-                    <span>{talent.jobs_completed} jobs</span>
-                  </div>
-                )}
-                {talent.success_rate > 0 && (
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" />
-                    <span>{talent.success_rate}% success</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  <span className="capitalize">{talent.availability || 'available'}</span>
+            <div className="space-y-2">
+              {talent.skills && talent.skills.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {talent.skills.slice(0, 3).map((skill: any, index: number) => (
+                    <Badge
+                      key={index}
+                      className="bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/20 text-xs font-medium px-2.5 py-1 hover:bg-[var(--accent)]/20 transition-colors"
+                    >
+                      {typeof skill === 'string' ? skill : skill.name}
+                    </Badge>
+                  ))}
+                  {talent.skills.length > 3 && (
+                    <Badge variant="outline" className="text-xs text-gray-500 border-gray-200">
+                      +{talent.skills.length - 3}
+                    </Badge>
+                  )}
                 </div>
+              ) : (
+                <div className="text-xs text-gray-400 italic">
+                  Skills to be added
+                </div>
+              )}
+            </div>
+
+            {/* Stats Bar */}
+            <div className="flex items-center justify-between py-3 px-4 bg-gray-50/80 rounded-xl">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <Briefcase className="h-3.5 w-3.5 text-[var(--accent)]" />
+                  <span className="text-xs text-gray-600 font-medium">
+                    {talent.jobs_completed || 0} jobs
+                  </span>
+                </div>
+
+                {talent.success_rate > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <TrendingUp className="h-3.5 w-3.5 text-green-500" />
+                    <span className="text-xs text-gray-600 font-medium">
+                      {talent.success_rate}% success
+                    </span>
+                  </div>
+                )}
               </div>
-              
-              <div className="flex gap-2">
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                >
-                  <Heart className="h-3 w-3 mr-1" />
-                  Save
-                </Button>
-                <Link href={`/talent/${talent.user?.id}`}>
-                  <Button 
-                    size="sm" 
-                    className="h-7 text-xs btn-primary opacity-0 group-hover:opacity-100 transition-all duration-200"
-                  >
-                    <Eye className="h-3 w-3 mr-1" />
-                    View Profile
-                  </Button>
-                </Link>
+
+              <div className="flex items-center gap-1.5">
+                <div className={`h-2 w-2 rounded-full ${
+                  talent.availability === 'available'
+                    ? 'bg-green-400'
+                    : talent.availability === 'busy'
+                    ? 'bg-yellow-400'
+                    : 'bg-gray-300'
+                }`} />
+                <span className="text-xs text-gray-500 capitalize">
+                  {talent.availability || 'Available'}
+                </span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 pt-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 h-9 text-xs border-gray-200 hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+              >
+                <Heart className="h-3.5 w-3.5 mr-1.5" />
+                Save
+              </Button>
+
+              <Link href={`/talent/${talent.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex-1">
+                <Button
+                  size="sm"
+                  className="w-full h-9 text-xs bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] hover:from-[var(--accent-dark)] hover:to-[var(--accent)] text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                >
+                  <Eye className="h-3.5 w-3.5 mr-1.5" />
+                  View Profile
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   )
 
@@ -420,20 +698,43 @@ export default function SearchableTalentPage() {
         </p>
       </motion.div>
 
+      {/* Featured Talents Section */}
+      {!featuredLoading && featuredTalents.length > 0 && (
+        <motion.div {...fadeInUp} className="space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold text-black">
+              <span className="text-[var(--accent)]">Featured</span> Talent
+            </h2>
+            <p className="text-black/70">Hand-picked professionals ready to bring your vision to life</p>
+          </div>
+
+          {/* Featured Talents Carousel */}
+          <div className="relative">
+            <div className="overflow-x-auto pb-4 scrollbar-hide">
+              <div className="flex gap-6 animate-slide-right">
+                {featuredTalents.concat(featuredTalents).map((talent: any, index: number) => (
+                  <FeaturedTalentCard key={`${talent.id}-${index}`} talent={talent} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Search and Filters */}
       <motion.div variants={searchAnimation}>
         <Card className="glass-card border-white/20 depth-2">
-          <CardContent className="p-8">
-            <form onSubmit={handleSearch} className="space-y-6">
+          <CardContent className="p-6">
+            <form onSubmit={handleSearch} className="space-y-4">
               {/* Main Search */}
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black/40 h-5 w-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/40 h-4 w-4" />
                 <Input
                   type="text"
                   placeholder="Search by name, skills, or expertise..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 text-lg glass-card border-white/20 focus:border-[var(--accent)] text-black placeholder:text-black/40"
+                  className="pl-10 h-12 text-base glass-card border-white/20 focus:border-[var(--accent)] text-black placeholder:text-black/40"
                 />
               </div>
 
@@ -442,10 +743,11 @@ export default function SearchableTalentPage() {
                 <Button
                   type="button"
                   variant="outline"
+                  size="sm"
                   onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                  className="flex items-center gap-2 hover:border-[var(--accent)] hover:text-[var(--accent)] h-9"
                 >
-                  <SlidersHorizontal className="h-4 w-4" />
+                  <SlidersHorizontal className="h-3 w-3" />
                   {showFilters ? 'Hide Filters' : 'Show Filters'}
                 </Button>
 
@@ -462,59 +764,59 @@ export default function SearchableTalentPage() {
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="space-y-4 border-t border-white/10 pt-6"
+                    className="space-y-3 border-t border-white/10 pt-4"
                   >
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-black mb-2">Skills</label>
+                        <label className="block text-xs font-medium text-black/70 mb-1">Skills</label>
                         <Input
-                          placeholder="e.g., React, Design"
+                          placeholder="React, Design..."
                           value={filters.skills}
                           onChange={(e) => handleFilterChange('skills', e.target.value)}
-                          className="glass-card border-white/20"
+                          className="glass-card border-white/20 h-9 text-sm"
                         />
                       </div>
-                      
+
                       <div>
-                        <label className="block text-sm font-medium text-black mb-2">Location</label>
+                        <label className="block text-xs font-medium text-black/70 mb-1">Location</label>
                         <Input
-                          placeholder="e.g., New York, Remote"
+                          placeholder="Remote, NYC..."
                           value={filters.location}
                           onChange={(e) => handleFilterChange('location', e.target.value)}
-                          className="glass-card border-white/20"
+                          className="glass-card border-white/20 h-9 text-sm"
                         />
                       </div>
-                      
+
                       <div>
-                        <label className="block text-sm font-medium text-black mb-2">Min Rate ($/hr)</label>
+                        <label className="block text-xs font-medium text-black/70 mb-1">Min Rate</label>
                         <Input
                           type="number"
                           placeholder="25"
                           value={filters.hourly_rate_min}
                           onChange={(e) => handleFilterChange('hourly_rate_min', e.target.value)}
-                          className="glass-card border-white/20"
+                          className="glass-card border-white/20 h-9 text-sm"
                         />
                       </div>
-                      
+
                       <div>
-                        <label className="block text-sm font-medium text-black mb-2">Max Rate ($/hr)</label>
+                        <label className="block text-xs font-medium text-black/70 mb-1">Max Rate</label>
                         <Input
                           type="number"
                           placeholder="100"
                           value={filters.hourly_rate_max}
                           onChange={(e) => handleFilterChange('hourly_rate_max', e.target.value)}
-                          className="glass-card border-white/20"
+                          className="glass-card border-white/20 h-9 text-sm"
                         />
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-4 items-end">
+                    <div className="flex flex-wrap gap-3 items-end">
                       <div>
-                        <label className="block text-sm font-medium text-black mb-2">Availability</label>
+                        <label className="block text-xs font-medium text-black/70 mb-1">Availability</label>
                         <select
                           value={filters.availability}
                           onChange={(e) => handleFilterChange('availability', e.target.value)}
-                          className="h-10 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-black"
+                          className="h-9 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-black text-sm"
                         >
                           <option value="">All</option>
                           <option value="available">Available</option>
@@ -522,13 +824,13 @@ export default function SearchableTalentPage() {
                           <option value="unavailable">Unavailable</option>
                         </select>
                       </div>
-                      
+
                       <div>
-                        <label className="block text-sm font-medium text-black mb-2">Sort by</label>
+                        <label className="block text-xs font-medium text-black/70 mb-1">Sort by</label>
                         <select
                           value={filters.sort}
                           onChange={(e) => handleFilterChange('sort', e.target.value)}
-                          className="h-10 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-black"
+                          className="h-9 px-3 rounded-lg glass-card border border-white/20 bg-transparent text-black text-sm"
                         >
                           <option value="featured">Featured</option>
                           <option value="rating">Highest Rated</option>
@@ -541,10 +843,11 @@ export default function SearchableTalentPage() {
                       <Button
                         type="button"
                         variant="outline"
+                        size="sm"
                         onClick={clearFilters}
-                        className="hover:border-red-400 hover:text-red-400"
+                        className="hover:border-red-400 hover:text-red-400 h-9"
                       >
-                        <X className="h-4 w-4 mr-2" />
+                        <X className="h-3 w-3 mr-1" />
                         Clear All
                       </Button>
                     </div>

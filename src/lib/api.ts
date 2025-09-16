@@ -1276,6 +1276,55 @@ class ApiClient {
     })
   }
 
+  // Admin Talent Profile Management
+  async getAdminTalentProfiles(filters?: { page?: number; limit?: number }): Promise<{
+    profiles: any[]
+    total: number
+    page: number
+    totalPages: number
+  }> {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          params.set(key, String(value))
+        }
+      })
+    }
+
+    const endpoint = `/admin/talent-profiles${params.toString() ? `?${params.toString()}` : ''}`
+    return this.request(endpoint)
+  }
+
+  async updateTalentFeatured(profileId: string, isFeatured: boolean): Promise<{
+    message: string
+    profile_id: string
+    is_featured: boolean
+  }> {
+    return this.request(`/admin/talent-profiles/${profileId}/featured`, {
+      method: 'PUT',
+      body: JSON.stringify({ is_featured: isFeatured })
+    })
+  }
+
+  async getUsersWithoutTalentProfiles(): Promise<{
+    users_without_profiles: any[]
+    total: number
+  }> {
+    return this.request('/admin/users/missing-talent-profiles')
+  }
+
+  async createMissingTalentProfile(userId: string): Promise<{
+    message: string
+    profile_id: string
+    user_email: string
+    user_name: string
+  }> {
+    return this.request(`/admin/users/${userId}/create-talent-profile`, {
+      method: 'POST'
+    })
+  }
+
   // User Search and Direct Messaging
   async searchUsers(query: string, limit?: number): Promise<{ users: any[] }> {
     const params = new URLSearchParams()

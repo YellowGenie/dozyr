@@ -64,79 +64,8 @@ export default function TalentProfilePage() {
           const talentData = await api.getTalentProfile(params.id as string)
           setTalent(talentData)
         } catch (error) {
-          console.error('API call failed, using demo data:', error)
-          
-          // Use demo data if API fails
-          const demoTalent: TalentProfile = {
-            id: params.id as string,
-            user_id: params.id as string,
-            first_name: "James",
-            last_name: "Bond",
-            email: "james.bond@example.com",
-            title: "Senior Full Stack Developer & Digital Strategist",
-            bio: "Experienced full-stack developer with 10+ years in the industry, specializing in modern web applications and digital transformation. I combine technical expertise with strategic thinking to deliver solutions that drive business growth. My passion lies in creating scalable, user-centric applications using cutting-edge technologies.",
-            hourly_rate: 120,
-            location: "London, UK",
-            availability: "available",
-            experience_years: 10,
-            completed_projects: 67,
-            rating: 4.8,
-            total_earned: 285000,
-            response_time: "Within 1 hour",
-            skills: [
-              { id: '1', name: 'React', level: 'expert', proficiency: 'expert', years_experience: 8, is_visible: true },
-              { id: '2', name: 'Node.js', level: 'expert', proficiency: 'expert', years_experience: 9, is_visible: true },
-              { id: '3', name: 'TypeScript', level: 'expert', proficiency: 'expert', years_experience: 6, is_visible: true },
-              { id: '4', name: 'Python', level: 'advanced', proficiency: 'advanced', years_experience: 5, is_visible: true },
-              { id: '5', name: 'AWS', level: 'expert', proficiency: 'expert', years_experience: 6, is_visible: true },
-              { id: '6', name: 'Docker', level: 'advanced', proficiency: 'advanced', years_experience: 4, is_visible: true },
-              { id: '7', name: 'GraphQL', level: 'advanced', proficiency: 'advanced', years_experience: 3, is_visible: true },
-              { id: '8', name: 'Next.js', level: 'expert', proficiency: 'expert', years_experience: 4, is_visible: true }
-            ],
-            languages: ["English (Native)", "French (Fluent)", "German (Conversational)"],
-            certifications: ["AWS Solutions Architect Professional", "React Advanced Certification", "Google Cloud Professional Developer"],
-            education: "M.S. Computer Science, University of Oxford",
-            portfolio: [
-              {
-                id: '1',
-                title: 'Enterprise SaaS Platform',
-                description: 'Built a comprehensive SaaS platform serving 50k+ users with advanced analytics and real-time collaboration features',
-                technologies: ['React', 'Node.js', 'PostgreSQL', 'AWS', 'Docker'],
-                live_url: 'https://demo-saas.com',
-                github_url: 'https://github.com/jbond/saas-platform',
-                image_url: ''
-              },
-              {
-                id: '2',
-                title: 'AI-Powered Dashboard',
-                description: 'Developed an intelligent dashboard with machine learning capabilities for business intelligence and predictive analytics',
-                technologies: ['Next.js', 'Python', 'TensorFlow', 'AWS', 'GraphQL'],
-                live_url: 'https://ai-dashboard-demo.com',
-                github_url: 'https://github.com/jbond/ai-dashboard',
-                image_url: ''
-              },
-              {
-                id: '3',
-                title: 'Mobile-First E-commerce',
-                description: 'Created a high-performance e-commerce platform optimized for mobile with seamless payment integration',
-                technologies: ['React Native', 'Node.js', 'MongoDB', 'Stripe', 'AWS'],
-                live_url: 'https://mobile-shop-demo.com',
-                github_url: 'https://github.com/jbond/mobile-ecommerce',
-                image_url: ''
-              }
-            ],
-            profile_visibility: {
-              is_public: true,
-              show_contact: true,
-              show_hourly_rate: true,
-              show_portfolio: true,
-              show_testimonials: true
-            },
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-          
-          setTalent(demoTalent)
+          console.error('Failed to fetch talent profile:', error)
+          setTalent(null)
         }
         
       } catch (error) {
@@ -159,9 +88,9 @@ export default function TalentProfilePage() {
       case 'intermediate':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/20'
       case 'beginner':
-        return 'bg-dozyr-medium-gray/20 text-dozyr-light-gray border-dozyr-medium-gray/20'
+        return 'bg-muted/20 text-foreground/60 border-muted/20'
       default:
-        return 'bg-dozyr-medium-gray/20 text-dozyr-light-gray border-dozyr-medium-gray/20'
+        return 'bg-muted/20 text-foreground/60 border-muted/20'
     }
   }
 
@@ -172,9 +101,9 @@ export default function TalentProfilePage() {
       case 'part-time':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/20'
       case 'contract':
-        return 'bg-dozyr-gold/20 text-dozyr-gold border-dozyr-gold/20'
+        return 'bg-[var(--accent)]/20 text-[var(--accent)] border-[var(--accent)]/20'
       default:
-        return 'bg-dozyr-medium-gray/20 text-dozyr-light-gray border-dozyr-medium-gray/20'
+        return 'bg-muted/20 text-foreground/60 border-muted/20'
     }
   }
 
@@ -215,7 +144,7 @@ export default function TalentProfilePage() {
   }
 
   // If it's a public view or enhanced profile, use the new PublicTalentProfile component
-  if (isPublicView || (talent.profile_visibility?.is_public && talent.skills?.length > 0)) {
+  if (isPublicView || talent.profile_visibility?.is_public) {
     return (
       <div className="relative">
         {/* Edit button for own profile */}
@@ -258,13 +187,17 @@ export default function TalentProfilePage() {
                     </h1>
                     <p className="text-dozyr-gold text-lg font-medium">{talent.title}</p>
                     <div className="flex items-center gap-4 mt-2">
-                      {talent.rating && (
+                      {talent.rating > 0 ? (
                         <div className="flex items-center gap-1">
                           <Star className="h-4 w-4 text-dozyr-gold fill-current" />
-                          <span className="text-[var(--foreground)] font-medium">{talent.rating}</span>
-                          {talent.completed_projects && (
-                            <span className="text-dozyr-light-gray">({talent.completed_projects} projects)</span>
+                          <span className="text-[var(--foreground)] font-medium">{talent.rating.toFixed(1)}</span>
+                          {talent.jobs_completed > 0 && (
+                            <span className="text-dozyr-light-gray">({talent.jobs_completed} jobs)</span>
                           )}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-dozyr-light-gray">
+                          No rating yet
                         </div>
                       )}
                       <Badge className={getAvailabilityColor(talent.availability)}>
@@ -298,12 +231,20 @@ export default function TalentProfilePage() {
                   <CardTitle>About</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-dozyr-light-gray leading-relaxed mb-4">
-                    {talent.bio}
-                  </p>
-                  <p className="text-dozyr-light-gray leading-relaxed">
-                    {talent.portfolio_description}
-                  </p>
+                  {talent.bio ? (
+                    <p className="text-dozyr-light-gray leading-relaxed mb-4">
+                      {talent.bio}
+                    </p>
+                  ) : (
+                    <p className="text-dozyr-light-gray/60 leading-relaxed mb-4 italic">
+                      This talent hasn't added a bio yet.
+                    </p>
+                  )}
+                  {talent.portfolio_description && (
+                    <p className="text-dozyr-light-gray leading-relaxed">
+                      {talent.portfolio_description}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -316,20 +257,30 @@ export default function TalentProfilePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-wrap gap-3">
-                    {talent.skills?.map((skill: any, index: number) => (
-                      <Badge 
-                        key={index} 
-                        className={`${getSkillColor(skill.proficiency)} px-3 py-1`}
-                        variant="outline"
-                      >
-                        {skill.name} 
-                        <span className="ml-2 text-xs opacity-75">
-                          ({skill.proficiency})
-                        </span>
-                      </Badge>
-                    ))}
-                  </div>
+                  {talent.skills && talent.skills.length > 0 ? (
+                    <div className="flex flex-wrap gap-3">
+                      {talent.skills.map((skill: any, index: number) => (
+                        <Badge
+                          key={index}
+                          className={`${getSkillColor(skill.proficiency)} px-3 py-1`}
+                          variant="outline"
+                        >
+                          {skill.name}
+                          <span className="ml-2 text-xs opacity-75">
+                            ({skill.proficiency})
+                          </span>
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Award className="h-12 w-12 text-dozyr-light-gray/50 mx-auto mb-3" />
+                      <p className="text-dozyr-light-gray">No skills listed yet</p>
+                      <p className="text-sm text-dozyr-light-gray/70 mt-1">
+                        This talent hasn't added their skills to their profile yet.
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -379,12 +330,14 @@ export default function TalentProfilePage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-3 bg-dozyr-medium-gray/20 rounded-lg">
-                      <div className="text-2xl font-bold text-[var(--foreground)]">${talent.hourly_rate || 'N/A'}</div>
+                      <div className="text-2xl font-bold text-[var(--foreground)]">
+                        {talent.hourly_rate ? `$${talent.hourly_rate}` : 'Not set'}
+                      </div>
                       <div className="text-xs text-dozyr-light-gray">per hour</div>
                     </div>
                     <div className="text-center p-3 bg-dozyr-medium-gray/20 rounded-lg">
-                      <div className="text-2xl font-bold text-[var(--foreground)]">{talent.completed_projects || '0'}</div>
-                      <div className="text-xs text-dozyr-light-gray">projects</div>
+                      <div className="text-2xl font-bold text-[var(--foreground)]">{talent.jobs_completed || '0'}</div>
+                      <div className="text-xs text-dozyr-light-gray">jobs completed</div>
                     </div>
                   </div>
                   <div className="space-y-3 pt-2">

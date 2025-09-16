@@ -24,7 +24,10 @@ import {
   CheckCircle,
   XCircle,
   Eye,
-  EyeOff
+  EyeOff,
+  Crown,
+  Star,
+  Briefcase
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -95,7 +98,11 @@ export default function AdminUsersPage() {
   const { user: currentUser } = useAuthStore()
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+  const [talentProfiles, setTalentProfiles] = useState<any[]>([])
+  const [usersWithoutProfiles, setUsersWithoutProfiles] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingProfiles, setIsLoadingProfiles] = useState(true)
+  const [isLoadingMissingProfiles, setIsLoadingMissingProfiles] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState<UserFilters>({})
@@ -107,6 +114,7 @@ export default function AdminUsersPage() {
   const [isViewUserDialogOpen, setIsViewUserDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isSuspendDialogOpen, setIsSuspendDialogOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'users' | 'talents'>('users')
   const [newUserData, setNewUserData] = useState<UserFormData>({
     email: '',
     first_name: '',
@@ -131,8 +139,48 @@ export default function AdminUsersPage() {
     }
   }
 
+  const loadTalentProfiles = async () => {
+    try {
+      setIsLoadingProfiles(true)
+      setError(null)
+      const response = await api.getAdminTalentProfiles({ limit: 1000 })
+      setTalentProfiles(response.profiles || [])
+    } catch (err: any) {
+      setError(err.message || 'Failed to load talent profiles')
+    } finally {
+      setIsLoadingProfiles(false)
+    }
+  }
+
+  const loadUsersWithoutProfiles = async () => {
+    try {
+      setIsLoadingMissingProfiles(true)
+      const response = await api.getUsersWithoutTalentProfiles()
+      setUsersWithoutProfiles(response.users_without_profiles || [])
+    } catch (err: any) {
+      setError(err.message || 'Failed to load users without profiles')
+    } finally {
+      setIsLoadingMissingProfiles(false)
+    }
+  }
+
+  const handleCreateMissingProfile = async (userId: string) => {
+    try {
+      setIsSubmitting(true)
+      await api.createMissingTalentProfile(userId)
+      await loadTalentProfiles()
+      await loadUsersWithoutProfiles()
+    } catch (err: any) {
+      setError(err.message || 'Failed to create talent profile')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   useEffect(() => {
     loadUsers()
+    loadTalentProfiles()
+    loadUsersWithoutProfiles()
   }, [])
 
   useEffect(() => {
@@ -285,6 +333,18 @@ export default function AdminUsersPage() {
       await loadUsers()
     } catch (err: any) {
       setError(err.message || 'Failed to update user status')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleToggleFeatured = async (profileId: string, currentlyFeatured: boolean) => {
+    try {
+      setIsSubmitting(true)
+      await api.updateTalentFeatured(profileId, !currentlyFeatured)
+      await loadTalentProfiles()
+    } catch (err: any) {
+      setError(err.message || 'Failed to update featured status')
     } finally {
       setIsSubmitting(false)
     }
@@ -835,10 +895,14 @@ export default function AdminUsersPage() {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                onClick={loadUsers}
-                disabled={isLoading}
+                onClick={() => {
+                  loadUsers()
+                  loadTalentProfiles()
+                  loadUsersWithoutProfiles()
+                }}
+                disabled={isLoading || isLoadingProfiles || isLoadingMissingProfiles}
               >
-                <RefreshCw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} />
+                <RefreshCw className={cn("h-4 w-4 mr-2", (isLoading || isLoadingProfiles) && "animate-spin")} />
                 Refresh
               </Button>
               <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -847,6 +911,51 @@ export default function AdminUsersPage() {
               </Button>
             </div>
           </motion.div>
+
+          {/* Tab Navigation */}
+          <div className="flex space-x-1 bg-white/5 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('users')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                activeTab === 'users'
+                  ? "bg-[var(--accent)] text-white shadow-sm"
+                  : "text-black/60 hover:text-black hover:bg-white/10"
+              )}
+            >
+              <Users className="h-4 w-4" />
+              Users
+            </button>
+            <button
+              onClick={() => setActiveTab('talents')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                activeTab === 'talents'
+                  ? "bg-[var(--accent)] text-white shadow-sm"
+                  : "text-black/60 hover:text-black hover:bg-white/10"
+              )}
+            >
+              <Briefcase className="h-4 w-4" />
+              Talent Profiles
+            </button>
+            <button
+              onClick={() => setActiveTab('missing')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                activeTab === 'missing'
+                  ? "bg-[var(--accent)] text-white shadow-sm"
+                  : "text-black/60 hover:text-black hover:bg-white/10"
+              )}
+            >
+              <AlertTriangle className="h-4 w-4" />
+              Missing Profiles
+              {usersWithoutProfiles.length > 0 && (
+                <Badge className="ml-1 bg-red-500 text-white text-xs px-2 py-1">
+                  {usersWithoutProfiles.length}
+                </Badge>
+              )}
+            </button>
+          </div>
 
           {/* Error Display */}
           {error && (
@@ -861,60 +970,63 @@ export default function AdminUsersPage() {
             </Card>
           )}
 
-          {/* Stats Cards */}
-          <UserStatsCards />
+          {/* Content based on active tab */}
+          {activeTab === 'users' && (
+            <>
+              {/* Stats Cards */}
+              <UserStatsCards />
 
-          {/* Filters and Search */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dozyr-light-gray h-4 w-4" />
-                    <Input
-                      placeholder="Search users by name or email..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+              {/* Filters and Search */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dozyr-light-gray h-4 w-4" />
+                        <Input
+                          placeholder="Search users by name or email..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Select
+                        value={filters.role || 'all'}
+                        onValueChange={(value) => setFilters({ ...filters, role: value })}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue placeholder="Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Roles</SelectItem>
+                          <SelectItem value="talent">Talent</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={filters.verified || 'all'}
+                        onValueChange={(value) => setFilters({ ...filters, verified: value })}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Status</SelectItem>
+                          <SelectItem value="verified">Verified</SelectItem>
+                          <SelectItem value="unverified">Unverified</SelectItem>
+                          <SelectItem value="suspended">Suspended</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Select
-                    value={filters.role || 'all'}
-                    onValueChange={(value) => setFilters({ ...filters, role: value })}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
-                      <SelectItem value="talent">Talent</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={filters.verified || 'all'}
-                    onValueChange={(value) => setFilters({ ...filters, verified: value })}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="verified">Verified</SelectItem>
-                      <SelectItem value="unverified">Unverified</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Users Table */}
-          <Card>
+              {/* Users Table */}
+              <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -1098,7 +1210,227 @@ export default function AdminUsersPage() {
                 </Table>
               )}
             </CardContent>
-          </Card>
+              </Card>
+            </>
+          )}
+
+          {activeTab === 'talents' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Talent Profiles ({talentProfiles.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingProfiles ? (
+                  <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="flex items-center gap-3 p-4 bg-dozyr-dark-gray rounded-lg">
+                          <div className="w-10 h-10 bg-dozyr-medium-gray rounded-full"></div>
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 bg-dozyr-medium-gray rounded w-1/4"></div>
+                            <div className="h-3 bg-dozyr-medium-gray rounded w-1/3"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Profile</TableHead>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Rate</TableHead>
+                        <TableHead>Location</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {talentProfiles.map((profile) => (
+                        <TableRow key={profile.id} className="hover:bg-dozyr-dark-gray/50">
+                          <TableCell className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full overflow-hidden">
+                              {profile.user?.profile_image ? (
+                                <img
+                                  src={profile.user.profile_image}
+                                  alt={`${profile.user.first_name} ${profile.user.last_name}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-10 h-10 bg-dozyr-gold rounded-full flex items-center justify-center">
+                                  <span className="text-dozyr-black font-bold text-sm">
+                                    {generateInitials(profile.user?.first_name, profile.user?.last_name)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-medium text-[var(--foreground)] flex items-center gap-2">
+                                {profile.user?.first_name} {profile.user?.last_name}
+                                {profile.is_featured && (
+                                  <Crown className="h-4 w-4 text-yellow-500" />
+                                )}
+                              </div>
+                              <div className="text-sm text-dozyr-light-gray">
+                                {profile.user?.email}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              {profile.title || 'No title set'}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              {profile.hourly_rate ? `$${profile.hourly_rate}/hr` : 'Not set'}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm text-dozyr-light-gray">
+                              {profile.location || 'Not specified'}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-2">
+                                {profile.user?.is_active ? (
+                                  profile.user?.email_verified ? (
+                                    <CheckCircle className="h-4 w-4 text-green-400" />
+                                  ) : (
+                                    <XCircle className="h-4 w-4 text-red-400" />
+                                  )
+                                ) : (
+                                  <Ban className="h-4 w-4 text-orange-400" />
+                                )}
+                                <span className="text-sm">
+                                  {!profile.user?.is_active
+                                    ? 'Suspended'
+                                    : profile.user?.email_verified
+                                    ? 'Active'
+                                    : 'Unverified'
+                                  }
+                                </span>
+                              </div>
+                              {profile.is_featured && (
+                                <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-xs px-2 py-1 border-0 shadow-lg w-fit">
+                                  <Star className="h-3 w-3 mr-1" />
+                                  Featured
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant={profile.is_featured ? "outline" : "default"}
+                              size="sm"
+                              onClick={() => handleToggleFeatured(profile.id, profile.is_featured)}
+                              disabled={isSubmitting}
+                              className={profile.is_featured ? "border-yellow-400 text-yellow-600 hover:bg-yellow-50" : ""}
+                            >
+                              {profile.is_featured ? (
+                                <>
+                                  <Crown className="h-4 w-4 mr-1" />
+                                  Unfeature
+                                </>
+                              ) : (
+                                <>
+                                  <Star className="h-4 w-4 mr-1" />
+                                  Feature
+                                </>
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Missing Profiles Tab */}
+          {activeTab === 'missing' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                  Users Missing Talent Profiles ({usersWithoutProfiles.length})
+                </CardTitle>
+                <p className="text-sm text-dozyr-light-gray mt-2">
+                  These talent users are missing their profiles, which means they won't appear in talent searches.
+                  Click "Create Profile" to fix this issue.
+                </p>
+              </CardHeader>
+              <CardContent>
+                {isLoadingMissingProfiles ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="flex items-center gap-3 p-4 bg-dozyr-dark-gray rounded-lg">
+                          <div className="w-10 h-10 bg-dozyr-medium-gray rounded-full"></div>
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 bg-dozyr-medium-gray rounded w-1/4"></div>
+                            <div className="h-3 bg-dozyr-medium-gray rounded w-1/3"></div>
+                          </div>
+                          <div className="w-24 h-8 bg-dozyr-medium-gray rounded"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : usersWithoutProfiles.length === 0 ? (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-[var(--foreground)] mb-2">
+                      All Talent Users Have Profiles
+                    </h3>
+                    <p className="text-dozyr-light-gray">
+                      Great! All talent users have their TalentProfile records created.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {usersWithoutProfiles.map((user) => (
+                      <div key={user.id} className="flex items-center gap-3 p-4 bg-dozyr-dark-gray rounded-lg">
+                        <div className="w-10 h-10 bg-dozyr-gold rounded-full flex items-center justify-center">
+                          <span className="text-dozyr-black font-bold text-sm">
+                            {user.name.split(' ').map((n: string) => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-[var(--foreground)] flex items-center gap-2">
+                            {user.name}
+                            {!user.is_active && (
+                              <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
+                                Inactive
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-sm text-dozyr-light-gray">
+                            {user.email}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => handleCreateMissingProfile(user.id)}
+                          disabled={isSubmitting}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <UserPlus className="h-4 w-4 mr-1" />
+                          Create Profile
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Dialogs */}
           {CreateUserDialog}

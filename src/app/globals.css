@@ -746,6 +746,34 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* Featured Talents Carousel Animation */
+.animate-slide-right {
+  animation: slideRight 30s linear infinite;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause animation on hover */
+.animate-slide-right:hover {
+  animation-play-state: paused;
+}
+
 /* Button spacing improvements */
 .btn-group {
   display: flex;

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -71,6 +71,99 @@ const FORM_STEPS = [
   { id: 4, title: "Review", icon: Eye, description: "Final touches" }
 ]
 
+// Enhanced Input Component - memoized to prevent unnecessary re-renders
+const EnhancedInput = memo(({
+  field,
+  label,
+  placeholder,
+  type = "text",
+  required = false,
+  icon: Icon,
+  value,
+  rows = undefined,
+  options = undefined,
+  handleInputChange,
+  handleFocus,
+  handleBlur,
+  focusedField,
+  fieldErrors
+}: any) => (
+  <motion.div
+    className="space-y-2 group"
+    variants={fadeInUp}
+  >
+    <label className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
+      {Icon && <Icon className="h-4 w-4" />}
+      {label} {required && <span className="text-red-400">*</span>}
+    </label>
+    <div className="relative">
+      {options ? (
+        <select
+          value={value}
+          onChange={(e) => handleInputChange(field, e.target.value)}
+          onFocus={() => handleFocus(field)}
+          onBlur={handleBlur}
+          className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
+            ${focusedField === field
+              ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]'
+              : fieldErrors[field]
+                ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
+                : 'border-white/20 hover:border-white/40'
+            }`}
+        >
+          {options.map((option: any) => (
+            <option key={option.value} value={option.value} className="bg-black text-[var(--foreground)]">
+              {option.label}
+            </option>
+          ))}
+        </select>
+      ) : rows ? (
+        <textarea
+          value={value}
+          onChange={(e) => handleInputChange(field, e.target.value)}
+          onFocus={() => handleFocus(field)}
+          onBlur={handleBlur}
+          placeholder={placeholder}
+          rows={rows}
+          className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 resize-none backdrop-blur-sm shadow-lg
+            ${focusedField === field
+              ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]'
+              : fieldErrors[field]
+                ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
+                : 'border-white/20 hover:border-white/40'
+            }`}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => handleInputChange(field, e.target.value)}
+          onFocus={() => handleFocus(field)}
+          onBlur={handleBlur}
+          placeholder={placeholder}
+          className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
+            ${focusedField === field
+              ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]'
+              : fieldErrors[field]
+                ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
+                : 'border-white/20 hover:border-white/40'
+            }`}
+        />
+      )}
+      {fieldErrors[field] && (
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-400 text-xs mt-1 flex items-center gap-1"
+        >
+          <span className="w-1 h-1 bg-red-400 rounded-full"></span>
+          {fieldErrors[field]}
+        </motion.p>
+      )}
+    </div>
+  </motion.div>
+))
+
 export default function PostJobPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -97,6 +190,14 @@ export default function PostJobPage() {
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
   const [focusedField, setFocusedField] = useState<string>('')
 
+  const handleFocus = useCallback((field: string) => {
+    setFocusedField(field)
+  }, [])
+
+  const handleBlur = useCallback(() => {
+    setFocusedField('')
+  }, [])
+
   useEffect(() => {
     // Add some sparkle animations to the background
     const sparkles = document.querySelectorAll('.sparkle-bg')
@@ -107,17 +208,20 @@ export default function PostJobPage() {
     })
   }, [currentStep])
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = useCallback((field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     // Clear field error when user starts typing
-    if (fieldErrors[field]) {
-      setFieldErrors(prev => ({...prev, [field]: ''}))
-    }
-  }
+    setFieldErrors(prev => {
+      if (prev[field]) {
+        return { ...prev, [field]: '' }
+      }
+      return prev
+    })
+  }, [])
 
-  const validateStep = (step: number) => {
+  const validateStep = useCallback((step: number) => {
     const errors: {[key: string]: string} = {}
-    
+
     switch(step) {
       case 1: // Job Basics
         if (!formData.title.trim()) errors.title = 'Job title is required'
@@ -128,7 +232,7 @@ export default function PostJobPage() {
       case 2: // Compensation
         if (!formData.budget_min) errors.budget_min = 'Minimum budget is required'
         if (!formData.budget_max) errors.budget_max = 'Maximum budget is required'
-        if (formData.budget_min && formData.budget_max && 
+        if (formData.budget_min && formData.budget_max &&
             parseFloat(formData.budget_max) < parseFloat(formData.budget_min)) {
           errors.budget_max = 'Maximum must be greater than minimum'
         }
@@ -138,10 +242,10 @@ export default function PostJobPage() {
         if (!formData.skills_required.trim()) errors.skills_required = 'Required skills help match candidates'
         break
     }
-    
+
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
-  }
+  }, [formData])
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
@@ -165,9 +269,7 @@ export default function PostJobPage() {
     return validateStep(1) && validateStep(2) && validateStep(3)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+  const handleSubmit = async () => {
     if (!validateForm()) {
       return
     }
@@ -200,7 +302,13 @@ export default function PostJobPage() {
   }
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
-    const jobData = {
+    // Prevent duplicate submissions
+    if (loading) {
+      console.log('Job creation already in progress, skipping duplicate call')
+      return
+    }
+    // Prepare base job data
+    const baseJobData = {
       title: formData.title,
       description: formData.description,
       budget_type: formData.budget_type,
@@ -209,15 +317,27 @@ export default function PostJobPage() {
       currency: formData.currency,
       category: formData.category,
       experience_level: formData.experience_level,
-      skills: formData.skills_required.split(',').map(s => s.trim()).filter(Boolean),
-      payment_intent_id: paymentIntentId
+      skills: formData.skills_required.split(',').map(s => s.trim()).filter(Boolean)
     }
+
+    // Add payment_intent_id only for paid posting
+    const jobData = paymentIntentId === 'free_posting'
+      ? baseJobData
+      : { ...baseJobData, payment_intent_id: paymentIntentId }
 
     try {
       setLoading(true)
       const token = localStorage.getItem('auth_token')
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-payment`, {
+
+      // Use different endpoint for free posting vs paid posting
+      const endpoint = paymentIntentId === 'free_posting'
+        ? `${process.env.NEXT_PUBLIC_API_URL}/jobs`
+        : `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-payment`
+
+      console.log('Creating job with data:', jobData)
+      console.log('Using endpoint:', endpoint)
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -227,11 +347,14 @@ export default function PostJobPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create job')
+        const errorData = await response.text()
+        console.error('Server response:', response.status, errorData)
+        throw new Error(`Failed to create job: ${response.status} - ${errorData}`)
       }
 
       const result = await response.json()
-      alert('Job created successfully with payment!')
+      console.log('Job creation result:', result)
+      alert(paymentIntentId === 'free_posting' ? 'Job created successfully!' : 'Job created successfully with payment!')
       router.push('/my-jobs')
 
     } catch (error) {
@@ -246,96 +369,6 @@ export default function PostJobPage() {
     // TODO: Implement job preview functionality
     console.log('Preview job:', formData)
   }
-
-  // Enhanced Input Component
-  const EnhancedInput = ({ 
-    field, 
-    label, 
-    placeholder, 
-    type = "text", 
-    required = false, 
-    icon: Icon,
-    value,
-    rows = undefined,
-    options = undefined
-  }: any) => (
-    <motion.div 
-      className="space-y-2 group"
-      variants={fadeInUp}
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-    >
-      <label className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
-        {Icon && <Icon className="h-4 w-4" />}
-        {label} {required && <span className="text-red-400">*</span>}
-      </label>
-      <div className="relative">
-        {options ? (
-          <select 
-            value={value}
-            onChange={(e) => handleInputChange(field, e.target.value)}
-            onFocus={() => setFocusedField(field)}
-            onBlur={() => setFocusedField('')}
-            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
-              ${focusedField === field 
-                ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]' 
-                : fieldErrors[field] 
-                  ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]' 
-                  : 'border-white/20 hover:border-white/40'
-              }`}
-          >
-            {options.map((option: any) => (
-              <option key={option.value} value={option.value} className="bg-black text-[var(--foreground)]">
-                {option.label}
-              </option>
-            ))}
-          </select>
-        ) : rows ? (
-          <textarea
-            value={value}
-            onChange={(e) => handleInputChange(field, e.target.value)}
-            onFocus={() => setFocusedField(field)}
-            onBlur={() => setFocusedField('')}
-            placeholder={placeholder}
-            rows={rows}
-            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 resize-none backdrop-blur-sm shadow-lg
-              ${focusedField === field 
-                ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]' 
-                : fieldErrors[field] 
-                  ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]' 
-                  : 'border-white/20 hover:border-white/40'
-              }`}
-          />
-        ) : (
-          <input
-            type={type}
-            value={value}
-            onChange={(e) => handleInputChange(field, e.target.value)}
-            onFocus={() => setFocusedField(field)}
-            onBlur={() => setFocusedField('')}
-            placeholder={placeholder}
-            className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
-              ${focusedField === field 
-                ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]' 
-                : fieldErrors[field] 
-                  ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]' 
-                  : 'border-white/20 hover:border-white/40'
-              }`}
-          />
-        )}
-        {fieldErrors[field] && (
-          <motion.p 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-red-400 text-xs mt-1 flex items-center gap-1"
-          >
-            <span className="w-1 h-1 bg-red-400 rounded-full"></span>
-            {fieldErrors[field]}
-          </motion.p>
-        )}
-      </div>
-    </motion.div>
-  )
 
   return (
     <ProtectedRoute requiredRole={['manager']}>
@@ -434,7 +467,7 @@ export default function PostJobPage() {
             </motion.div>
 
             {/* Form Content */}
-            <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               <AnimatePresence mode="wait">
                 {currentStep === 1 && (
                   <motion.div
@@ -466,6 +499,11 @@ export default function PostJobPage() {
                           required
                           icon={Target}
                           value={formData.title}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <EnhancedInput
@@ -475,6 +513,11 @@ export default function PostJobPage() {
                           required
                           icon={Building}
                           value={formData.company_name}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <EnhancedInput
@@ -484,6 +527,11 @@ export default function PostJobPage() {
                           required
                           icon={MapPin}
                           value={formData.location}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <EnhancedInput
@@ -493,6 +541,11 @@ export default function PostJobPage() {
                           required
                           icon={Globe}
                           value={formData.category}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <EnhancedInput
@@ -505,6 +558,11 @@ export default function PostJobPage() {
                             { value: 'hybrid', label: '🏢 Hybrid' },
                             { value: 'onsite', label: '📍 On-site' }
                           ]}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <EnhancedInput
@@ -517,6 +575,11 @@ export default function PostJobPage() {
                             { value: 'intermediate', label: '🚀 Intermediate (3-5 years)' },
                             { value: 'expert', label: '⭐ Expert (5+ years)' }
                           ]}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
                       </motion.div>
                     </div>
@@ -556,6 +619,10 @@ export default function PostJobPage() {
                               { value: 'fixed', label: '💰 Fixed Project' },
                               { value: 'hourly', label: '⏰ Hourly Rate' }
                             ]}
+                            handleInputChange={handleInputChange}
+                            setFocusedField={setFocusedField}
+                            focusedField={focusedField}
+                            fieldErrors={fieldErrors}
                           />
 
                           <EnhancedInput
@@ -569,6 +636,10 @@ export default function PostJobPage() {
                               { value: 'GBP', label: '🇬🇧 GBP (£)' },
                               { value: 'CAD', label: '🇨🇦 CAD ($)' }
                             ]}
+                            handleInputChange={handleInputChange}
+                            setFocusedField={setFocusedField}
+                            focusedField={focusedField}
+                            fieldErrors={fieldErrors}
                           />
                         </div>
 
@@ -581,6 +652,10 @@ export default function PostJobPage() {
                             required
                             icon={TrendingUp}
                             value={formData.budget_min}
+                            handleInputChange={handleInputChange}
+                            setFocusedField={setFocusedField}
+                            focusedField={focusedField}
+                            fieldErrors={fieldErrors}
                           />
 
                           <EnhancedInput
@@ -591,6 +666,10 @@ export default function PostJobPage() {
                             required
                             icon={Star}
                             value={formData.budget_max}
+                            handleInputChange={handleInputChange}
+                            setFocusedField={setFocusedField}
+                            focusedField={focusedField}
+                            fieldErrors={fieldErrors}
                           />
                         </div>
 
@@ -601,6 +680,11 @@ export default function PostJobPage() {
                           icon={Heart}
                           rows={4}
                           value={formData.benefits}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <motion.div 
@@ -651,6 +735,11 @@ export default function PostJobPage() {
                           icon={FileText}
                           rows={6}
                           value={formData.description}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <EnhancedInput
@@ -660,6 +749,11 @@ export default function PostJobPage() {
                           icon={CheckCircle}
                           rows={4}
                           value={formData.requirements}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <EnhancedInput
@@ -669,6 +763,11 @@ export default function PostJobPage() {
                           required
                           icon={Zap}
                           value={formData.skills_required}
+                          handleInputChange={handleInputChange}
+                          handleFocus={handleFocus}
+                          handleBlur={handleBlur}
+                          focusedField={focusedField}
+                          fieldErrors={fieldErrors}
                         />
 
                         <motion.div 
@@ -746,28 +845,37 @@ export default function PostJobPage() {
                           </div>
                         </div>
 
-                        {/* Job Stats Preview */}
-                        <div className="grid md:grid-cols-3 gap-4">
-                          <motion.div 
-                            className="bg-gradient-to-r from-[var(--accent)]/10 to-transparent p-4 rounded-xl border border-[var(--accent)]/20 text-center"
+                        {/* Job Summary */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <motion.div
+                            className="bg-gradient-to-r from-[var(--accent)]/10 to-transparent p-6 rounded-xl border border-[var(--accent)]/20"
                             variants={fadeInUp}
                           >
-                            <div className="text-2xl font-bold text-[var(--accent)]">~50+</div>
-                            <p className="text-[var(--foreground)]/60 text-sm">Expected Applications</p>
+                            <h4 className="text-lg font-semibold text-[var(--foreground)] mb-3">Compensation</h4>
+                            <div className="space-y-2">
+                              <p className="text-[var(--foreground)]/80">
+                                <span className="font-medium">Type:</span> {formData.budget_type === 'hourly' ? 'Hourly Rate' : 'Fixed Project'}
+                              </p>
+                              <p className="text-[var(--foreground)]/80">
+                                <span className="font-medium">Range:</span> {formData.currency} ${formData.budget_min || '0'} - ${formData.budget_max || '0'}
+                                {formData.budget_type === 'hourly' ? '/hour' : ''}
+                              </p>
+                            </div>
                           </motion.div>
-                          <motion.div 
-                            className="bg-gradient-to-r from-green-500/10 to-transparent p-4 rounded-xl border border-green-500/20 text-center"
+
+                          <motion.div
+                            className="bg-gradient-to-r from-green-500/10 to-transparent p-6 rounded-xl border border-green-500/20"
                             variants={fadeInUp}
                           >
-                            <div className="text-2xl font-bold text-green-400">24h</div>
-                            <p className="text-[var(--foreground)]/60 text-sm">Average Response Time</p>
-                          </motion.div>
-                          <motion.div 
-                            className="bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/20 text-center"
-                            variants={fadeInUp}
-                          >
-                            <div className="text-2xl font-bold text-blue-400">85%</div>
-                            <p className="text-[var(--foreground)]/60 text-sm">Match Quality Score</p>
+                            <h4 className="text-lg font-semibold text-[var(--foreground)] mb-3">Requirements</h4>
+                            <div className="space-y-2">
+                              <p className="text-[var(--foreground)]/80">
+                                <span className="font-medium">Level:</span> {formData.experience_level || 'Not specified'}
+                              </p>
+                              <p className="text-[var(--foreground)]/80">
+                                <span className="font-medium">Skills:</span> {formData.skills_required || 'Not specified'}
+                              </p>
+                            </div>
                           </motion.div>
                         </div>
 
@@ -780,7 +888,7 @@ export default function PostJobPage() {
                             <span className="font-semibold text-[var(--foreground)]">Ready to Launch!</span>
                           </div>
                           <p className="text-[var(--foreground)]/80 text-sm">
-                            Your job post looks great! Once you submit, it will be reviewed and published within 2-4 hours.
+                            Your job post looks great! Once you submit, it will be published immediately and visible to talented freelancers.
                           </p>
                         </motion.div>
                       </motion.div>
@@ -819,8 +927,9 @@ export default function PostJobPage() {
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   ) : (
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="button"
+                      onClick={handleSubmit}
                       disabled={loading}
                       className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-black hover:from-[var(--accent-dark)] hover:to-[var(--accent)] flex items-center gap-2 px-8 py-3 shadow-[0_0_30px_rgba(212,175,55,0.3)]"
                     >
@@ -839,7 +948,7 @@ export default function PostJobPage() {
                   )}
                 </div>
               </motion.div>
-            </form>
+            </div>
 
             {/* Payment Modal */}
             <JobPaymentModal 

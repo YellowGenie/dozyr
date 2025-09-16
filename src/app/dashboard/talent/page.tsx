@@ -45,6 +45,7 @@ const staggerContainer = {
 
 export default function TalentDashboardPage() {
   const { user } = useAuthStore()
+
   const router = useRouter()
   const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -83,7 +84,7 @@ export default function TalentDashboardPage() {
       <ProtectedRoute requiredRole={['talent']}>
         <DashboardLayout>
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-dozyr-gold"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)]"></div>
           </div>
         </DashboardLayout>
       </ProtectedRoute>
@@ -105,7 +106,7 @@ export default function TalentDashboardPage() {
       case 'rejected':
         return 'bg-red-500/20 text-red-400 border-red-500/20'
       default:
-        return 'bg-dozyr-medium-gray/20 text-dozyr-light-gray border-dozyr-medium-gray/20'
+        return 'bg-muted/20 text-foreground/60 border-muted/20'
     }
   }
 
@@ -134,7 +135,7 @@ export default function TalentDashboardPage() {
               <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">
                 Welcome back, {user?.first_name}! 👋
               </h1>
-              <p className="text-dozyr-light-gray">
+              <p className="text-foreground/70">
                 Here's your talent dashboard overview
               </p>
             </div>
@@ -152,7 +153,7 @@ export default function TalentDashboardPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-dozyr-light-gray text-sm font-medium">Applications Sent</p>
+                      <p className="text-foreground/70 text-sm font-medium">Applications Sent</p>
                       <p className="text-2xl font-bold text-[var(--foreground)]">{stats.applications_sent}</p>
                     </div>
                     <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -168,7 +169,7 @@ export default function TalentDashboardPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-dozyr-light-gray text-sm font-medium">Interviews</p>
+                      <p className="text-foreground/70 text-sm font-medium">Interviews</p>
                       <p className="text-2xl font-bold text-[var(--foreground)]">{stats.interviews_scheduled}</p>
                     </div>
                     <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -184,11 +185,11 @@ export default function TalentDashboardPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-dozyr-light-gray text-sm font-medium">Completed</p>
+                      <p className="text-foreground/70 text-sm font-medium">Completed</p>
                       <p className="text-2xl font-bold text-[var(--foreground)]">{stats.jobs_completed}</p>
                     </div>
-                    <div className="h-12 w-12 bg-dozyr-gold/20 rounded-lg flex items-center justify-center">
-                      <CheckCircle className="h-6 w-6 text-dozyr-gold" />
+                    <div className="h-12 w-12 bg-[var(--accent)]/20 rounded-lg flex items-center justify-center">
+                      <CheckCircle className="h-6 w-6 text-[var(--accent)]" />
                     </div>
                   </div>
                 </CardContent>
@@ -200,7 +201,7 @@ export default function TalentDashboardPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-dozyr-light-gray text-sm font-medium">Total Earned</p>
+                      <p className="text-foreground/70 text-sm font-medium">Total Earned</p>
                       <p className="text-2xl font-bold text-[var(--foreground)]">${stats.total_earned.toLocaleString()}</p>
                     </div>
                     <div className="h-12 w-12 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -228,11 +229,11 @@ export default function TalentDashboardPage() {
                 <CardContent className="space-y-4">
                   {recentApplications.length > 0 ? (
                     recentApplications.map((application) => (
-                      <div key={application.id} className="flex items-center justify-between p-4 bg-dozyr-dark-gray rounded-lg">
+                      <div key={application.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-[var(--foreground)] truncate">{application.job_title}</h4>
-                          <p className="text-sm text-dozyr-light-gray">{application.company_name}</p>
-                          <p className="text-xs text-dozyr-light-gray">Applied {application.applied_at}</p>
+                          <p className="text-sm text-foreground/70">{application.company_name}</p>
+                          <p className="text-xs text-foreground/70">Applied {application.applied_at}</p>
                         </div>
                         <div className="ml-4">
                           <Badge className={getStatusColor(application.status)}>
@@ -244,9 +245,9 @@ export default function TalentDashboardPage() {
                     ))
                   ) : (
                     <div className="text-center py-8">
-                      <Briefcase className="h-12 w-12 text-dozyr-medium-gray mx-auto mb-4" />
-                      <p className="text-dozyr-light-gray">No applications yet</p>
-                      <p className="text-sm text-dozyr-medium-gray">Start applying to jobs to see your application history here</p>
+                      <Briefcase className="h-12 w-12 text-foreground/40 mx-auto mb-4" />
+                      <p className="text-foreground/70">No applications yet</p>
+                      <p className="text-sm text-foreground/50">Start applying to jobs to see your application history here</p>
                     </div>
                   )}
                 </CardContent>
@@ -268,11 +269,11 @@ export default function TalentDashboardPage() {
                 <CardContent className="space-y-4">
                   {recommendedJobs.length > 0 ? (
                     recommendedJobs.map((job) => (
-                      <div key={job.id} className="p-4 bg-dozyr-dark-gray rounded-lg hover:bg-dozyr-medium-gray/50 transition-colors cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
+                      <div key={job.id} className="p-4 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-[var(--foreground)] truncate">{job.title}</h4>
-                            <div className="flex items-center gap-4 text-sm text-dozyr-light-gray mt-1">
+                            <div className="flex items-center gap-4 text-sm text-foreground/70 mt-1">
                               <div className="flex items-center gap-1">
                                 <Building className="h-3 w-3" />
                                 {job.company_name}
@@ -284,23 +285,19 @@ export default function TalentDashboardPage() {
                             </div>
                           </div>
                           <div className="ml-4 text-right">
-                            <div className="flex items-center gap-1 text-dozyr-gold">
-                              <Star className="h-3 w-3 fill-current" />
-                              <span className="text-xs font-medium">{job.match_score}% match</span>
-                            </div>
+                            <span className="text-xs text-foreground/60">{job.posted_at}</span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-dozyr-gold">{job.salary_range}</span>
-                          <span className="text-xs text-dozyr-light-gray">{job.posted_at}</span>
+                          <span className="text-sm font-medium text-[var(--accent)]">{job.salary_range}</span>
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className="text-center py-8">
-                      <Star className="h-12 w-12 text-dozyr-medium-gray mx-auto mb-4" />
-                      <p className="text-dozyr-light-gray">No recommended jobs</p>
-                      <p className="text-sm text-dozyr-medium-gray">Complete your profile to get personalized job recommendations</p>
+                      <Star className="h-12 w-12 text-foreground/40 mx-auto mb-4" />
+                      <p className="text-foreground/70">No recommended jobs</p>
+                      <p className="text-sm text-foreground/50">Complete your profile to get personalized job recommendations</p>
                     </div>
                   )}
                 </CardContent>
@@ -329,10 +326,46 @@ export default function TalentDashboardPage() {
                     <span className="text-xs opacity-80">Update your information</span>
                   </Button>
                   
-                  <Button 
-                    variant="outline" 
-                    className="h-auto p-6 flex-col items-start border-purple-500/20 hover:bg-purple-500/10" 
-                    onClick={() => router.push(`/talent/${user?.id}`)}
+                  <Button
+                    variant="outline"
+                    className="h-auto p-6 flex-col items-start border-purple-500/20 hover:bg-purple-500/10"
+                    onClick={async () => {
+                      if (!user?.id) {
+                        console.error('User ID not available')
+                        alert('Profile not available. Please try again later.')
+                        return
+                      }
+
+                      try {
+                        // Try to get the profile first
+                        let profile
+                        try {
+                          profile = await api.getTalentProfile(user.id)
+                        } catch (profileError) {
+                          // Profile not found, try to create/update with minimal data
+                          try {
+                            profile = await api.updateTalentProfile({
+                              title: 'New Talent',
+                              bio: 'Welcome to my profile',
+                              availability: 'contract'
+                            })
+                          } catch (createError) {
+                            console.error('Failed to create profile:', createError)
+                            alert('Unable to create your profile. Please complete your profile setup first.')
+                            router.push('/profile/edit')
+                            return
+                          }
+                        }
+
+                        // If we have a profile, open in new tab
+                        if (profile) {
+                          window.open(`/talent/${user.id}`, '_blank')
+                        }
+                      } catch (error) {
+                        console.error('❌ Unexpected error:', error)
+                        alert('Something went wrong. Please try again later.')
+                      }
+                    }}
                   >
                     <Eye className="h-6 w-6 mb-2 text-purple-400" />
                     <span className="font-semibold">View Public Profile</span>
@@ -378,22 +411,22 @@ export default function TalentDashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button className="h-auto p-6 flex-col items-start bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/90" onClick={() => router.push('/jobs')}>
+                  <Button className="h-auto p-6 flex-col items-start bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90" onClick={() => router.push('/jobs')}>
                     <Briefcase className="h-6 w-6 mb-2" />
                     <span className="font-semibold">Browse Jobs</span>
                     <span className="text-xs opacity-80">Find your next opportunity</span>
                   </Button>
                   
                   <Button variant="outline" className="h-auto p-6 flex-col items-start" onClick={() => router.push('/profile')}>
-                    <TrendingUp className="h-6 w-6 mb-2 text-dozyr-gold" />
+                    <TrendingUp className="h-6 w-6 mb-2 text-[var(--accent)]" />
                     <span className="font-semibold">Update Profile</span>
-                    <span className="text-xs text-dozyr-light-gray">Keep your profile current</span>
+                    <span className="text-xs text-foreground/60">Keep your profile current</span>
                   </Button>
                   
                   <Button variant="outline" className="h-auto p-6 flex-col items-start" onClick={() => router.push('/skills')}>
-                    <Star className="h-6 w-6 mb-2 text-dozyr-gold" />
+                    <Star className="h-6 w-6 mb-2 text-[var(--accent)]" />
                     <span className="font-semibold">Skill Assessment</span>
-                    <span className="text-xs text-dozyr-light-gray">Boost your profile</span>
+                    <span className="text-xs text-foreground/60">Boost your profile</span>
                   </Button>
                 </div>
               </CardContent>

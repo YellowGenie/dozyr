@@ -84,7 +84,7 @@ export function Pagination({
           if (page === '...') {
             return (
               <div key={`ellipsis-${index}`} className="h-8 w-8 flex items-center justify-center">
-                <MoreHorizontal className="h-4 w-4 text-dozyr-light-gray" />
+                <MoreHorizontal className="h-4 w-4 text-foreground/60" />
               </div>
             )
           }
@@ -100,7 +100,7 @@ export function Pagination({
               onClick={() => onPageChange(pageNumber)}
               className={cn(
                 'h-8 w-8 p-0',
-                isActive && 'bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/90'
+                isActive && 'bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90'
               )}
             >
               {pageNumber}
@@ -141,7 +141,7 @@ export function PaginationInfo({
   const end = Math.min(currentPage * limit, total)
 
   return (
-    <div className={cn('text-sm text-dozyr-light-gray', className)}>
+    <div className={cn('text-sm text-foreground/70', className)}>
       Showing {start}-{end} of {total} jobs
     </div>
   )
