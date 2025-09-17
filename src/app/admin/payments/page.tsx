@@ -32,7 +32,11 @@ import {
   XCircle,
   Clock,
   Search,
-  Filter
+  Filter,
+  PlusCircle,
+  Tag,
+  Archive,
+  X
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -126,7 +130,9 @@ export default function AdminPaymentDashboard() {
     target_audience: 'manager',
     base_price: 0,
     currency: 'usd',
-    billing_cycle: 'one_time'
+    billing_cycle: 'one_time',
+    job_posts: 1,
+    featured_posts: 0
   });
 
   // Package Edit/View State
@@ -234,7 +240,9 @@ export default function AdminPaymentDashboard() {
         target_audience: 'manager',
         base_price: 0,
         currency: 'usd',
-        billing_cycle: 'one_time'
+        billing_cycle: 'one_time',
+        job_posts: 1,
+        featured_posts: 0
       });
       fetchData();
     } catch (error) {
@@ -319,6 +327,90 @@ export default function AdminPaymentDashboard() {
     }
   };
 
+  // Discount Handler Functions
+  const handleCreateDiscount = () => {
+    setDiscountForm({
+      code: '',
+      type: 'percentage',
+      value: 0,
+      max_uses: null,
+      description: '',
+      is_active: true
+    });
+    setShowDiscountForm(true);
+  };
+
+  const handleEditDiscount = (discount: any) => {
+    setSelectedDiscount(discount);
+    setDiscountForm({
+      code: discount.code,
+      type: discount.type,
+      value: discount.value,
+      max_uses: discount.max_uses,
+      description: discount.description || '',
+      is_active: discount.status === 'valid'
+    });
+    setShowEditDiscount(true);
+  };
+
+  const handleViewDiscount = (discount: any) => {
+    setSelectedDiscount(discount);
+    setShowViewDiscount(true);
+  };
+
+  const handleDeleteDiscount = (discount: any) => {
+    setSelectedDiscount(discount);
+    setShowDeleteDiscountConfirm(true);
+  };
+
+  const handleSubmitDiscount = async () => {
+    try {
+      if (selectedDiscount) {
+        // Update existing discount
+        await api.updateDiscount(selectedDiscount.id.toString(), discountForm);
+        toast.success('Discount updated successfully');
+        setShowEditDiscount(false);
+      } else {
+        // Create new discount
+        await api.createDiscount(discountForm);
+        toast.success('Discount created successfully');
+        setShowDiscountForm(false);
+      }
+
+      setSelectedDiscount(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error saving discount:', error);
+      toast.error('Failed to save discount');
+    }
+  };
+
+  const confirmDeleteDiscount = async () => {
+    if (!selectedDiscount) return;
+
+    try {
+      await api.deleteDiscount(selectedDiscount.id.toString());
+      toast.success('Discount deleted successfully');
+      setShowDeleteDiscountConfirm(false);
+      setSelectedDiscount(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting discount:', error);
+      toast.error('Failed to delete discount');
+    }
+  };
+
+  const handleRestoreDiscount = async (discount: any) => {
+    try {
+      await api.unarchiveDiscount(discount.id.toString());
+      toast.success('Discount restored successfully');
+      fetchData();
+    } catch (error) {
+      console.error('Error restoring discount:', error);
+      toast.error('Failed to restore discount');
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       completed: { color: 'bg-green-100 text-green-800', icon: CheckCircle },
@@ -380,13 +472,11 @@ export default function AdminPaymentDashboard() {
       )}
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="system">System Control</TabsTrigger>
           <TabsTrigger value="packages">Packages</TabsTrigger>
+          <TabsTrigger value="discounts">Discounts</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          <TabsTrigger value="commissions">Commissions</TabsTrigger>
-          <TabsTrigger value="escrow">Escrow</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -649,6 +739,166 @@ export default function AdminPaymentDashboard() {
           </Card>
         </TabsContent>
 
+        {/* Discounts Tab */}
+        <TabsContent value="discounts" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Discount Codes</CardTitle>
+              <Button onClick={handleCreateDiscount}>
+                <PlusCircle className="w-4 h-4 mr-2" />
+                Create Discount
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="animate-pulse">
+                      <div className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                          <div className="space-y-2">
+                            <div className="h-4 bg-gray-300 rounded w-20"></div>
+                            <div className="h-3 bg-gray-300 rounded w-16"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : discounts.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Tag className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p>No discount codes found</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Active Discounts */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Tag className="h-5 w-5" />
+                      Active Discounts
+                    </h3>
+                    <div className="space-y-3">
+                      {discounts.filter(d => d.archived_at === null && d.status !== 'expired').map((discount) => (
+                        <div key={discount.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Tag className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{discount.code}</p>
+                                <Badge variant={discount.status === 'valid' ? 'default' : 'secondary'}>
+                                  {discount.status}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600">
+                                {discount.type === 'percentage' && `${discount.value}% off`}
+                                {discount.type === 'fixed_amount' && `$${discount.value} off`}
+                                {discount.type === 'free_posts' && `${discount.value} free posts`}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-right mr-4">
+                              <p className="text-sm font-medium">
+                                {discount.usage_count || 0}
+                                {discount.max_uses ? `/${discount.max_uses}` : ''} used
+                              </p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditDiscount(discount)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewDiscount(discount)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteDiscount(discount)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Archived Discounts */}
+                  {discounts.filter(d => d.archived_at !== null || d.status === 'expired').length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <Archive className="h-5 w-5 text-orange-500" />
+                        Archived & Expired Discounts
+                      </h3>
+                      <div className="space-y-3">
+                        {discounts.filter(d => d.archived_at !== null || d.status === 'expired').map((discount) => (
+                          <div key={discount.id} className="flex items-center justify-between p-4 border border-orange-200 bg-orange-50 rounded-lg opacity-75">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                                <Archive className="h-5 w-5 text-orange-600" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium">{discount.code}</p>
+                                  <Badge variant="outline" className="text-orange-600 border-orange-600">
+                                    {discount.archived_at ? 'Archived' : discount.status}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                  {discount.type === 'percentage' && `${discount.value}% off`}
+                                  {discount.type === 'fixed_amount' && `$${discount.value} off`}
+                                  {discount.type === 'free_posts' && `${discount.value} free posts`}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-right mr-4">
+                                <p className="text-sm font-medium">
+                                  {discount.usage_count || 0}
+                                  {discount.max_uses ? `/${discount.max_uses}` : ''} used
+                                </p>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleViewDiscount(discount)}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              {discount.archived_at && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleRestoreDiscount(discount)}
+                                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Transactions Tab */}
         <TabsContent value="transactions" className="space-y-6">
           <Card>
@@ -695,81 +945,151 @@ export default function AdminPaymentDashboard() {
 
       {/* Package Creation Modal */}
       {showPackageForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Create Package</CardTitle>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-gray-900 border-gray-700 shadow-2xl">
+            <CardHeader className="border-b border-gray-700 bg-gray-800">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Create Package</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPackageForm(false)}
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6 p-6 bg-white dark:bg-gray-900">
               <div className="space-y-2">
-                <Label htmlFor="package-name">Package Name</Label>
+                <Label htmlFor="package-name" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Package Name
+                </Label>
                 <Input
                   id="package-name"
+                  placeholder="e.g., Basic Job Package"
                   value={packageForm.name}
                   onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
+                  className="w-full text-gray-900 dark:text-gray-100"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="package-description">Description</Label>
+                <Label htmlFor="package-description" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Description
+                </Label>
                 <Textarea
                   id="package-description"
+                  placeholder="Describe what this package includes..."
                   value={packageForm.description}
                   onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
+                  className="w-full min-h-[80px] resize-none text-gray-900 dark:text-gray-100"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="package-type">Package Type</Label>
-                <Select
-                  value={packageForm.package_type}
-                  onValueChange={(value) => setPackageForm({ ...packageForm, package_type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="job_posting">Job Posting</SelectItem>
-                    <SelectItem value="featured_listing">Featured Listing</SelectItem>
-                    <SelectItem value="bulk_package">Bulk Package</SelectItem>
-                    <SelectItem value="premium_features">Premium Features</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="package-type" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    Package Type
+                  </Label>
+                  <Select
+                    value={packageForm.package_type}
+                    onValueChange={(value) => setPackageForm({ ...packageForm, package_type: value })}
+                  >
+                    <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-gray-100">
+                      <SelectValue className="text-gray-100" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-white border shadow-lg">
+                      <SelectItem value="job_posting" className="text-gray-900 hover:bg-gray-100">Job Posting</SelectItem>
+                      <SelectItem value="featured_listing" className="text-gray-900 hover:bg-gray-100">Featured Listing</SelectItem>
+                      <SelectItem value="bulk_package" className="text-gray-900 hover:bg-gray-100">Bulk Package</SelectItem>
+                      <SelectItem value="premium_features" className="text-gray-900 hover:bg-gray-100">Premium Features</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="target-audience" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    Target Audience
+                  </Label>
+                  <Select
+                    value={packageForm.target_audience}
+                    onValueChange={(value) => setPackageForm({ ...packageForm, target_audience: value })}
+                  >
+                    <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-gray-100">
+                      <SelectValue className="text-gray-100" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-white border shadow-lg">
+                      <SelectItem value="talent" className="text-gray-900 hover:bg-gray-100">Talent</SelectItem>
+                      <SelectItem value="manager" className="text-gray-900 hover:bg-gray-100">Manager</SelectItem>
+                      <SelectItem value="both" className="text-gray-900 hover:bg-gray-100">Both</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="job-posts" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    Job Posts
+                  </Label>
+                  <Input
+                    id="job-posts"
+                    type="number"
+                    min="1"
+                    placeholder="1"
+                    value={packageForm.job_posts}
+                    onChange={(e) => setPackageForm({ ...packageForm, job_posts: parseInt(e.target.value) || 1 })}
+                    className="w-full text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="featured-posts" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    Featured Posts
+                  </Label>
+                  <Input
+                    id="featured-posts"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={packageForm.featured_posts}
+                    onChange={(e) => setPackageForm({ ...packageForm, featured_posts: parseInt(e.target.value) || 0 })}
+                    className="w-full text-gray-900 dark:text-gray-100"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="target-audience">Target Audience</Label>
-                <Select
-                  value={packageForm.target_audience}
-                  onValueChange={(value) => setPackageForm({ ...packageForm, target_audience: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="talent">Talent</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="both">Both</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="base-price">Base Price ($)</Label>
+                <Label htmlFor="base-price" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Base Price ($)
+                </Label>
                 <Input
                   id="base-price"
                   type="number"
                   step="0.01"
+                  min="0"
+                  placeholder="0.00"
                   value={packageForm.base_price}
                   onChange={(e) => setPackageForm({ ...packageForm, base_price: parseFloat(e.target.value) || 0 })}
+                  className="w-full text-gray-900 dark:text-gray-100"
                 />
               </div>
 
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowPackageForm(false)}>
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPackageForm(false)}
+                  className="min-w-[80px]"
+                >
                   Cancel
                 </Button>
-                <Button onClick={handleCreatePackage}>Create Package</Button>
+                <Button
+                  onClick={handleCreatePackage}
+                  className="min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Create Package
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -778,55 +1098,86 @@ export default function AdminPaymentDashboard() {
 
       {/* Package Edit Modal */}
       {showEditPackage && selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Edit Package</CardTitle>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-gray-900 border-gray-700 shadow-2xl">
+            <CardHeader className="border-b border-gray-700 bg-gray-800">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Edit Package</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEditPackage(false)}
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6 p-6 bg-white dark:bg-gray-900">
               <div className="space-y-2">
-                <Label htmlFor="edit-package-name">Package Name</Label>
+                <Label htmlFor="edit-package-name" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Package Name
+                </Label>
                 <Input
                   id="edit-package-name"
                   value={editPackageForm.name}
                   onChange={(e) => setEditPackageForm({ ...editPackageForm, name: e.target.value })}
+                  className="w-full text-gray-900 dark:text-gray-100"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-package-description">Description</Label>
+                <Label htmlFor="edit-package-description" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Description
+                </Label>
                 <Textarea
                   id="edit-package-description"
                   value={editPackageForm.description}
                   onChange={(e) => setEditPackageForm({ ...editPackageForm, description: e.target.value })}
+                  className="w-full min-h-[80px] resize-none text-gray-900 dark:text-gray-100"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-base-price">Base Price ($)</Label>
+                <Label htmlFor="edit-base-price" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Base Price ($)
+                </Label>
                 <Input
                   id="edit-base-price"
                   type="number"
                   step="0.01"
+                  min="0"
                   value={editPackageForm.base_price}
                   onChange={(e) => setEditPackageForm({ ...editPackageForm, base_price: parseFloat(e.target.value) || 0 })}
+                  className="w-full text-gray-900 dark:text-gray-100"
                 />
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border">
                 <Switch
                   id="edit-is-active"
                   checked={editPackageForm.is_active}
                   onCheckedChange={(checked) => setEditPackageForm({ ...editPackageForm, is_active: checked })}
                 />
-                <Label htmlFor="edit-is-active">Active</Label>
+                <Label htmlFor="edit-is-active" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Active Package
+                </Label>
               </div>
 
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowEditPackage(false)}>
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowEditPackage(false)}
+                  className="min-w-[80px]"
+                >
                   Cancel
                 </Button>
-                <Button onClick={handleUpdatePackage}>Update Package</Button>
+                <Button
+                  onClick={handleUpdatePackage}
+                  className="min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Update Package
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -835,71 +1186,94 @@ export default function AdminPaymentDashboard() {
 
       {/* Package View Modal */}
       {showViewPackage && selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-lg">
-            <CardHeader>
-              <CardTitle>Package Details</CardTitle>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-gray-900 border-gray-700 shadow-2xl">
+            <CardHeader className="border-b bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Package Details</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowViewPackage(false)}
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Name</Label>
-                  <p className="font-medium">{selectedPackage.name}</p>
+            <CardContent className="space-y-6 p-6 bg-white dark:bg-gray-900">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Name</Label>
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-base">{selectedPackage.name}</p>
                 </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Type</Label>
-                  <p className="font-medium">{selectedPackage.package_type}</p>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Type</Label>
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-base capitalize">{selectedPackage.package_type}</p>
                 </div>
               </div>
 
-              <div>
-                <Label className="text-sm font-medium text-gray-600">Description</Label>
-                <p className="text-sm text-gray-800">{selectedPackage.description}</p>
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Description</Label>
+                <p className="text-sm text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg border">
+                  {selectedPackage.description}
+                </p>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Price</Label>
-                  <p className="font-medium">${(selectedPackage.pricing.base_price / 100).toFixed(2)}</p>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Price</Label>
+                  <p className="font-bold text-xl text-green-700 dark:text-green-300">
+                    ${(selectedPackage.pricing.base_price / 100).toFixed(2)}
+                  </p>
                 </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Currency</Label>
-                  <p className="font-medium">{selectedPackage.pricing.currency.toUpperCase()}</p>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Currency</Label>
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-base">{selectedPackage.pricing.currency.toUpperCase()}</p>
                 </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Billing</Label>
-                  <p className="font-medium">{selectedPackage.pricing.billing_cycle}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Target Audience</Label>
-                  <p className="font-medium">{selectedPackage.target_audience}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Status</Label>
-                  {selectedPackage.availability.is_active ? (
-                    <Badge className="bg-green-100 text-green-800">Active</Badge>
-                  ) : (
-                    <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>
-                  )}
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Billing</Label>
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-base capitalize">{selectedPackage.pricing.billing_cycle}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Sales</Label>
-                  <p className="font-medium">{selectedPackage.analytics.purchase_count}</p>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Target Audience</Label>
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-base capitalize">{selectedPackage.target_audience}</p>
                 </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-600">Revenue</Label>
-                  <p className="font-medium">${(selectedPackage.analytics.total_revenue / 100).toFixed(2)}</p>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Status</Label>
+                  <div>
+                    {selectedPackage.availability.is_active ? (
+                      <Badge className="bg-green-200 text-green-900 dark:bg-green-800 dark:text-green-100 font-semibold">Active</Badge>
+                    ) : (
+                      <Badge className="bg-red-200 text-red-900 dark:bg-red-800 dark:text-red-100 font-semibold">Inactive</Badge>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-end">
-                <Button onClick={() => setShowViewPackage(false)}>Close</Button>
+              <div className="grid grid-cols-2 gap-6 pt-4 border-t-2 border-gray-300 dark:border-gray-600">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Sales</Label>
+                  <p className="font-bold text-xl text-blue-700 dark:text-blue-300">{selectedPackage.analytics.purchase_count}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Revenue</Label>
+                  <p className="font-bold text-xl text-purple-700 dark:text-purple-300">
+                    ${(selectedPackage.analytics.total_revenue / 100).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  onClick={() => setShowViewPackage(false)}
+                  className="bg-gray-600 hover:bg-gray-700 text-white min-w-[80px]"
+                >
+                  Close
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -908,39 +1282,312 @@ export default function AdminPaymentDashboard() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md border shadow-xl bg-white dark:bg-gray-900">
+            <CardHeader className="border-b bg-red-50 dark:bg-red-900/20">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                  <AlertCircle className="w-5 h-5" />
+                  Delete Package
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6 p-6 bg-white dark:bg-gray-900">
+              <div className="space-y-3">
+                <p className="text-gray-800 dark:text-gray-200 text-base">
+                  Are you sure you want to delete the package <strong className="text-red-600 dark:text-red-400">"{selectedPackage.name}"</strong>?
+                </p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">
+                  This action will deactivate the package and prevent new purchases.
+                </p>
+              </div>
+
+              <div className="bg-yellow-50 dark:bg-yellow-900/30 border-2 border-yellow-300 dark:border-yellow-600 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-700 dark:text-yellow-300 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-bold text-yellow-900 dark:text-yellow-100">
+                      Soft Delete
+                    </p>
+                    <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-1">
+                      The package will be deactivated but existing purchases and data will be preserved.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="min-w-[80px]"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmDeletePackage}
+                  className="bg-red-600 hover:bg-red-700 text-white min-w-[120px]"
+                >
+                  Delete Package
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Discount Create Modal */}
+      {showDiscountForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md bg-gray-900 border-gray-700 shadow-2xl">
+            <CardHeader className="border-b border-gray-700 bg-gray-800">
+              <CardTitle>Create Discount Code</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="discount-code">Discount Code</Label>
+                <Input
+                  id="discount-code"
+                  value={discountForm.code}
+                  onChange={(e) => setDiscountForm({ ...discountForm, code: e.target.value.toUpperCase() })}
+                  placeholder="e.g., SAVE20"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="discount-type" className="text-sm font-semibold text-gray-800 dark:text-gray-200">Type</Label>
+                <select
+                  id="discount-type"
+                  className="w-full p-3 border-2 rounded-lg bg-gray-800 text-gray-100 border-gray-600 focus:border-blue-400 focus:ring-2 focus:ring-blue-300"
+                  value={discountForm.type}
+                  onChange={(e) => setDiscountForm({ ...discountForm, type: e.target.value })}
+                >
+                  <option value="percentage" className="bg-gray-800 text-gray-100">Percentage</option>
+                  <option value="fixed_amount" className="bg-gray-800 text-gray-100">Fixed Amount</option>
+                  <option value="free_posts" className="bg-gray-800 text-gray-100">Free Posts</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="discount-value">
+                  Value {discountForm.type === 'percentage' ? '(%)' : discountForm.type === 'fixed_amount' ? '($)' : '(posts)'}
+                </Label>
+                <Input
+                  id="discount-value"
+                  type="number"
+                  value={discountForm.value}
+                  onChange={(e) => setDiscountForm({ ...discountForm, value: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="max-uses">Max Uses (Optional)</Label>
+                <Input
+                  id="max-uses"
+                  type="number"
+                  value={discountForm.max_uses || ''}
+                  onChange={(e) => setDiscountForm({ ...discountForm, max_uses: e.target.value ? parseInt(e.target.value) : null })}
+                  placeholder="Leave empty for unlimited"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="discount-description">Description</Label>
+                <Textarea
+                  id="discount-description"
+                  value={discountForm.description}
+                  onChange={(e) => setDiscountForm({ ...discountForm, description: e.target.value })}
+                  placeholder="Optional description"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowDiscountForm(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmitDiscount}>Create Discount</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Discount Edit Modal */}
+      {showEditDiscount && selectedDiscount && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md bg-gray-900 border-gray-700 shadow-2xl">
+            <CardHeader className="border-b border-gray-700 bg-gray-800">
+              <CardTitle>Edit Discount Code</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-discount-code">Discount Code</Label>
+                <Input
+                  id="edit-discount-code"
+                  value={discountForm.code}
+                  onChange={(e) => setDiscountForm({ ...discountForm, code: e.target.value.toUpperCase() })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-discount-value">
+                  Value {discountForm.type === 'percentage' ? '(%)' : discountForm.type === 'fixed_amount' ? '($)' : '(posts)'}
+                </Label>
+                <Input
+                  id="edit-discount-value"
+                  type="number"
+                  value={discountForm.value}
+                  onChange={(e) => setDiscountForm({ ...discountForm, value: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-max-uses">Max Uses</Label>
+                <Input
+                  id="edit-max-uses"
+                  type="number"
+                  value={discountForm.max_uses || ''}
+                  onChange={(e) => setDiscountForm({ ...discountForm, max_uses: e.target.value ? parseInt(e.target.value) : null })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-discount-description">Description</Label>
+                <Textarea
+                  id="edit-discount-description"
+                  value={discountForm.description}
+                  onChange={(e) => setDiscountForm({ ...discountForm, description: e.target.value })}
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="edit-discount-active"
+                  checked={discountForm.is_active}
+                  onCheckedChange={(checked) => setDiscountForm({ ...discountForm, is_active: checked })}
+                />
+                <Label htmlFor="edit-discount-active">Active</Label>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowEditDiscount(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmitDiscount}>Update Discount</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Discount View Modal */}
+      {showViewDiscount && selectedDiscount && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-lg bg-gray-900 border-gray-700 shadow-2xl">
+            <CardHeader className="border-b border-gray-700 bg-gray-800">
+              <CardTitle>Discount Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-400">Code</Label>
+                  <p className="font-medium text-gray-100">{selectedDiscount.code}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-400">Type</Label>
+                  <p className="font-medium text-gray-100">{selectedDiscount.type}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-400">Value</Label>
+                  <p className="font-medium">
+                    {selectedDiscount.type === 'percentage' && `${selectedDiscount.value}%`}
+                    {selectedDiscount.type === 'fixed_amount' && `$${selectedDiscount.value}`}
+                    {selectedDiscount.type === 'free_posts' && `${selectedDiscount.value} posts`}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-400">Status</Label>
+                  <Badge variant={selectedDiscount.status === 'valid' ? 'default' : 'secondary'}>
+                    {selectedDiscount.status}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-400">Usage</Label>
+                  <p className="font-medium text-gray-100">
+                    {selectedDiscount.usage_count || 0}
+                    {selectedDiscount.max_uses ? `/${selectedDiscount.max_uses}` : ''} uses
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-400">Max Uses</Label>
+                  <p className="font-medium text-gray-100">{selectedDiscount.max_uses || 'Unlimited'}</p>
+                </div>
+              </div>
+
+              {selectedDiscount.description && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-400">Description</Label>
+                  <p className="text-sm text-gray-200">{selectedDiscount.description}</p>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <Button onClick={() => setShowViewDiscount(false)}>Close</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Discount Delete Confirmation Modal */}
+      {showDeleteDiscountConfirm && selectedDiscount && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md bg-gray-900 border-gray-700 shadow-2xl">
+            <CardHeader className="border-b border-gray-700 bg-red-900/20">
               <CardTitle className="flex items-center gap-2 text-red-600">
                 <AlertCircle className="w-5 h-5" />
-                Delete Package
+                Delete Discount
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-700">
-                Are you sure you want to delete the package "{selectedPackage.name}"?
-                This action will deactivate the package and prevent new purchases.
+              <p className="text-gray-200">
+                Are you sure you want to delete the discount code "{selectedDiscount.code}"?
+                This action cannot be undone.
               </p>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <p className="text-sm text-yellow-800">
-                  <strong>Note:</strong> This is a soft delete. The package will be deactivated
-                  but existing purchases and data will be preserved.
+              <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-3">
+                <p className="text-sm text-yellow-200">
+                  <strong>Note:</strong> Users who have already used this discount code
+                  will not be affected, but no new uses will be allowed.
                 </p>
               </div>
 
               <div className="flex justify-end gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
+                  onClick={() => setShowDeleteDiscountConfirm(false)}
                 >
                   Cancel
                 </Button>
                 <Button
-                  onClick={confirmDeletePackage}
+                  onClick={confirmDeleteDiscount}
                   className="bg-red-600 hover:bg-red-700 text-white"
                 >
-                  Delete Package
+                  Delete Discount
                 </Button>
               </div>
             </CardContent>
