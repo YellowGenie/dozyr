@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/layout/protected-route';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -104,9 +105,12 @@ export default function AdminPaymentDashboard() {
   const [analytics, setAnalytics] = useState<PaymentAnalytics | null>(null);
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [packages, setPackages] = useState<PaymentPackage[]>([]);
+  const [deletedPackages, setDeletedPackages] = useState<PaymentPackage[]>([]);
+  const [discounts, setDiscounts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('overview');
+  const [packageView, setPackageView] = useState<'active' | 'deleted'>('active');
 
   // System Control State
   const [paymentSystemEnabled, setPaymentSystemEnabled] = useState(true);
@@ -125,37 +129,63 @@ export default function AdminPaymentDashboard() {
     billing_cycle: 'one_time'
   });
 
+  // Package Edit/View State
+  const [showEditPackage, setShowEditPackage] = useState(false);
+  const [showViewPackage, setShowViewPackage] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<PaymentPackage | null>(null);
+  const [editPackageForm, setEditPackageForm] = useState({
+    name: '',
+    description: '',
+    package_type: 'job_posting',
+    target_audience: 'manager',
+    base_price: 0,
+    currency: 'usd',
+    billing_cycle: 'one_time',
+    is_active: true
+  });
+
+  // Discount Management State
+  const [showDiscountForm, setShowDiscountForm] = useState(false);
+  const [showEditDiscount, setShowEditDiscount] = useState(false);
+  const [showViewDiscount, setShowViewDiscount] = useState(false);
+  const [showDeleteDiscountConfirm, setShowDeleteDiscountConfirm] = useState(false);
+  const [selectedDiscount, setSelectedDiscount] = useState<any | null>(null);
+  const [discountForm, setDiscountForm] = useState({
+    code: '',
+    type: 'percentage',
+    value: 0,
+    max_uses: null,
+    description: '',
+    is_active: true
+  });
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [analyticsRes, statusRes, packagesRes, transactionsRes] = await Promise.all([
-        fetch('/api/v1/admin/payments/analytics'),
-        fetch('/api/v1/admin/payments/system/status'),
-        fetch('/api/v1/admin/payments/packages'),
-        fetch('/api/v1/admin/payments/transactions?limit=10')
+      const [analyticsData, statusData, activePackagesData, deletedPackagesData, discountsData, transactionsData] = await Promise.all([
+        api.get<PaymentAnalytics>('/admin/payments/analytics').catch(() => null),
+        api.get<SystemStatus>('/admin/payments/system/status').catch(() => null),
+        api.get<{packages: PaymentPackage[]}>('/admin/payments/packages?is_active=true').catch(() => ({packages: []})),
+        api.get<{packages: PaymentPackage[]}>('/admin/payments/packages?is_active=false').catch(() => ({packages: []})),
+        api.getDiscounts().catch(() => ({discounts: []})),
+        api.get<{transactions: Transaction[]}>('/admin/payments/transactions?limit=10').catch(() => ({transactions: []}))
       ]);
 
-      if (analyticsRes.ok) {
-        const analyticsData = await analyticsRes.json();
+      if (analyticsData) {
         setAnalytics(analyticsData);
       }
 
-      if (statusRes.ok) {
-        const statusData = await statusRes.json();
+      if (statusData) {
         setSystemStatus(statusData);
         setPaymentSystemEnabled(statusData.system_status.enabled);
         setMaintenanceMode(statusData.system_status.maintenance);
       }
 
-      if (packagesRes.ok) {
-        const packagesData = await packagesRes.json();
-        setPackages(packagesData.packages || []);
-      }
-
-      if (transactionsRes.ok) {
-        const transactionsData = await transactionsRes.json();
-        setTransactions(transactionsData.transactions || []);
-      }
+      setPackages(activePackagesData.packages || []);
+      setDeletedPackages(deletedPackagesData.packages || []);
+      setDiscounts(discountsData.discounts || []);
+      setTransactions(transactionsData.transactions || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Failed to load dashboard data');
@@ -170,25 +200,14 @@ export default function AdminPaymentDashboard() {
 
   const handleSystemToggle = async (setting: string, value: any) => {
     try {
-      const response = await fetch('/api/v1/admin/payments/system/status', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          setting_key: setting,
-          setting_value: value,
-          reason: `Admin updated ${setting} to ${value}`
-        }),
+      await api.put('/admin/payments/system/status', {
+        setting_key: setting,
+        setting_value: value,
+        reason: `Admin updated ${setting} to ${value}`
       });
 
-      if (response.ok) {
-        toast.success(`${setting} updated successfully`);
-        fetchData();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to update setting');
-      }
+      toast.success(`${setting} updated successfully`);
+      fetchData();
     } catch (error) {
       console.error('Error updating system setting:', error);
       toast.error('Failed to update system setting');
@@ -197,41 +216,106 @@ export default function AdminPaymentDashboard() {
 
   const handleCreatePackage = async () => {
     try {
-      const response = await fetch('/api/v1/admin/payments/packages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...packageForm,
-          pricing: {
-            base_price: packageForm.base_price * 100, // Convert to cents
-            currency: packageForm.currency,
-            billing_cycle: packageForm.billing_cycle
-          }
-        }),
+      await api.post('/admin/payments/packages', {
+        ...packageForm,
+        pricing: {
+          base_price: packageForm.base_price * 100, // Convert to cents
+          currency: packageForm.currency,
+          billing_cycle: packageForm.billing_cycle
+        }
       });
 
-      if (response.ok) {
-        toast.success('Package created successfully');
-        setShowPackageForm(false);
-        setPackageForm({
-          name: '',
-          description: '',
-          package_type: 'job_posting',
-          target_audience: 'manager',
-          base_price: 0,
-          currency: 'usd',
-          billing_cycle: 'one_time'
-        });
-        fetchData();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to create package');
-      }
+      toast.success('Package created successfully');
+      setShowPackageForm(false);
+      setPackageForm({
+        name: '',
+        description: '',
+        package_type: 'job_posting',
+        target_audience: 'manager',
+        base_price: 0,
+        currency: 'usd',
+        billing_cycle: 'one_time'
+      });
+      fetchData();
     } catch (error) {
       console.error('Error creating package:', error);
       toast.error('Failed to create package');
+    }
+  };
+
+  const handleViewPackage = (pkg: PaymentPackage) => {
+    setSelectedPackage(pkg);
+    setShowViewPackage(true);
+  };
+
+  const handleEditPackage = (pkg: PaymentPackage) => {
+    setSelectedPackage(pkg);
+    setEditPackageForm({
+      name: pkg.name,
+      description: pkg.description,
+      package_type: pkg.package_type,
+      target_audience: pkg.target_audience,
+      base_price: pkg.pricing.base_price / 100, // Convert from cents
+      currency: pkg.pricing.currency,
+      billing_cycle: pkg.pricing.billing_cycle,
+      is_active: pkg.availability.is_active
+    });
+    setShowEditPackage(true);
+  };
+
+  const handleUpdatePackage = async () => {
+    if (!selectedPackage) return;
+
+    try {
+      await api.put(`/admin/payments/packages/${selectedPackage._id}`, {
+        name: editPackageForm.name,
+        description: editPackageForm.description,
+        'pricing.base_price': editPackageForm.base_price * 100, // Convert to cents
+        'availability.is_active': editPackageForm.is_active
+      });
+
+      toast.success('Package updated successfully');
+      setShowEditPackage(false);
+      setSelectedPackage(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error updating package:', error);
+      toast.error('Failed to update package');
+    }
+  };
+
+  const handleDeletePackage = (pkg: PaymentPackage) => {
+    setSelectedPackage(pkg);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeletePackage = async () => {
+    if (!selectedPackage) return;
+
+    try {
+      await api.delete(`/admin/payments/packages/${selectedPackage._id}?soft_delete=true`);
+
+      toast.success('Package deleted successfully');
+      setShowDeleteConfirm(false);
+      setSelectedPackage(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting package:', error);
+      toast.error('Failed to delete package');
+    }
+  };
+
+  const handleRestorePackage = async (pkg: PaymentPackage) => {
+    try {
+      await api.put(`/admin/payments/packages/${pkg._id}`, {
+        'availability.is_active': true
+      });
+
+      toast.success('Package restored successfully');
+      fetchData();
+    } catch (error) {
+      console.error('Error restoring package:', error);
+      toast.error('Failed to restore package');
     }
   };
 
@@ -422,55 +506,145 @@ export default function AdminPaymentDashboard() {
         {/* Packages Tab */}
         <TabsContent value="packages" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Payment Packages</CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant={packageView === 'active' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPackageView('active')}
+                >
+                  Active ({packages.length})
+                </Button>
+                <Button
+                  variant={packageView === 'deleted' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPackageView('deleted')}
+                >
+                  Deleted ({deletedPackages.length})
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Audience</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Sales</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {packages.map((pkg) => (
-                    <TableRow key={pkg._id}>
-                      <TableCell className="font-medium">{pkg.name}</TableCell>
-                      <TableCell>{pkg.package_type}</TableCell>
-                      <TableCell>{pkg.target_audience}</TableCell>
-                      <TableCell>
-                        ${(pkg.pricing.base_price / 100).toFixed(2)} {pkg.pricing.currency.toUpperCase()}
-                      </TableCell>
-                      <TableCell>
-                        {pkg.availability.is_active ? (
-                          <Badge className="bg-green-100 text-green-800">Active</Badge>
-                        ) : (
-                          <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {pkg.analytics.purchase_count} (${(pkg.analytics.total_revenue / 100).toFixed(2)})
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              {packageView === 'active' ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Audience</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Sales</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {packages.map((pkg) => (
+                      <TableRow key={pkg._id}>
+                        <TableCell className="font-medium">{pkg.name}</TableCell>
+                        <TableCell>{pkg.package_type}</TableCell>
+                        <TableCell>{pkg.target_audience}</TableCell>
+                        <TableCell>
+                          ${(pkg.pricing.base_price / 100).toFixed(2)} {pkg.pricing.currency.toUpperCase()}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className="bg-green-100 text-green-800">Active</Badge>
+                        </TableCell>
+                        <TableCell>
+                          {pkg.analytics.purchase_count} (${(pkg.analytics.total_revenue / 100).toFixed(2)})
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditPackage(pkg)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewPackage(pkg)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeletePackage(pkg)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="space-y-4">
+                  {deletedPackages.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <Trash2 className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                      <p>No deleted packages found</p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Audience</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Sales</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {deletedPackages.map((pkg) => (
+                          <TableRow key={pkg._id} className="opacity-75">
+                            <TableCell className="font-medium">{pkg.name}</TableCell>
+                            <TableCell>{pkg.package_type}</TableCell>
+                            <TableCell>{pkg.target_audience}</TableCell>
+                            <TableCell>
+                              ${(pkg.pricing.base_price / 100).toFixed(2)} {pkg.pricing.currency.toUpperCase()}
+                            </TableCell>
+                            <TableCell>
+                              <Badge className="bg-red-100 text-red-800">Deleted</Badge>
+                            </TableCell>
+                            <TableCell>
+                              {pkg.analytics.purchase_count} (${(pkg.analytics.total_revenue / 100).toFixed(2)})
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleViewPackage(pkg)}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleRestorePackage(pkg)}
+                                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -596,6 +770,178 @@ export default function AdminPaymentDashboard() {
                   Cancel
                 </Button>
                 <Button onClick={handleCreatePackage}>Create Package</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Package Edit Modal */}
+      {showEditPackage && selectedPackage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Edit Package</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-package-name">Package Name</Label>
+                <Input
+                  id="edit-package-name"
+                  value={editPackageForm.name}
+                  onChange={(e) => setEditPackageForm({ ...editPackageForm, name: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-package-description">Description</Label>
+                <Textarea
+                  id="edit-package-description"
+                  value={editPackageForm.description}
+                  onChange={(e) => setEditPackageForm({ ...editPackageForm, description: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-base-price">Base Price ($)</Label>
+                <Input
+                  id="edit-base-price"
+                  type="number"
+                  step="0.01"
+                  value={editPackageForm.base_price}
+                  onChange={(e) => setEditPackageForm({ ...editPackageForm, base_price: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="edit-is-active"
+                  checked={editPackageForm.is_active}
+                  onCheckedChange={(checked) => setEditPackageForm({ ...editPackageForm, is_active: checked })}
+                />
+                <Label htmlFor="edit-is-active">Active</Label>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowEditPackage(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleUpdatePackage}>Update Package</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Package View Modal */}
+      {showViewPackage && selectedPackage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-lg">
+            <CardHeader>
+              <CardTitle>Package Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Name</Label>
+                  <p className="font-medium">{selectedPackage.name}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Type</Label>
+                  <p className="font-medium">{selectedPackage.package_type}</p>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium text-gray-600">Description</Label>
+                <p className="text-sm text-gray-800">{selectedPackage.description}</p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Price</Label>
+                  <p className="font-medium">${(selectedPackage.pricing.base_price / 100).toFixed(2)}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Currency</Label>
+                  <p className="font-medium">{selectedPackage.pricing.currency.toUpperCase()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Billing</Label>
+                  <p className="font-medium">{selectedPackage.pricing.billing_cycle}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Target Audience</Label>
+                  <p className="font-medium">{selectedPackage.target_audience}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Status</Label>
+                  {selectedPackage.availability.is_active ? (
+                    <Badge className="bg-green-100 text-green-800">Active</Badge>
+                  ) : (
+                    <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Sales</Label>
+                  <p className="font-medium">{selectedPackage.analytics.purchase_count}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Revenue</Label>
+                  <p className="font-medium">${(selectedPackage.analytics.total_revenue / 100).toFixed(2)}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={() => setShowViewPackage(false)}>Close</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && selectedPackage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-600">
+                <AlertCircle className="w-5 h-5" />
+                Delete Package
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-gray-700">
+                Are you sure you want to delete the package "{selectedPackage.name}"?
+                This action will deactivate the package and prevent new purchases.
+              </p>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> This is a soft delete. The package will be deactivated
+                  but existing purchases and data will be preserved.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmDeletePackage}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Delete Package
+                </Button>
               </div>
             </CardContent>
           </Card>
