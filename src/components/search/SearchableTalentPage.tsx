@@ -40,6 +40,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api'
+import { TalentProfileDrawer } from '@/components/profile/talent-profile-drawer'
 import Link from 'next/link'
 
 const fadeInUp = {
@@ -84,6 +85,9 @@ export default function SearchableTalentPage() {
   const searchParams = useSearchParams()
   const [showFilters, setShowFilters] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [selectedTalentId, setSelectedTalentId] = useState<string | null>(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [featuredScrollPosition, setFeaturedScrollPosition] = useState(0)
   const [filters, setFilters] = useState({
     skills: '',
     location: '',
@@ -260,202 +264,254 @@ export default function SearchableTalentPage() {
     const pages = []
     const startPage = Math.max(1, currentPage - Math.floor(MAX_PAGE_BUTTONS / 2))
     const endPage = Math.min(totalPages, startPage + MAX_PAGE_BUTTONS - 1)
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i)
     }
-    
+
     return pages
   }
 
-  const FeaturedTalentCard = ({ talent }: { talent: any }) => (
-    <motion.div
-      className="flex-shrink-0 w-80 group"
-    >
-      <Card className="h-full relative overflow-hidden bg-gradient-to-br from-yellow-50 to-white border-0 shadow-xl hover:shadow-2xl transition-all duration-500">
-        {/* Featured Banner */}
-        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 px-4 py-2 z-10">
-          <div className="flex items-center justify-center gap-2 text-black font-bold text-sm">
-            <Crown className="h-4 w-4" />
-            FEATURED TALENT
-            <Crown className="h-4 w-4" />
-          </div>
-        </div>
+  // Handle opening talent profile drawer
+  const handleViewProfile = (talentUserId: string) => {
+    setSelectedTalentId(talentUserId)
+    setIsDrawerOpen(true)
+  }
 
-        <CardContent className="p-6 pt-16 relative z-10">
-          <div className="space-y-5">
-            {/* Profile Header */}
-            <div className="flex items-start gap-4">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-yellow-400 to-amber-500 p-0.5">
-                  <div className="w-full h-full rounded-2xl overflow-hidden bg-white">
-                    {talent.user?.profile_image ? (
-                      <img
-                        src={talent.user.profile_image}
-                        alt={`${talent.user.first_name} ${talent.user.last_name}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center text-white font-bold text-3xl">
-                        {talent.user?.first_name?.[0]}{talent.user?.last_name?.[0]}
+  // Handle closing drawer
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false)
+    setSelectedTalentId(null)
+  }
+
+  // Featured carousel navigation
+  const scrollFeaturedLeft = () => {
+    const container = document.getElementById('featured-carousel')
+    if (container) {
+      container.scrollBy({ left: -320, behavior: 'smooth' })
+    }
+  }
+
+  const scrollFeaturedRight = () => {
+    const container = document.getElementById('featured-carousel')
+    if (container) {
+      container.scrollBy({ left: 320, behavior: 'smooth' })
+    }
+  }
+
+  const FeaturedTalentCard = ({ talent }: { talent: any }) => {
+    // Only render if we have actual user data
+    if (!talent.user?.first_name || !talent.user?.last_name) {
+      return null
+    }
+
+    return (
+      <motion.div
+        className="flex-shrink-0 w-80 group"
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Card className="h-full relative overflow-hidden bg-gradient-to-br from-amber-50 via-yellow-50 to-white border border-amber-200/30 shadow-xl hover:shadow-2xl transition-all duration-500 group-hover:border-amber-300/50">
+          {/* Premium glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-400/10 via-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+          {/* Subtle featured indicator */}
+          <div className="absolute top-3 right-3 z-20">
+            <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+              <Crown className="h-4 w-4 text-white" />
+            </div>
+          </div>
+
+          <CardContent className="p-6 relative z-10">
+            <div className="space-y-4">
+              {/* Profile Header */}
+              <div className="flex items-start gap-4">
+                <div className="relative">
+                  {/* Premium avatar with double border */}
+                  <div className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-500 p-1 shadow-lg">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-white p-0.5">
+                      <div className="w-full h-full rounded-full overflow-hidden">
+                        {talent.user?.profile_image ? (
+                          <img
+                            src={talent.user.profile_image}
+                            alt={`${talent.user.first_name} ${talent.user.last_name}`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center text-white font-bold text-xl">
+                            {talent.user.first_name[0]}{talent.user.last_name[0]}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  </div>
+
+                  {/* Premium verified badge */}
+                  {talent.user?.email_verified && (
+                    <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-r from-emerald-500 to-green-500 border-3 border-white rounded-full shadow-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* Featured star indicator */}
+                  <div className="absolute -top-1 -left-1 w-6 h-6 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Star className="h-3 w-3 text-white fill-white" />
                   </div>
                 </div>
 
-                {/* Premium verified badge with golden theme */}
-                {talent.user?.email_verified && (
-                  <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-r from-yellow-400 to-amber-500 border-2 border-white rounded-full shadow-lg flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-lg text-gray-900 truncate leading-tight">
+                    {talent.user.first_name} {talent.user.last_name}
+                  </h3>
+                  {talent.title && (
+                    <p className="text-amber-700 font-semibold text-sm truncate mt-1">
+                      {talent.title}
+                    </p>
+                  )}
+                  {talent.location && (
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <MapPin className="h-4 w-4 text-slate-500" />
+                      <span className="text-slate-600 text-sm font-medium">
+                        {talent.location}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Rating and Rate Row */}
+              <div className="flex items-center justify-between">
+                <div>
+                  {talent.rating && talent.rating > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < Math.floor(talent.rating)
+                                ? 'text-amber-500 fill-amber-500'
+                                : 'text-gray-200'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-800 font-semibold">
+                        {talent.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+
+                {talent.hourly_rate && (
+                  <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md">
+                    ${talent.hourly_rate}/hr
                   </div>
                 )}
               </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-bold text-xl text-gray-900 truncate leading-tight">
-                      {talent.user?.first_name} {talent.user?.last_name}
-                    </h3>
-                    <p className="text-[var(--accent)] font-bold text-base truncate mt-1">
-                      {talent.title || 'Featured Freelancer'}
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <MapPin className="h-4 w-4 text-amber-600" />
-                      <span className="text-gray-600 text-sm font-medium">
-                        {talent.location || 'Remote'}
-                      </span>
-                    </div>
-                  </div>
+              {/* Bio snippet if available */}
+              {talent.bio && (
+                <p className="text-gray-700 text-sm leading-relaxed line-clamp-2 bg-slate-50/50 p-3 rounded-lg border border-slate-200/50">
+                  {talent.bio}
+                </p>
+              )}
 
-                  <div className="text-right">
-                    {talent.rating > 0 ? (
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < Math.floor(talent.rating)
-                                  ? 'text-yellow-500 fill-yellow-500'
-                                  : 'text-gray-200'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-base text-gray-800 font-bold">
-                          {talent.rating.toFixed(1)}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-400 mb-2">
-                        No reviews yet
-                      </div>
-                    )}
-
-                    {talent.hourly_rate ? (
-                      <div className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-base font-bold px-3 py-2 rounded-xl shadow-lg">
-                        ${talent.hourly_rate}/hr
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-400 bg-gray-100 px-3 py-2 rounded-xl">
-                        Rate TBD
-                      </div>
+              {/* Skills */}
+              {talent.skills && talent.skills.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {talent.skills.slice(0, 4).map((skill: any, index: number) => (
+                      <Badge
+                        key={index}
+                        className="bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border-amber-200 text-xs font-medium px-3 py-1 hover:from-amber-200 hover:to-yellow-200 transition-all"
+                      >
+                        {typeof skill === 'string' ? skill : skill.name}
+                      </Badge>
+                    ))}
+                    {talent.skills.length > 4 && (
+                      <Badge className="bg-slate-100 text-slate-600 border-slate-200 text-xs px-3 py-1">
+                        +{talent.skills.length - 4} more
+                      </Badge>
                     )}
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bio */}
-            {talent.bio ? (
-              <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 font-medium">
-                {talent.bio}
-              </p>
-            ) : (
-              <p className="text-gray-400 text-sm italic">
-                No bio available yet
-              </p>
-            )}
-
-            {/* Skills */}
-            <div className="space-y-2">
-              {talent.skills && talent.skills.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {talent.skills.slice(0, 4).map((skill: any, index: number) => (
-                    <Badge
-                      key={index}
-                      className="bg-gradient-to-r from-[var(--accent)]/20 to-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/30 text-sm font-semibold px-3 py-1.5 hover:from-[var(--accent)]/30 hover:to-[var(--accent)]/20 transition-all duration-200"
-                    >
-                      {typeof skill === 'string' ? skill : skill.name}
-                    </Badge>
-                  ))}
-                  {talent.skills.length > 4 && (
-                    <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-sm font-semibold px-3 py-1.5">
-                      +{talent.skills.length - 4}
-                    </Badge>
-                  )}
-                </div>
-              ) : (
-                <div className="text-sm text-gray-400 italic">
-                  Skills to be added
                 </div>
               )}
-            </div>
 
-            {/* Enhanced Stats Bar */}
-            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-amber-600" />
-                    <div>
-                      <div className="text-lg font-bold text-gray-900">{talent.jobs_completed || 0}</div>
-                      <div className="text-xs text-gray-600 font-medium">Jobs</div>
+              {/* Premium Stats Card */}
+              <div className="bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                        <Briefcase className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-base font-bold text-gray-900">{talent.jobs_completed || 0}</div>
+                        <div className="text-xs text-gray-600">Projects</div>
+                      </div>
                     </div>
+
+                    {talent.hourly_rate && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center">
+                          <DollarSign className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-base font-bold text-gray-900">${talent.hourly_rate}</div>
+                          <div className="text-xs text-gray-600">Per Hour</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {talent.success_rate && talent.success_rate > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
+                          <TrendingUp className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-base font-bold text-gray-900">{talent.success_rate}%</div>
+                          <div className="text-xs text-gray-600">Success</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {talent.success_rate > 0 && (
+                  {talent.availability && ['available', 'busy', 'full-time', 'part-time'].includes(talent.availability) && (
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-green-600" />
-                      <div>
-                        <div className="text-lg font-bold text-gray-900">{talent.success_rate}%</div>
-                        <div className="text-xs text-gray-600 font-medium">Success</div>
-                      </div>
+                      <div className={`h-3 w-3 rounded-full ${
+                        talent.availability === 'available'
+                          ? 'bg-green-500 animate-pulse shadow-green-300 shadow-lg'
+                          : talent.availability === 'busy'
+                          ? 'bg-amber-500'
+                          : 'bg-blue-500'
+                      }`} />
+                      <span className="text-sm text-gray-700 font-medium capitalize">
+                        {talent.availability === 'full-time' ? 'Full Time' :
+                         talent.availability === 'part-time' ? 'Part Time' :
+                         talent.availability}
+                      </span>
                     </div>
                   )}
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <div className={`h-3 w-3 rounded-full ${
-                    talent.availability === 'available'
-                      ? 'bg-green-400 animate-pulse'
-                      : talent.availability === 'busy'
-                      ? 'bg-yellow-400'
-                      : 'bg-gray-300'
-                  }`} />
-                  <span className="text-sm text-gray-700 font-semibold capitalize">
-                    {talent.availability || 'Available'}
-                  </span>
-                </div>
               </div>
-            </div>
 
-            {/* Premium Action Button */}
-            <Link href={`/talent/${talent.user?.id}`} target="_blank" rel="noopener noreferrer" className="block">
-              <Button className="w-full h-12 text-base font-bold bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 hover:from-amber-500 hover:via-yellow-600 hover:to-amber-500 text-black border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-                <Eye className="h-5 w-5 mr-2" />
-                View Featured Profile
-                <Crown className="h-4 w-4 ml-2" />
+              {/* Premium CTA Button */}
+              <Button
+                onClick={() => handleViewProfile(talent.user.id)}
+                className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-600 text-black border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                View Profile
               </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    )
+  }
 
   const TalentCard = ({ talent }: { talent: any }) => (
     <motion.div
@@ -605,11 +661,20 @@ export default function SearchableTalentPage() {
                 <div className="flex items-center gap-1.5">
                   <Briefcase className="h-3.5 w-3.5 text-[var(--accent)]" />
                   <span className="text-xs text-gray-600 font-medium">
-                    {talent.jobs_completed || 0} jobs
+                    {talent.jobs_completed || 0} projects
                   </span>
                 </div>
 
-                {talent.success_rate > 0 && (
+                {talent.hourly_rate && (
+                  <div className="flex items-center gap-1.5">
+                    <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="text-xs text-gray-600 font-medium">
+                      ${talent.hourly_rate}/hr
+                    </span>
+                  </div>
+                )}
+
+                {talent.success_rate && talent.success_rate > 0 && (
                   <div className="flex items-center gap-1.5">
                     <TrendingUp className="h-3.5 w-3.5 text-green-500" />
                     <span className="text-xs text-gray-600 font-medium">
@@ -619,18 +684,22 @@ export default function SearchableTalentPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <div className={`h-2 w-2 rounded-full ${
-                  talent.availability === 'available'
-                    ? 'bg-green-400'
-                    : talent.availability === 'busy'
-                    ? 'bg-yellow-400'
-                    : 'bg-gray-300'
-                }`} />
-                <span className="text-xs text-gray-500 capitalize">
-                  {talent.availability || 'Available'}
-                </span>
-              </div>
+              {['available', 'busy', 'full-time', 'part-time'].includes(talent.availability) && (
+                <div className="flex items-center gap-1.5">
+                  <div className={`h-2 w-2 rounded-full ${
+                    talent.availability === 'available'
+                      ? 'bg-green-400'
+                      : talent.availability === 'busy'
+                      ? 'bg-yellow-400'
+                      : 'bg-blue-400'
+                  }`} />
+                  <span className="text-xs text-gray-500 capitalize">
+                    {talent.availability === 'full-time' ? 'Full Time' :
+                     talent.availability === 'part-time' ? 'Part Time' :
+                     talent.availability}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
@@ -644,15 +713,14 @@ export default function SearchableTalentPage() {
                 Save
               </Button>
 
-              <Link href={`/talent/${talent.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex-1">
-                <Button
-                  size="sm"
-                  className="w-full h-9 text-xs bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] hover:from-[var(--accent-dark)] hover:to-[var(--accent)] text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
-                >
-                  <Eye className="h-3.5 w-3.5 mr-1.5" />
-                  View Profile
-                </Button>
-              </Link>
+              <Button
+                size="sm"
+                onClick={() => handleViewProfile(talent.user?.id)}
+                className="flex-1 h-9 text-xs bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] hover:from-[var(--accent-dark)] hover:to-[var(--accent)] text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <Eye className="h-3.5 w-3.5 mr-1.5" />
+                View Profile
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -685,10 +753,54 @@ export default function SearchableTalentPage() {
 
   return (
     <div className="min-h-screen space-y-8">
+      {/* Featured Talents Section */}
+      {!featuredLoading && featuredTalents.length > 0 && (
+        <motion.div {...fadeInUp} className="py-6">
+
+          {/* Featured Talents Carousel */}
+          <div className="relative">
+            {/* Navigation Buttons */}
+            {featuredTalents.length > 3 && (
+              <>
+                <Button
+                  onClick={scrollFeaturedLeft}
+                  variant="outline"
+                  size="sm"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border-gray-200 shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={scrollFeaturedRight}
+                  variant="outline"
+                  size="sm"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border-gray-200 shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+
+            {/* Scrollable Container */}
+            <div
+              id="featured-carousel"
+              className="overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              <div className="flex gap-6 px-12">
+                {featuredTalents.map((talent: any, index: number) => (
+                  <FeaturedTalentCard key={`${talent.id}-${index}`} talent={talent} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Hero Section */}
-      <motion.div 
+      <motion.div
         {...fadeInUp}
-        className="text-center space-y-4 py-12"
+        className="text-center space-y-4 py-8"
       >
         <h1 className="text-4xl lg:text-5xl font-bold text-black">
           Find <span className="text-[var(--accent)] drop-shadow-lg">Exceptional</span> Talent
@@ -697,29 +809,6 @@ export default function SearchableTalentPage() {
           Connect with skilled professionals who can bring your vision to life
         </p>
       </motion.div>
-
-      {/* Featured Talents Section */}
-      {!featuredLoading && featuredTalents.length > 0 && (
-        <motion.div {...fadeInUp} className="space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-black">
-              <span className="text-[var(--accent)]">Featured</span> Talent
-            </h2>
-            <p className="text-black/70">Hand-picked professionals ready to bring your vision to life</p>
-          </div>
-
-          {/* Featured Talents Carousel */}
-          <div className="relative">
-            <div className="overflow-x-auto pb-4 scrollbar-hide">
-              <div className="flex gap-6 animate-slide-right">
-                {featuredTalents.concat(featuredTalents).map((talent: any, index: number) => (
-                  <FeaturedTalentCard key={`${talent.id}-${index}`} talent={talent} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
 
       {/* Search and Filters */}
       <motion.div variants={searchAnimation}>
@@ -934,6 +1023,13 @@ export default function SearchableTalentPage() {
           )}
         </div>
       )}
+
+      {/* Talent Profile Drawer */}
+      <TalentProfileDrawer
+        userId={selectedTalentId}
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+      />
     </div>
   )
 }

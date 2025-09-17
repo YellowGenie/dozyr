@@ -120,7 +120,6 @@ const getProficiencyPercentage = (proficiency: string) => {
 
 export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentProfileProps) {
   const [likes, setLikes] = useState(0)
-  const [views, setViews] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
 
   // Animation refs
@@ -129,9 +128,18 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
   const [projectsRef, projectsInView] = useInView({ threshold: 0.3 })
 
   useEffect(() => {
-    // Simulate view count increment
-    setViews(prev => prev + 1)
-  }, [])
+    // Increment view count when profile is viewed
+    if (profile?.user_id) {
+      fetch(`/api/v1/profiles/talents/${profile.user_id}/view`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).catch(error => {
+        console.error('Failed to increment view count:', error)
+      })
+    }
+  }, [profile?.user_id])
 
   const visibleSkills = profile.skills?.filter(skill => skill.is_visible) || []
   const visibleProjects = profile.portfolio?.slice(0, 6) || []
@@ -284,7 +292,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                   <div className="relative w-full h-full">
                     <Avatar.Root className="w-full h-full">
                       <Avatar.Image
-                        src={profile.avatar_url || `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face`}
+                        src={profile.profile_image}
                         alt={`${profile.first_name} ${profile.last_name}`}
                         className="w-full h-full object-cover rounded-full border-4 border-white/10 shadow-2xl"
                       />
@@ -345,7 +353,7 @@ export function PublicTalentProfile({ profile, isPublic = false }: PublicTalentP
                 <div className="text-gray-400">Client Rating</div>
               </div>
               <div className="text-center p-6 bg-black/30 backdrop-blur-lg border border-white/10 rounded-2xl">
-                <div className="text-3xl font-bold text-white font-heading">{views}</div>
+                <div className="text-3xl font-bold text-white font-heading">{profile.view_count || 0}</div>
                 <div className="text-gray-400">Profile Views</div>
               </div>
             </motion.div>
