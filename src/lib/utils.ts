@@ -87,3 +87,31 @@ export function formatDate(date: string | Date): string {
     minute: '2-digit'
   })
 }
+
+export function getImageUrl(originalUrl: string, addCacheBusting: boolean = true): string {
+  if (!originalUrl) return ''
+
+  let imageUrl = originalUrl
+
+  // In development, proxy cPanel filestore URLs through backend to avoid CORS/403 issues
+  if (imageUrl.includes('filestore.dozyr.co')) {
+    const isLocalDev = process.env.NODE_ENV === 'development' ||
+                       (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+
+    if (isLocalDev) {
+      // Extract the file path from the full URL
+      const urlParts = imageUrl.split('filestore.dozyr.co')[1]
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api/v1'
+      imageUrl = `${backendUrl}/files/image-proxy${urlParts}`
+      console.log('Using backend proxy URL:', imageUrl)
+    }
+  }
+
+  // Add cache busting timestamp if requested
+  if (addCacheBusting) {
+    const separator = imageUrl.includes('?') ? '&' : '?'
+    imageUrl = `${imageUrl}${separator}t=${Date.now()}`
+  }
+
+  return imageUrl
+}

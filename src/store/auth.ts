@@ -111,14 +111,19 @@ export const useAuthStore = create<AuthStore>()(
       updateProfile: async (data: Partial<User>) => {
         try {
           set({ isLoading: true, error: null })
+          console.log('Auth store: Updating profile with data:', data)
           const updatedUser = await api.updateProfile(data)
-          
+          console.log('Auth store: Received updated user:', updatedUser)
+
           set({
             user: updatedUser,
             isLoading: false,
             error: null
           })
+
+          console.log('Auth store: Profile updated successfully')
         } catch (error: any) {
+          console.error('Auth store: Profile update failed:', error)
           set({
             error: error.message || 'Profile update failed',
             isLoading: false

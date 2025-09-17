@@ -8,7 +8,7 @@ import ReactCrop, {
   PixelCrop,
   convertToPixelCrop,
 } from 'react-image-crop'
-import { Camera, Upload, Download, Trash2, X, Check } from 'lucide-react'
+import { Camera, Upload, Download, Trash2, X, Check, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -18,7 +18,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { generateInitials } from '@/lib/utils'
+import { generateInitials, getImageUrl } from '@/lib/utils'
 import { api } from '@/lib/api'
 
 // Import react-image-crop CSS
@@ -62,6 +62,7 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
   const [aspect] = useState<number>(1) // Square aspect ratio
   const [isUploading, setIsUploading] = useState(false)
   const [imageKey, setImageKey] = useState(0) // Force re-render when image changes
+  const [imageLoadError, setImageLoadError] = useState(false)
 
   const imgRef = useRef<HTMLImageElement>(null)
   const previewCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -71,6 +72,7 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
   // Force re-render when profile image changes
   useEffect(() => {
     setImageKey(prev => prev + 1)
+    setImageLoadError(false) // Reset error state when image changes
   }, [user?.profile_image])
 
   // Update the preview canvas when crop is completed
@@ -237,14 +239,32 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
       console.log('Uploading profile image...')
       const response = await api.uploadProfileImage(file)
       console.log('Upload response:', response)
-      
+
       // Handle both full URLs and relative paths
       let imageUrl = response.image_url
       console.log('Original image URL:', imageUrl)
-      
+      console.log('Full upload response:', response)
+
+      // Check if we're in development and the URL points to cPanel filestore
+      if (imageUrl && imageUrl.includes('filestore.dozyr.co')) {
+        console.log('cPanel filestore URL detected')
+
+        // In development, proxy through the backend to avoid CORS/403 issues
+        const isLocalDev = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost'
+
+        if (isLocalDev) {
+          console.log('Development environment detected, creating backend proxy URL')
+          // Extract the file path from the full URL
+          const urlParts = imageUrl.split('filestore.dozyr.co')[1]
+          const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api/v1'
+          imageUrl = `${backendUrl}/files/image-proxy${urlParts}`
+          console.log('Backend proxy URL created:', imageUrl)
+        }
+      }
+
       if (imageUrl && !imageUrl.startsWith('http')) {
         // If it's a relative path, prepend the API base URL (remove /api/v1 from base)
-        const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003/api/v1'
+        const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api/v1'
         const serverUrl = baseApiUrl.replace('/api/v1', '')
         imageUrl = `${serverUrl}${response.image_url}`
         console.log('Server URL:', serverUrl)
@@ -267,7 +287,9 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
 
   const handleRemoveImage = async () => {
     try {
+      console.log('Removing profile image...')
       await api.deleteProfileImage()
+      console.log('Profile image delete request successful')
       onImageUpdate(null)
     } catch (error) {
       console.error('Error removing profile image:', error)
@@ -295,13 +317,10 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
   console.log('ProfileImageUpload - hasProfileImage:', hasProfileImage)
   console.log('ProfileImageUpload - user.profile_image:', user?.profile_image)
 
-  // Add cache busting for updated images
+  // Get image URL with proxy and cache busting
   const getImageSrc = () => {
     if (!hasProfileImage) return ''
-    
-    // Add timestamp to bust cache for newly uploaded images
-    const separator = user.profile_image?.includes('?') ? '&' : '?'
-    return `${user.profile_image}${separator}t=${Date.now()}`
+    return getImageUrl(user.profile_image!, true)
   }
 
   return (
@@ -316,6 +335,23 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
             onError={(e) => {
               console.error('Profile image failed to load:', user.profile_image)
               console.error('Full image URL:', getImageSrc())
+              console.error('Image load error event:', e)
+
+              setImageLoadError(true)
+
+              // Test if it's a network/CORS issue by trying to fetch
+              fetch(getImageSrc(), { method: 'HEAD' })
+                .then(response => {
+                  console.log('HEAD request status:', response.status)
+                  console.log('HEAD request headers:', response.headers)
+                  if (!response.ok) {
+                    console.error('Image URL returned HTTP error:', response.status)
+                  }
+                })
+                .catch(fetchError => {
+                  console.error('Fetch test failed - likely CORS or network issue:', fetchError)
+                })
+
               // Hide the broken image and show initials instead
               e.currentTarget.style.display = 'none'
               const initialsDiv = e.currentTarget.nextElementSibling as HTMLElement
@@ -376,6 +412,15 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
           <Button
             size="sm"
             variant="outline"
+            onClick={() => window.open(user?.profile_image, '_blank')}
+            className="flex items-center gap-1 border-blue-500/20 text-blue-400 hover:text-blue-300 hover:border-blue-500/50 hover:bg-blue-500/10"
+          >
+            <Eye className="h-3 w-3" />
+            Test URL
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
             onClick={handleRemoveImage}
             className="flex items-center gap-1 border-red-500/20 text-red-400 hover:text-red-300 hover:border-red-500/50 hover:bg-red-500/10"
           >
@@ -386,13 +431,28 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
       )}
 
       <p className="text-sm text-black/70">
-        {isEditing 
-          ? "Click the camera icon to upload a new photo" 
-          : hasProfileImage 
-            ? "Profile photo" 
-            : "No profile photo uploaded"
+        {imageLoadError && hasProfileImage
+          ? "⚠️ Image failed to load from external server"
+          : isEditing
+            ? "Click the camera icon to upload a new photo"
+            : hasProfileImage
+              ? "Profile photo"
+              : "No profile photo uploaded"
         }
       </p>
+
+      {imageLoadError && hasProfileImage && isEditing && (
+        <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+          <p><strong>🔧 Backend Proxy Required</strong></p>
+          <p className="mt-1">The image is hosted on cPanel but needs backend proxy for development.</p>
+          <p className="mt-1">Original URL: <code className="bg-blue-100 px-1 rounded break-all">{user?.profile_image}</code></p>
+          <div className="mt-2 space-y-1 text-xs">
+            <p><strong>Solution:</strong> Add image proxy endpoint to your backend API:</p>
+            <p><code className="bg-blue-100 px-1">GET /api/v1/files/image-proxy/*</code></p>
+            <p>This endpoint should fetch the image from cPanel and serve it locally.</p>
+          </div>
+        </div>
+      )}
 
       {/* Hidden anchor for downloads */}
       <a

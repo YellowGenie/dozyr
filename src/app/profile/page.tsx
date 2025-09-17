@@ -240,30 +240,34 @@ export default function ProfilePage() {
   const handleImageUpdate = async (imageUrl: string | null) => {
     try {
       setProfileImage(imageUrl)
-      
-      // The uploadProfileImage endpoint should have already updated the user profile
-      // So we just need to refresh the user data from the backend
-      if (user) {
-        try {
-          const updatedUser = await api.getProfile()
-          
-          // Update the auth store directly by setting the user
-          // Instead of calling updateProfile (which makes another API call)
-          const { setUser } = useAuthStore.getState()
-          setUser(updatedUser)
-          
-          console.log('Profile refreshed with image:', updatedUser.profile_image)
-          
-          // Update local state to match
-          setProfileImage(updatedUser.profile_image || null)
-          
-        } catch (refreshError) {
-          console.error('Failed to refresh profile after image upload:', refreshError)
-          // Fallback: try direct update via API
-          await updateProfile({ 
-            profile_image: imageUrl 
-          })
-        }
+
+      if (user && imageUrl) {
+        console.log('Updating profile with new image URL:', imageUrl)
+
+        // Explicitly update the profile with the new image URL
+        // This ensures the backend user record is updated
+        await updateProfile({
+          profile_image: imageUrl
+        })
+
+        console.log('Profile updated successfully with image')
+
+        // Force a re-render by updating a state that dashboard layout might watch
+        window.dispatchEvent(new CustomEvent('profile-image-updated', {
+          detail: { imageUrl: imageUrl }
+        }))
+
+      } else if (user && imageUrl === null) {
+        // Handle image removal
+        await updateProfile({
+          profile_image: null
+        })
+
+        console.log('Profile image removed successfully')
+
+        window.dispatchEvent(new CustomEvent('profile-image-updated', {
+          detail: { imageUrl: null }
+        }))
       }
     } catch (error) {
       console.error('Failed to update profile image:', error)

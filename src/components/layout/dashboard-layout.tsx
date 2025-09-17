@@ -33,7 +33,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth'
-import { generateInitials, cn } from '@/lib/utils'
+import { generateInitials, cn, getImageUrl } from '@/lib/utils'
 import { Omnisearch } from '@/components/search/Omnisearch'
 import { useProposalNotifications } from '@/hooks/useProposalNotifications'
 import { useContractNotifications } from '@/hooks/useContractNotifications'
@@ -49,9 +49,26 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false)
+  const [imageKey, setImageKey] = useState(0) // Force re-render when profile image changes
   const { newProposalsCount } = useProposalNotifications()
   const { unreadCount: contractNotificationsCount } = useContractNotifications()
   // Removed old search - now using Omnisearch component
+
+  // Force re-render when user profile image changes
+  useEffect(() => {
+    setImageKey(prev => prev + 1)
+  }, [user?.profile_image])
+
+  // Listen for profile image update events
+  useEffect(() => {
+    const handleProfileImageUpdate = () => {
+      console.log('Dashboard: Profile image update event received')
+      setImageKey(prev => prev + 1)
+    }
+
+    window.addEventListener('profile-image-updated', handleProfileImageUpdate)
+    return () => window.removeEventListener('profile-image-updated', handleProfileImageUpdate)
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -220,11 +237,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                 {user?.profile_image && user.profile_image.trim() !== '' ? (
                   <img
-                    key={`profile-${user.profile_image}-${Date.now()}`}
-                    src={`${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}`}
+                    key={`profile-desktop-${imageKey}-${user.profile_image}`}
+                    src={getImageUrl(user.profile_image, true)}
                     alt="Profile"
                     className="w-full h-full object-cover rounded-full border-2 border-[var(--primary)]"
                     onError={(e) => {
+                      console.error('Dashboard profile image failed to load:', user.profile_image)
+                      console.error('Dashboard image URL with cache busting:', `${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}&v=${imageKey}`)
+
                       e.currentTarget.style.display = 'none'
                       const fallback = e.currentTarget.nextElementSibling as HTMLElement
                       if (fallback) {
@@ -263,17 +283,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Footer Actions */}
           <div className="p-4 border-t border-gray-200 flex-shrink-0">
             <div className="flex items-center justify-center gap-2">
-              <Link href="/profile">
-                <motion.div
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
-                  title="Profile"
-                >
-                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                </motion.div>
-              </Link>
-              
               <Link href="/settings">
                 <motion.div
                   whileHover={{ scale: 1.1, y: -2 }}
@@ -284,15 +293,29 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   <Settings className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
                 </motion.div>
               </Link>
-              
+
               <motion.div
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-50 hover:bg-red-500 transition-all duration-300 group cursor-pointer"
-                onClick={handleLogout}
-                title="Logout"
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                title="Help & Support"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-help', {
+                    detail: { initialRole: user?.role }
+                  }))
+                }}
               >
-                <LogOut className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" />
+                <HelpCircle className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                title="Notifications"
+              >
+                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
               </motion.div>
             </div>
           </div>
@@ -332,11 +355,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                 {user?.profile_image && user.profile_image.trim() !== '' ? (
                   <img
-                    key={`profile-${user.profile_image}-${Date.now()}`}
-                    src={`${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}`}
+                    key={`profile-mobile-${imageKey}-${user.profile_image}`}
+                    src={getImageUrl(user.profile_image, true)}
                     alt="Profile"
                     className="w-full h-full object-cover rounded-full border-2 border-[var(--primary)]"
                     onError={(e) => {
+                      console.error('Dashboard profile image failed to load:', user.profile_image)
+                      console.error('Dashboard image URL with cache busting:', `${user.profile_image}${user.profile_image.includes('?') ? '&' : '?'}t=${Date.now()}&v=${imageKey}`)
+
                       e.currentTarget.style.display = 'none'
                       const fallback = e.currentTarget.nextElementSibling as HTMLElement
                       if (fallback) {
@@ -345,7 +371,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     }}
                   />
                 ) : null}
-                <div 
+                <div
                   className="w-full h-full bg-[var(--primary)] rounded-full flex items-center justify-center absolute inset-0"
                   style={{ display: user?.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
                 >
@@ -375,18 +401,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Footer Actions */}
           <div className="p-4 border-t border-gray-200 flex-shrink-0">
             <div className="flex items-center justify-center gap-2">
-              <Link href="/profile">
-                <motion.div
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
-                  title="Profile"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                </motion.div>
-              </Link>
-              
               <Link href="/settings">
                 <motion.div
                   whileHover={{ scale: 1.1, y: -2 }}
@@ -398,18 +412,31 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   <Settings className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
                 </motion.div>
               </Link>
-              
+
               <motion.div
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-50 hover:bg-red-500 transition-all duration-300 group cursor-pointer"
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                title="Help & Support"
                 onClick={() => {
                   setIsSidebarOpen(false)
-                  handleLogout()
+                  window.dispatchEvent(new CustomEvent('open-help', {
+                    detail: { initialRole: user?.role }
+                  }))
                 }}
-                title="Logout"
               >
-                <LogOut className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" />
+                <HelpCircle className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                title="Notifications"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
               </motion.div>
             </div>
           </div>
@@ -437,30 +464,34 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]" title="Notifications">
-                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-              </div>
-              
-              <div 
-                className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]" 
-                title="Help & Support"
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('open-help', {
-                    detail: { initialRole: user?.role }
-                  }))
-                }}
-              >
-                <HelpCircle className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-              </div>
-              
-              <div 
-                className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]" 
+              <Link href="/profile">
+                <motion.div
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]"
+                  title="Profile"
+                >
+                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                </motion.div>
+              </Link>
+
+              <div
+                className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]"
                 title="AI Assistant"
                 onClick={() => setIsAIAssistantOpen(true)}
               >
                 <Bot className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
               </div>
+
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center justify-center w-10 h-10 rounded-md bg-red-50 hover:bg-red-500 transition-all duration-300 group cursor-pointer border border-red-200 hover:border-red-500"
+                onClick={handleLogout}
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" />
+              </motion.div>
             </div>
           </div>
         </header>
