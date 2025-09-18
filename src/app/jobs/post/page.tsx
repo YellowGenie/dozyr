@@ -320,19 +320,27 @@ export default function PostJobPage() {
       skills: formData.skills_required.split(',').map(s => s.trim()).filter(Boolean)
     }
 
-    // Add payment_intent_id only for paid posting
-    const jobData = paymentIntentId === 'free_posting'
-      ? baseJobData
-      : { ...baseJobData, payment_intent_id: paymentIntentId }
+    // Determine the endpoint and job data based on payment type
+    let endpoint
+    let jobData
+
+    if (paymentIntentId === 'free_posting') {
+      // Free posting
+      endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs`
+      jobData = baseJobData
+    } else if (paymentIntentId === 'package_credits') {
+      // Using package credits
+      endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-package`
+      jobData = baseJobData
+    } else {
+      // Paid posting with Stripe
+      endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-payment`
+      jobData = { ...baseJobData, payment_intent_id: paymentIntentId }
+    }
 
     try {
       setLoading(true)
       const token = localStorage.getItem('auth_token')
-
-      // Use different endpoint for free posting vs paid posting
-      const endpoint = paymentIntentId === 'free_posting'
-        ? `${process.env.NEXT_PUBLIC_API_URL}/jobs`
-        : `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-payment`
 
       console.log('Creating job with data:', jobData)
       console.log('Using endpoint:', endpoint)

@@ -65,8 +65,13 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
       const data = await response.json()
 
       // Handle free posting case
-      if (data.free_posting) {
-        return { free_posting: true }
+      if (data.free_posting || data.using_package_credits) {
+        return {
+          free_posting: data.free_posting,
+          using_package_credits: data.using_package_credits,
+          package_info: data.package_info,
+          message: data.message
+        }
       }
 
       setPaymentIntent(data)
@@ -133,8 +138,11 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
     }
   })
 
-  // Show free posting message if it's free
-  if (paymentIntent?.free_posting) {
+  // Show posting message based on type
+  if (paymentIntent?.free_posting || paymentIntent?.using_package_credits) {
+    const isUsingCredits = paymentIntent?.using_package_credits
+    const packageInfo = paymentIntent?.package_info
+
     return (
       <div className="space-y-6 text-center">
         <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-6">
@@ -143,9 +151,16 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
               <Briefcase className="h-6 w-6 text-green-400" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-green-400 mb-2">Job Posting is Free!</h3>
+          <h3 className="text-lg font-semibold text-green-400 mb-2">
+            {isUsingCredits ? 'Using Package Credits!' : 'Job Posting is Free!'}
+          </h3>
           <p className="text-green-200">
-            Great news! Job posting is currently free on our platform.
+            {isUsingCredits
+              ? `Using credits from your ${packageInfo?.name || 'active package'}. ${packageInfo?.remaining_credits || 0} credits remaining.`
+              : 'Great news! Job posting is currently free on our platform.'
+            }
+          </p>
+          <p className="text-green-200 text-sm mt-2">
             Your job post is being created now...
           </p>
         </div>
@@ -158,36 +173,56 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
 
   return (
     <div className="space-y-6">
-      {/* Payment Summary */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Briefcase className="h-4 w-4 text-[var(--accent)]" />
-            <span className="text-sm font-medium text-[var(--foreground)]">Job Posting Fee</span>
-          </div>
-          <div className="flex items-center gap-1 text-[var(--accent)] font-bold">
-            <DollarSign className="h-4 w-4" />
-            FREE
-          </div>
-        </div>
-        <p className="text-xs text-[var(--foreground)]/60">
-          "{jobTitle}"
-        </p>
-      </div>
+      {/* Check if we're using package credits or if it's free */}
+      {(() => {
+        const isUsingCredits = paymentIntent?.using_package_credits
+        const packageInfo = paymentIntent?.package_info
 
-      {/* Important Notice */}
-      <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-medium text-green-400 mb-1">Currently Free!</h4>
-            <p className="text-sm text-green-200">
-              Job posting is currently free on our platform.
-              No payment required - just click the button below to post your job!
-            </p>
-          </div>
-        </div>
-      </div>
+        return (
+          <>
+            {/* Payment Summary */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4 text-[var(--accent)]" />
+                  <span className="text-sm font-medium text-[var(--foreground)]">Job Posting Fee</span>
+                </div>
+                <div className="flex items-center gap-1 text-[var(--accent)] font-bold">
+                  {isUsingCredits ? (
+                    <span className="text-sm">Using Credits</span>
+                  ) : (
+                    <>
+                      <DollarSign className="h-4 w-4" />
+                      FREE
+                    </>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-[var(--foreground)]/60">
+                "{jobTitle}"
+              </p>
+            </div>
+
+            {/* Important Notice */}
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-green-400 mb-1">
+                    {isUsingCredits ? 'Using Package Credits!' : 'Currently Free!'}
+                  </h4>
+                  <p className="text-sm text-green-200">
+                    {isUsingCredits
+                      ? `This job post will use 1 credit from your ${packageInfo?.name || 'active package'}. You have ${packageInfo?.remaining_credits || 0} credits remaining.`
+                      : 'Job posting is currently free on our platform. No payment required - just click the button below to post your job!'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          </>
+        )
+      })()}
 
       <div className="flex items-center justify-end gap-3">
         <Button type="button" variant="outline" onClick={onClose}>
@@ -199,7 +234,8 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
             if (submitting) return // Prevent multiple submissions
             setSubmitting(true)
             try {
-              await onSuccess('free_posting')
+              const isUsingCredits = paymentIntent?.using_package_credits
+              await onSuccess(isUsingCredits ? 'package_credits' : 'free_posting')
               onClose()
             } catch (error) {
               console.error('Error posting job:', error)
@@ -210,7 +246,10 @@ function PaymentForm({ onSuccess, onClose, jobTitle }: { onSuccess: (paymentInte
           className="bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90 transition-colors"
         >
           {(loading || submitting) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          {submitting ? 'Posting...' : 'Post Job for Free'}
+          {submitting ? 'Posting...' : (() => {
+            const isUsingCredits = paymentIntent?.using_package_credits
+            return isUsingCredits ? 'Use Package Credits' : 'Post Job for Free'
+          })()}
         </Button>
       </div>
     </div>
