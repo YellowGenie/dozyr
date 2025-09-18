@@ -55,6 +55,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
   Table,
@@ -220,6 +223,18 @@ export default function AdminUsersPage() {
       await loadUsers()
     } catch (err: any) {
       setError(err.message || 'Failed to update user status')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleUserRoleUpdate = async (userId: string, newRole: string) => {
+    try {
+      setIsSubmitting(true)
+      await api.updateUserRole(userId, newRole)
+      await loadUsers()
+    } catch (err: any) {
+      setError(err.message || 'Failed to update user role')
     } finally {
       setIsSubmitting(false)
     }
@@ -1152,6 +1167,41 @@ export default function AdminUsersPage() {
                                 <Edit3 className="mr-2 h-4 w-4" />
                                 Edit User
                               </DropdownMenuItem>
+
+                              {/* Role Switching */}
+                              <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                  <Crown className="mr-2 h-4 w-4" />
+                                  Change Role
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                  {user.role !== 'talent' && (
+                                    <DropdownMenuItem
+                                      onClick={() => handleUserRoleUpdate(user.id, 'talent')}
+                                    >
+                                      <Star className="mr-2 h-4 w-4" />
+                                      Make Talent
+                                    </DropdownMenuItem>
+                                  )}
+                                  {user.role !== 'manager' && (
+                                    <DropdownMenuItem
+                                      onClick={() => handleUserRoleUpdate(user.id, 'manager')}
+                                    >
+                                      <Briefcase className="mr-2 h-4 w-4" />
+                                      Make Manager
+                                    </DropdownMenuItem>
+                                  )}
+                                  {user.role !== 'admin' && user.email?.endsWith('@yellowgenie.io') && (
+                                    <DropdownMenuItem
+                                      onClick={() => handleUserRoleUpdate(user.id, 'admin')}
+                                    >
+                                      <Shield className="mr-2 h-4 w-4" />
+                                      Make Admin
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuSubContent>
+                              </DropdownMenuSub>
+
                               <DropdownMenuSeparator />
                               {!user.is_verified && (
                                 <DropdownMenuItem

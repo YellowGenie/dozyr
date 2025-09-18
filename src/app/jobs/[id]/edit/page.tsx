@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useToast } from '@/contexts/ToastContext'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -28,6 +29,7 @@ const fadeInUp = {
 export default function EditJobPage() {
   const params = useParams()
   const router = useRouter()
+  const { showSuccess, showError } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
@@ -61,7 +63,7 @@ export default function EditJobPage() {
         })
       } catch (error) {
         console.error('Failed to fetch job:', error)
-        alert('Failed to load job details')
+        showError('Loading Failed', 'Failed to load job details')
         router.push('/my-jobs')
       } finally {
         setLoading(false)
@@ -96,11 +98,11 @@ export default function EditJobPage() {
     try {
       setSaving(true)
       await api.updateJob(params.id as string, jobData)
-      alert('Job updated successfully!')
+      showSuccess('Job Updated!', 'Your job has been updated successfully.')
       router.push(`/jobs/${params.id}`)
     } catch (error) {
       console.error('Failed to update job:', error)
-      alert('Failed to update job: ' + error.message)
+      showError('Update Failed', 'Failed to update job: ' + error.message)
     } finally {
       setSaving(false)
     }

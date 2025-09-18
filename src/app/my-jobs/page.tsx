@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useToast } from '@/contexts/ToastContext'
+import { useConfirmation } from '@/hooks/useConfirmation'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import {
   Briefcase,
   Plus,
@@ -31,6 +34,8 @@ const fadeInUp = {
 }
 
 export default function MyJobsPage() {
+  const { showSuccess, showError } = useToast()
+  const confirmation = useConfirmation()
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [needsManagerProfile, setNeedsManagerProfile] = useState(false)
@@ -88,24 +93,28 @@ export default function MyJobsPage() {
   }
 
   const handleDeleteJob = async (jobId: string) => {
-    if (!confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
-      return
-    }
+    await confirmation.confirm(
+      async () => {
+        setDeletingJob(jobId)
+        await api.deleteJob(jobId)
 
-    try {
-      setDeletingJob(jobId)
-      await api.deleteJob(jobId)
-      
-      // Remove job from local state
-      setJobs(prevJobs => prevJobs.filter((job: any) => job.id !== jobId))
-      
-      alert('Job deleted successfully!')
-    } catch (error) {
+        // Remove job from local state
+        setJobs(prevJobs => prevJobs.filter((job: any) => job.id !== jobId))
+
+        showSuccess('Job Deleted!', 'Your job has been deleted successfully.')
+        setDeletingJob(null)
+      },
+      {
+        title: 'Delete Job',
+        description: 'Are you sure you want to delete this job? This action cannot be undone.',
+        confirmText: 'Delete',
+        variant: 'destructive'
+      }
+    ).catch((error) => {
       console.error('Failed to delete job:', error)
-      alert('Failed to delete job: ' + error.message)
-    } finally {
+      showError('Deletion Failed', 'Failed to delete job: ' + error.message)
       setDeletingJob(null)
-    }
+    })
   }
 
   if (loading) {
@@ -294,6 +303,18 @@ export default function MyJobsPage() {
           </div>
         </div>
       </DashboardLayout>
+
+      <ConfirmationDialog
+        open={confirmation.isOpen}
+        onOpenChange={confirmation.setIsOpen}
+        title={confirmation.options.title}
+        description={confirmation.options.description}
+        confirmText={confirmation.options.confirmText}
+        cancelText={confirmation.options.cancelText}
+        variant={confirmation.options.variant}
+        onConfirm={confirmation.onConfirm}
+        loading={confirmation.loading}
+      />
     </ProtectedRoute>
   )
 }

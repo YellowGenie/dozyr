@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { HelpProvider } from "@/components/help/help-provider";
 import { AdminNotificationProvider } from "@/contexts/AdminNotificationContext";
 import { NotificationManager } from "@/components/notifications/notification-manager";
+import { ToastProvider } from "@/contexts/ToastContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,12 +37,14 @@ export default function RootLayout({
         <AuthProvider>
           <SocketProvider>
             <AdminNotificationProvider>
-              <EmailVerificationGuard>
-                <HelpProvider>
-                  {children}
-                  <NotificationManager />
-                </HelpProvider>
-              </EmailVerificationGuard>
+              <ToastProvider>
+                <EmailVerificationGuard>
+                  <HelpProvider>
+                    {children}
+                    <NotificationManager />
+                  </HelpProvider>
+                </EmailVerificationGuard>
+              </ToastProvider>
             </AdminNotificationProvider>
           </SocketProvider>
         </AuthProvider>

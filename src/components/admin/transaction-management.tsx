@@ -24,13 +24,16 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Loader2
+  Loader2,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Transaction {
   _id: string;
   transaction_id: string;
+  stripe_payment_intent_id: string;
   transaction_type: string;
   status: string;
   payment_details: {
@@ -202,6 +205,36 @@ export function TransactionManagement() {
     }
   };
 
+  const handleResolvePending = async (transaction: Transaction) => {
+    if (!transaction.stripe_payment_intent_id) {
+      toast.error('No Stripe payment intent ID found');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/v1/admin/payments/resolve-pending`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payment_intent_id: transaction.stripe_payment_intent_id
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Payment resolved successfully');
+        fetchTransactions(currentPage);
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to resolve payment');
+      }
+    } catch (error) {
+      console.error('Error resolving payment:', error);
+      toast.error('Failed to resolve payment');
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       completed: { color: 'bg-green-100 text-green-800', icon: CheckCircle },
@@ -344,6 +377,7 @@ export function TransactionManagement() {
             <TableHeader>
               <TableRow>
                 <TableHead>Transaction ID</TableHead>
+                <TableHead>Payment Intent</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>User</TableHead>
                 <TableHead>Amount</TableHead>
@@ -356,21 +390,35 @@ export function TransactionManagement() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                   </TableCell>
                 </TableRow>
               ) : transactions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     No transactions found
                   </TableCell>
                 </TableRow>
               ) : (
                 transactions.map((transaction) => (
-                  <TableRow key={transaction._id}>
+                  <TableRow key={transaction._id} className={transaction.status === 'pending' ? 'bg-yellow-50' : ''}>
                     <TableCell className="font-mono text-sm">
                       {transaction.transaction_id}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">
+                      {transaction.stripe_payment_intent_id ? (
+                        <div>
+                          <span className="text-blue-600">{transaction.stripe_payment_intent_id}</span>
+                          {transaction.status === 'pending' && (
+                            <Badge variant="outline" className="ml-1 text-xs">
+                              Stripe ID
+                            </Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
@@ -406,6 +454,17 @@ export function TransactionManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        {transaction.status === 'pending' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleResolvePending(transaction)}
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            title="Resolve pending payment"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"

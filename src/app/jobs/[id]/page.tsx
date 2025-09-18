@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
+import { useToast } from '@/contexts/ToastContext'
+import { useConfirmation } from '@/hooks/useConfirmation'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -36,6 +39,8 @@ export default function JobViewPage() {
   const params = useParams()
   const router = useRouter()
   const { user } = useAuthStore()
+  const { showSuccess, showError } = useToast()
+  const confirmation = useConfirmation()
   const [job, setJob] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
@@ -72,21 +77,25 @@ export default function JobViewPage() {
   }, [params.id])
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
-      return
-    }
-
-    try {
-      setDeleting(true)
-      await api.deleteJob(params.id as string)
-      alert('Job deleted successfully!')
-      router.push('/my-jobs')
-    } catch (error) {
+    await confirmation.confirm(
+      async () => {
+        setDeleting(true)
+        await api.deleteJob(params.id as string)
+        showSuccess('Job Deleted!', 'Your job has been deleted successfully.')
+        router.push('/my-jobs')
+        setDeleting(false)
+      },
+      {
+        title: 'Delete Job',
+        description: 'Are you sure you want to delete this job? This action cannot be undone.',
+        confirmText: 'Delete',
+        variant: 'destructive'
+      }
+    ).catch((error) => {
       console.error('Failed to delete job:', error)
-      alert('Failed to delete job: ' + error.message)
-    } finally {
+      showError('Deletion Failed', 'Failed to delete job: ' + error.message)
       setDeleting(false)
-    }
+    })
   }
 
   const getStatusColor = (status?: string) => {
@@ -164,10 +173,10 @@ export default function JobViewPage() {
         cover_letter: 'This is a placeholder proposal. The proposal system needs to be implemented.',
         bid_amount: job.budget_min || 0
       })
-      alert('Proposal submitted successfully!')
+      showSuccess('Proposal Submitted!', 'Your proposal has been submitted successfully.')
     } catch (error) {
       console.error('Failed to submit proposal:', error)
-      alert('Failed to submit proposal: ' + error.message)
+      showError('Submission Failed', 'Failed to submit proposal: ' + error.message)
     } finally {
       setSubmittingProposal(false)
     }
@@ -374,6 +383,18 @@ export default function JobViewPage() {
           </div>
         </div>
       </DashboardLayout>
+
+      <ConfirmationDialog
+        open={confirmation.isOpen}
+        onOpenChange={confirmation.setIsOpen}
+        title={confirmation.options.title}
+        description={confirmation.options.description}
+        confirmText={confirmation.options.confirmText}
+        cancelText={confirmation.options.cancelText}
+        variant={confirmation.options.variant}
+        onConfirm={confirmation.onConfirm}
+        loading={confirmation.loading}
+      />
     </ProtectedRoute>
   )
 }

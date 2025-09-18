@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useConfirmation } from '@/hooks/useConfirmation'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import {
   Mail,
   Bell,
@@ -769,22 +771,28 @@ function TemplatesTab({ templates, onTemplatesUpdate }: {
   }
 
   const handleDeleteTemplate = async (templateId: number) => {
-    if (!confirm('Are you sure you want to delete this template?')) return
-    
-    try {
-      await api.delete(`/notifications/templates/${templateId}`)
-      toast({
-        title: "Template Deleted",
-        description: "Email template has been deleted successfully.",
-      })
-      onTemplatesUpdate()
-    } catch (error) {
+    await confirmation.confirm(
+      async () => {
+        await api.delete(`/notifications/templates/${templateId}`)
+        toast({
+          title: "Template Deleted",
+          description: "Email template has been deleted successfully.",
+        })
+        onTemplatesUpdate()
+      },
+      {
+        title: 'Delete Template',
+        description: 'Are you sure you want to delete this template?',
+        confirmText: 'Delete',
+        variant: 'destructive'
+      }
+    ).catch((error) => {
       toast({
         title: "Error",
         description: "Failed to delete template.",
         variant: "destructive",
       })
-    }
+    })
   }
 
   return (
@@ -1121,6 +1129,7 @@ function TemplateForm({ template, onSave, isLoading }: {
 
 export default function NotificationsPage() {
   const { user } = useAuthStore()
+  const confirmation = useConfirmation()
   const [settings, setSettings] = useState<NotificationSettings>({
     smtp_host: '',
     smtp_port: '587',
@@ -1394,6 +1403,18 @@ export default function NotificationsPage() {
           </Tabs>
         </div>
       </DashboardLayout>
+
+      <ConfirmationDialog
+        open={confirmation.isOpen}
+        onOpenChange={confirmation.setIsOpen}
+        title={confirmation.options.title}
+        description={confirmation.options.description}
+        confirmText={confirmation.options.confirmText}
+        cancelText={confirmation.options.cancelText}
+        variant={confirmation.options.variant}
+        onConfirm={confirmation.onConfirm}
+        loading={confirmation.loading}
+      />
     </ProtectedRoute>
   )
 }

@@ -39,6 +39,7 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { AnalyticsDashboard } from '@/components/admin/analytics-dashboard'
 import { SystemLogs } from '@/components/admin/system-logs'
 import { GeographyDashboard } from '@/components/admin/geography-dashboard'
+import { PendingPayments } from '@/components/admin/pending-payments'
 import { useAuthStore } from '@/store/auth'
 import { api } from '@/lib/api'
 import { User, AdminStats } from '@/types'
@@ -186,7 +187,10 @@ export default function AdminPage() {
       </div>
       
       <AnalyticsDashboard />
-      
+
+      {/* Pending Payments Section */}
+      <PendingPayments />
+
       {/* Quick Actions */}
       <Card>
         <CardHeader>

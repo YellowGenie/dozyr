@@ -795,9 +795,16 @@ class ApiClient {
   }
 
   async updateUserStatus(userId: string, data: { is_verified?: boolean; is_active?: boolean }): Promise<User> {
-    return this.request(`/admin/users/${userId}`, {
+    return this.request(`/admin/users/${userId}/status`, {
       method: 'PUT',
       body: JSON.stringify(data),
+    })
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<{ message: string }> {
+    return this.request(`/admin/users/${userId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify({ role }),
     })
   }
 

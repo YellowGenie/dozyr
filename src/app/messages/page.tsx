@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useToast } from '@/contexts/ToastContext'
+import { useConfirmation } from '@/hooks/useConfirmation'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import {
   MessageSquare,
   Search,
@@ -34,6 +37,8 @@ const fadeInUp = {
 
 export default function MessagesPage() {
   const socket = useSocket()
+  const { showSuccess, showError } = useToast()
+  const confirmation = useConfirmation()
   const [conversations, setConversations] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -114,23 +119,28 @@ export default function MessagesPage() {
   const handleDeleteConversation = async (conversation: any, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
-    if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
-      return
-    }
 
-    try {
-      setDeletingConversation(conversation.id)
-      await api.deleteConversation(conversation.job_id.toString(), conversation.other_user_id?.toString() || conversation.other_user?.id?.toString())
-      
-      // Remove from local state
-      setConversations(prev => prev.filter((conv: any) => conv.id !== conversation.id))
-    } catch (error) {
+    await confirmation.confirm(
+      async () => {
+        setDeletingConversation(conversation.id)
+        await api.deleteConversation(conversation.job_id.toString(), conversation.other_user_id?.toString() || conversation.other_user?.id?.toString())
+
+        // Remove from local state
+        setConversations(prev => prev.filter((conv: any) => conv.id !== conversation.id))
+        showSuccess('Conversation Deleted!', 'The conversation has been deleted successfully.')
+        setDeletingConversation(null)
+      },
+      {
+        title: 'Delete Conversation',
+        description: 'Are you sure you want to delete this conversation? This action cannot be undone.',
+        confirmText: 'Delete',
+        variant: 'destructive'
+      }
+    ).catch((error) => {
       console.error('Failed to delete conversation:', error)
-      alert('Failed to delete conversation. Please try again.')
-    } finally {
+      showError('Deletion Failed', 'Failed to delete conversation. Please try again.')
       setDeletingConversation(null)
-    }
+    })
   }
 
   if (loading) {
@@ -332,6 +342,18 @@ export default function MessagesPage() {
           )}
         </div>
       </DashboardLayout>
+
+      <ConfirmationDialog
+        open={confirmation.isOpen}
+        onOpenChange={confirmation.setIsOpen}
+        title={confirmation.options.title}
+        description={confirmation.options.description}
+        confirmText={confirmation.options.confirmText}
+        cancelText={confirmation.options.cancelText}
+        variant={confirmation.options.variant}
+        onConfirm={confirmation.onConfirm}
+        loading={confirmation.loading}
+      />
     </ProtectedRoute>
   )
 }

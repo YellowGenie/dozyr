@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, memo } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/contexts/ToastContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Briefcase,
@@ -12,20 +13,15 @@ import {
   FileText,
   Building,
   Globe,
-  Save,
-  Eye,
-  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Plus,
+  X,
   Target,
   Zap,
-  CheckCircle,
   ArrowRight,
-  ArrowLeft,
-  Rocket,
-  Star,
-  TrendingUp,
-  Award,
-  Heart,
-  Users2
+  ArrowLeft
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -36,83 +32,101 @@ import { ProtectedRoute } from '@/components/layout/protected-route'
 import { JobPaymentModal } from '@/components/payments/job-payment-modal'
 import { api } from '@/lib/api'
 
+// Animation variants
 const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: "easeOut" }
+  exit: { opacity: 0, y: -20 }
 }
 
-const slideIn = {
-  initial: { opacity: 0, x: 50 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -50 },
-  transition: { duration: 0.4, ease: "easeInOut" }
-}
-
-const staggerContainer = {
-  initial: {},
+const slideVariants = {
+  initial: (direction: number) => ({
+    x: direction > 0 ? 300 : -300,
+    opacity: 0
+  }),
   animate: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-}
-
-const progressAnimation = {
-  initial: { width: 0 },
-  animate: { width: "100%" },
-  transition: { duration: 0.8, ease: "easeOut" }
+    x: 0,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 300, damping: 30 }
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 300 : -300,
+    opacity: 0,
+    transition: { duration: 0.2 }
+  })
 }
 
 const FORM_STEPS = [
-  { id: 1, title: "Job Basics", icon: Briefcase, description: "Tell us about the role" },
-  { id: 2, title: "Compensation", icon: DollarSign, description: "Define the reward" },
-  { id: 3, title: "Details", icon: FileText, description: "Add the specifics" },
-  { id: 4, title: "Review", icon: Eye, description: "Final touches" }
+  {
+    id: 1,
+    title: "Job Basics",
+    subtitle: "Essential information about your role",
+    icon: Target,
+    fields: ['title', 'company_name', 'location', 'category']
+  },
+  {
+    id: 2,
+    title: "Compensation",
+    subtitle: "Define budget and employment type",
+    icon: DollarSign,
+    fields: ['budget_min', 'budget_max', 'compensation_type', 'employment_type', 'experience_level']
+  },
+  {
+    id: 3,
+    title: "Job Details",
+    subtitle: "Description and requirements",
+    icon: FileText,
+    fields: ['description', 'skills']
+  },
+  {
+    id: 4,
+    title: "Review & Publish",
+    subtitle: "Review your job post and publish",
+    icon: Check,
+    fields: []
+  }
 ]
 
-// Enhanced Input Component - memoized to prevent unnecessary re-renders
-const EnhancedInput = memo(({
-  field,
+// Professional Input Component
+const ProfessionalInput = memo(({
   label,
+  value,
+  onChange,
   placeholder,
   type = "text",
   required = false,
   icon: Icon,
-  value,
-  rows = undefined,
-  options = undefined,
-  handleInputChange,
-  handleFocus,
-  handleBlur,
-  focusedField,
-  fieldErrors
+  error,
+  rows,
+  options
 }: any) => (
   <motion.div
-    className="space-y-2 group"
+    className="space-y-2"
     variants={fadeInUp}
   >
-    <label className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
-      {Icon && <Icon className="h-4 w-4" />}
-      {label} {required && <span className="text-red-400">*</span>}
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {label} {required && <span className="text-red-500">*</span>}
     </label>
+
     <div className="relative">
+      {Icon && (
+        <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
+      )}
+
       {options ? (
         <select
           value={value}
-          onChange={(e) => handleInputChange(field, e.target.value)}
-          onFocus={() => handleFocus(field)}
-          onBlur={handleBlur}
-          className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
-            ${focusedField === field
-              ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]'
-              : fieldErrors[field]
-                ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
-                : 'border-white/20 hover:border-white/40'
-            }`}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full ${Icon ? 'pl-11' : 'pl-4'} pr-4 py-3 border border-gray-200 rounded-lg
+            focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            transition-all duration-200 ease-in-out
+            bg-white text-gray-900 placeholder-gray-500
+            hover:border-gray-300
+            ${error ? 'border-red-300 focus:ring-red-500' : ''}
+          `}
         >
           {options.map((option: any) => (
-            <option key={option.value} value={option.value} className="bg-black text-[var(--foreground)]">
+            <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
@@ -120,353 +134,592 @@ const EnhancedInput = memo(({
       ) : rows ? (
         <textarea
           value={value}
-          onChange={(e) => handleInputChange(field, e.target.value)}
-          onFocus={() => handleFocus(field)}
-          onBlur={handleBlur}
+          onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={rows}
-          className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 resize-none backdrop-blur-sm shadow-lg
-            ${focusedField === field
-              ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]'
-              : fieldErrors[field]
-                ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
-                : 'border-white/20 hover:border-white/40'
-            }`}
+          className={`w-full ${Icon ? 'pl-11' : 'pl-4'} pr-4 py-3 border border-gray-200 rounded-lg
+            focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            transition-all duration-200 ease-in-out
+            bg-white text-gray-900 placeholder-gray-500
+            hover:border-gray-300 resize-none
+            ${error ? 'border-red-300 focus:ring-red-500' : ''}
+          `}
         />
       ) : (
         <input
           type={type}
           value={value}
-          onChange={(e) => handleInputChange(field, e.target.value)}
-          onFocus={() => handleFocus(field)}
-          onBlur={handleBlur}
+          onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full bg-gradient-to-r from-[var(--glass-bg)] to-transparent border-2 transition-all duration-300 rounded-xl px-4 py-3 text-[var(--foreground)] placeholder-white/50 backdrop-blur-sm shadow-lg
-            ${focusedField === field
-              ? 'border-[var(--accent)] shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-[var(--accent-muted)]'
-              : fieldErrors[field]
-                ? 'border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
-                : 'border-white/20 hover:border-white/40'
-            }`}
+          className={`w-full ${Icon ? 'pl-11' : 'pl-4'} pr-4 py-3 border border-gray-200 rounded-lg
+            focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            transition-all duration-200 ease-in-out
+            bg-white text-gray-900 placeholder-gray-500
+            hover:border-gray-300
+            ${error ? 'border-red-300 focus:ring-red-500' : ''}
+          `}
         />
       )}
-      {fieldErrors[field] && (
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-red-400 text-xs mt-1 flex items-center gap-1"
-        >
-          <span className="w-1 h-1 bg-red-400 rounded-full"></span>
-          {fieldErrors[field]}
-        </motion.p>
-      )}
     </div>
+
+    {error && (
+      <motion.p
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-sm text-red-600 mt-1"
+      >
+        {error}
+      </motion.p>
+    )}
   </motion.div>
 ))
 
+// Skills Input Component
+const SkillsInput = memo(({ skills, onSkillsChange }: any) => {
+  const [inputValue, setInputValue] = useState('')
+
+  const addSkill = () => {
+    if (inputValue.trim() && !skills.includes(inputValue.trim())) {
+      onSkillsChange([...skills, inputValue.trim()])
+      setInputValue('')
+    }
+  }
+
+  const removeSkill = (skillToRemove: string) => {
+    onSkillsChange(skills.filter((skill: string) => skill !== skillToRemove))
+  }
+
+  return (
+    <motion.div className="space-y-3" variants={fadeInUp}>
+      <label className="block text-sm font-medium text-gray-700">
+        Required Skills
+      </label>
+
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+          placeholder="Add a skill (press Enter)"
+          className="flex-1 pl-4 pr-4 py-2 border border-gray-200 rounded-lg
+            focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            transition-all duration-200 ease-in-out
+            bg-white text-gray-900 placeholder-gray-500"
+        />
+        <Button
+          type="button"
+          onClick={addSkill}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {skills.length > 0 && (
+        <motion.div
+          className="flex flex-wrap gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          {skills.map((skill: string, index: number) => (
+            <motion.span
+              key={skill}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm border border-blue-200"
+            >
+              {skill}
+              <button
+                type="button"
+                onClick={() => removeSkill(skill)}
+                className="ml-1 hover:text-blue-900 transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </motion.span>
+          ))}
+        </motion.div>
+      )}
+    </motion.div>
+  )
+})
+
 export default function PostJobPage() {
   const router = useRouter()
+  const { showSuccess, showError } = useToast()
+  const [currentStep, setCurrentStep] = useState(1)
+  const [direction, setDirection] = useState(0)
   const [loading, setLoading] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const [currentStep, setCurrentStep] = useState(1)
-  const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     company_name: '',
     location: '',
-    work_type: 'remote',
-    budget_type: 'fixed',
+    category: 'technology',
     budget_min: '',
     budget_max: '',
-    currency: 'USD',
-    category: '',
-    requirements: '',
-    benefits: '',
-    skills_required: '',
-    experience_level: 'intermediate'
+    employment_type: 'full-time',
+    experience_level: 'intermediate',
+    compensation_type: 'project',
+    description: '',
+    skills: [] as string[]
   })
 
-  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
-  const [focusedField, setFocusedField] = useState<string>('')
+  const categoryOptions = [
+    { value: 'technology', label: 'Technology' },
+    { value: 'design', label: 'Design' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'sales', label: 'Sales' },
+    { value: 'finance', label: 'Finance' },
+    { value: 'operations', label: 'Operations' },
+    { value: 'other', label: 'Other' }
+  ]
 
-  const handleFocus = useCallback((field: string) => {
-    setFocusedField(field)
-  }, [])
+  const employmentTypeOptions = [
+    { value: 'full-time', label: 'Full-time' },
+    { value: 'part-time', label: 'Part-time' },
+    { value: 'contract', label: 'Contract' },
+    { value: 'freelance', label: 'Freelance' }
+  ]
 
-  const handleBlur = useCallback(() => {
-    setFocusedField('')
-  }, [])
+  const experienceLevelOptions = [
+    { value: 'entry', label: 'Entry Level' },
+    { value: 'intermediate', label: 'Mid Level' },
+    { value: 'expert', label: 'Senior Level' }
+  ]
 
-  useEffect(() => {
-    // Add some sparkle animations to the background
-    const sparkles = document.querySelectorAll('.sparkle-bg')
-    sparkles.forEach((sparkle, index) => {
-      setTimeout(() => {
-        sparkle.classList.add('animate-pulse')
-      }, index * 200)
-    })
-  }, [currentStep])
+  const compensationTypeOptions = [
+    { value: 'project', label: 'Fixed Project Price' },
+    { value: 'hourly', label: 'Hourly Rate' }
+  ]
 
-  const handleInputChange = useCallback((field: string, value: string) => {
+  const updateField = useCallback((field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-    // Clear field error when user starts typing
-    setFieldErrors(prev => {
-      if (prev[field]) {
-        return { ...prev, [field]: '' }
-      }
-      return prev
-    })
-  }, [])
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }, [errors])
 
-  const validateStep = useCallback((step: number) => {
-    const errors: {[key: string]: string} = {}
+  const validateStep = (step: number) => {
+    const stepFields = FORM_STEPS[step - 1].fields
+    const newErrors: Record<string, string> = {}
 
-    switch(step) {
-      case 1: // Job Basics
-        if (!formData.title.trim()) errors.title = 'Job title is required'
-        if (!formData.company_name.trim()) errors.company_name = 'Company name is required'
-        if (!formData.location.trim()) errors.location = 'Location is required'
-        if (!formData.category.trim()) errors.category = 'Category helps candidates find your job'
-        break
-      case 2: // Compensation
-        if (!formData.budget_min) errors.budget_min = 'Minimum budget is required'
-        if (!formData.budget_max) errors.budget_max = 'Maximum budget is required'
-        if (formData.budget_min && formData.budget_max &&
-            parseFloat(formData.budget_max) < parseFloat(formData.budget_min)) {
-          errors.budget_max = 'Maximum must be greater than minimum'
+    stepFields.forEach(field => {
+      if (field === 'skills') {
+        if (formData.skills.length === 0) {
+          newErrors[field] = 'At least one skill is required'
         }
-        break
-      case 3: // Details
-        if (!formData.description.trim()) errors.description = 'Job description is required'
-        if (!formData.skills_required.trim()) errors.skills_required = 'Required skills help match candidates'
-        break
+      } else if (!formData[field as keyof typeof formData]) {
+        newErrors[field] = 'This field is required'
+      }
+    })
+
+    if (step === 2) {
+      const min = parseFloat(formData.budget_min)
+      const max = parseFloat(formData.budget_max)
+      if (min && max && min >= max) {
+        newErrors.budget_max = 'Maximum budget must be greater than minimum'
+      }
     }
 
-    setFieldErrors(errors)
-    return Object.keys(errors).length === 0
-  }, [formData])
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCompletedSteps(prev => [...new Set([...prev, currentStep])])
-      setCurrentStep(prev => Math.min(prev + 1, 4))
+      setDirection(1)
+      setCurrentStep(prev => Math.min(prev + 1, FORM_STEPS.length))
     }
   }
 
   const prevStep = () => {
+    setDirection(-1)
     setCurrentStep(prev => Math.max(prev - 1, 1))
   }
 
   const goToStep = (step: number) => {
-    // Can only go to completed steps or next step
-    if (completedSteps.includes(step) || step === Math.max(...completedSteps, 0) + 1) {
-      setCurrentStep(step)
-    }
-  }
-
-  const validateForm = () => {
-    return validateStep(1) && validateStep(2) && validateStep(3)
+    setDirection(step > currentStep ? 1 : -1)
+    setCurrentStep(step)
   }
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return
-    }
+    if (!validateStep(3)) return
 
     try {
       setLoading(true)
-      
-      // Check if manager profile exists before proceeding
-      try {
-        await api.getManagerProfile()
-      } catch (profileError) {
-        console.warn('Manager profile check failed:', profileError.message)
-        if (profileError.message.includes('not found') || profileError.message.includes('profile not found')) {
-          alert('Please complete your manager profile first before posting jobs.')
-          router.push('/profile/manager-setup')
-          return
-        }
-      }
 
-      // Show payment modal instead of directly creating the job
+      // Check manager profile
+      await api.getManagerProfile()
+
+      // Show payment modal
       setShowPaymentModal(true)
-
-    } catch (error) {
-      console.error('Failed to validate job posting:', error)
-      alert('Please complete your manager profile first before posting jobs.')
-      router.push('/profile/manager-setup')
+    } catch (profileError: any) {
+      console.warn('Manager profile check failed:', profileError.message)
+      if (profileError.message.includes('not found') || profileError.message.includes('profile not found')) {
+        showError('Profile Required', 'Please complete your manager profile first before posting jobs.')
+        router.push('/profile/manager-setup')
+        return
+      }
     } finally {
       setLoading(false)
     }
   }
 
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
-    // Prevent duplicate submissions
-    if (loading) {
-      console.log('Job creation already in progress, skipping duplicate call')
-      return
-    }
-    // Prepare base job data
-    const baseJobData = {
-      title: formData.title,
-      description: formData.description,
-      budget_type: formData.budget_type,
-      budget_min: formData.budget_min ? parseFloat(formData.budget_min) : 0,
-      budget_max: formData.budget_max ? parseFloat(formData.budget_max) : 0,
-      currency: formData.currency,
-      category: formData.category,
-      experience_level: formData.experience_level,
-      skills: formData.skills_required.split(',').map(s => s.trim()).filter(Boolean)
-    }
-
-    // Determine the endpoint and job data based on payment type
-    let endpoint
-    let jobData
-
-    if (paymentIntentId === 'free_posting') {
-      // Free posting
-      endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs`
-      jobData = baseJobData
-    } else if (paymentIntentId === 'package_credits') {
-      // Using package credits
-      endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-package`
-      jobData = baseJobData
-    } else {
-      // Paid posting with Stripe
-      endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-payment`
-      jobData = { ...baseJobData, payment_intent_id: paymentIntentId }
-    }
-
+  const handleJobCreation = async (paymentIntentId: string) => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('auth_token')
+      console.log('Creating job with payment intent:', paymentIntentId) // Debug log
 
-      console.log('Creating job with data:', jobData)
-      console.log('Using endpoint:', endpoint)
+      const jobData = {
+        ...formData,
+        budget_min: parseFloat(formData.budget_min),
+        budget_max: parseFloat(formData.budget_max),
+        budget_type: formData.compensation_type === 'hourly' ? 'hourly' : 'fixed', // Map compensation_type to budget_type
+        status: 'open'
+      }
 
-      const response = await fetch(endpoint, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || localStorage.getItem('token')}`
         },
-        body: JSON.stringify(jobData)
+        body: JSON.stringify({
+          ...jobData,
+          payment_intent_id: paymentIntentId
+        })
       })
 
       if (!response.ok) {
         const errorData = await response.text()
-        console.error('Server response:', response.status, errorData)
+        console.error('Job creation error:', { status: response.status, data: errorData })
         throw new Error(`Failed to create job: ${response.status} - ${errorData}`)
       }
 
       const result = await response.json()
       console.log('Job creation result:', result)
-      alert(paymentIntentId === 'free_posting' ? 'Job created successfully!' : 'Job created successfully with payment!')
+      showSuccess('Job Created!', paymentIntentId === 'free_posting' ? 'Your job has been posted successfully.' : 'Your job has been posted and payment processed successfully.')
       router.push('/my-jobs')
 
     } catch (error) {
       console.error('Failed to create job:', error)
-      alert('Failed to create job: ' + (error instanceof Error ? error.message : 'Unknown error'))
+      showError('Job Creation Failed', (error instanceof Error ? error.message : 'Unknown error occurred while creating the job.'))
     } finally {
       setLoading(false)
     }
   }
 
-  const handlePreview = () => {
-    // TODO: Implement job preview functionality
-    console.log('Preview job:', formData)
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <motion.div
+            key="step1"
+            custom={direction}
+            variants={slideVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="space-y-6"
+          >
+            <div className="grid md:grid-cols-2 gap-6">
+              <ProfessionalInput
+                label="Job Title"
+                value={formData.title}
+                onChange={(value: string) => updateField('title', value)}
+                placeholder="e.g. Senior Frontend Developer"
+                icon={Target}
+                required
+                error={errors.title}
+              />
+
+              <ProfessionalInput
+                label="Company Name"
+                value={formData.company_name}
+                onChange={(value: string) => updateField('company_name', value)}
+                placeholder="Your company name"
+                icon={Building}
+                required
+                error={errors.company_name}
+              />
+
+              <ProfessionalInput
+                label="Location"
+                value={formData.location}
+                onChange={(value: string) => updateField('location', value)}
+                placeholder="Remote, New York, Global, etc."
+                icon={MapPin}
+                required
+                error={errors.location}
+              />
+
+              <ProfessionalInput
+                label="Category"
+                value={formData.category}
+                onChange={(value: string) => updateField('category', value)}
+                icon={Briefcase}
+                required
+                options={categoryOptions}
+                error={errors.category}
+              />
+            </div>
+          </motion.div>
+        )
+
+      case 2:
+        return (
+          <motion.div
+            key="step2"
+            custom={direction}
+            variants={slideVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="space-y-6"
+          >
+            <div className="grid md:grid-cols-2 gap-6">
+              <ProfessionalInput
+                label="Compensation Type"
+                value={formData.compensation_type}
+                onChange={(value: string) => updateField('compensation_type', value)}
+                icon={DollarSign}
+                required
+                options={compensationTypeOptions}
+                error={errors.compensation_type}
+              />
+
+              <div></div>
+
+              <ProfessionalInput
+                label={`Minimum ${formData.compensation_type === 'hourly' ? 'Hourly Rate' : 'Project Budget'} (USD)`}
+                value={formData.budget_min}
+                onChange={(value: string) => updateField('budget_min', value)}
+                placeholder={formData.compensation_type === 'hourly' ? '25' : '5000'}
+                type="number"
+                icon={DollarSign}
+                required
+                error={errors.budget_min}
+              />
+
+              <ProfessionalInput
+                label={`Maximum ${formData.compensation_type === 'hourly' ? 'Hourly Rate' : 'Project Budget'} (USD)`}
+                value={formData.budget_max}
+                onChange={(value: string) => updateField('budget_max', value)}
+                placeholder={formData.compensation_type === 'hourly' ? '100' : '15000'}
+                type="number"
+                icon={DollarSign}
+                required
+                error={errors.budget_max}
+              />
+
+              <ProfessionalInput
+                label="Employment Type"
+                value={formData.employment_type}
+                onChange={(value: string) => updateField('employment_type', value)}
+                icon={Clock}
+                required
+                options={employmentTypeOptions}
+                error={errors.employment_type}
+              />
+
+              <ProfessionalInput
+                label="Experience Level"
+                value={formData.experience_level}
+                onChange={(value: string) => updateField('experience_level', value)}
+                icon={Users}
+                required
+                options={experienceLevelOptions}
+                error={errors.experience_level}
+              />
+            </div>
+          </motion.div>
+        )
+
+      case 3:
+        return (
+          <motion.div
+            key="step3"
+            custom={direction}
+            variants={slideVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="space-y-6"
+          >
+            <ProfessionalInput
+              label="Job Description"
+              value={formData.description}
+              onChange={(value: string) => updateField('description', value)}
+              placeholder="Describe the role, responsibilities, and what you're looking for..."
+              rows={6}
+              required
+              error={errors.description}
+            />
+
+            <SkillsInput
+              skills={formData.skills}
+              onSkillsChange={(skills: string[]) => updateField('skills', skills)}
+            />
+            {errors.skills && (
+              <p className="text-sm text-red-600">{errors.skills}</p>
+            )}
+          </motion.div>
+        )
+
+      case 4:
+        return (
+          <motion.div
+            key="step4"
+            custom={direction}
+            variants={slideVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="space-y-6"
+          >
+            <div className="bg-gray-50 p-6 rounded-lg border">
+              <h3 className="text-lg font-semibold mb-4">Review Your Job Post</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-600">Job Title</p>
+                  <p className="font-medium">{formData.title}</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Company</p>
+                    <p className="font-medium">{formData.company_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Location</p>
+                    <p className="font-medium">{formData.location}</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      {formData.compensation_type === 'hourly' ? 'Hourly Rate Range' : 'Project Budget Range'}
+                    </p>
+                    <p className="font-medium">
+                      ${formData.budget_min} - ${formData.budget_max}
+                      {formData.compensation_type === 'hourly' ? '/hour' : ' total'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Compensation Type</p>
+                    <p className="font-medium">
+                      {formData.compensation_type === 'hourly' ? 'Hourly Rate' : 'Fixed Project Price'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Employment Type</p>
+                    <p className="font-medium capitalize">{formData.employment_type}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Experience Level</p>
+                    <p className="font-medium">
+                      {experienceLevelOptions.find(opt => opt.value === formData.experience_level)?.label || formData.experience_level}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600">Skills Required</p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {formData.skills.map((skill) => (
+                      <span key={skill} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600">Description</p>
+                  <p className="text-sm mt-1 line-clamp-3">{formData.description}</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )
+
+      default:
+        return null
+    }
   }
 
   return (
     <ProtectedRoute requiredRole={['manager']}>
       <DashboardLayout>
-        <div className="min-h-screen relative overflow-hidden">
-          {/* Animated Background */}
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--accent)]/20 rounded-full blur-3xl animate-pulse sparkle-bg"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse sparkle-bg"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-[var(--accent)]/5 to-transparent rounded-full sparkle-bg"></div>
-          </div>
-
-          <div className="relative z-10 max-w-6xl mx-auto p-6 space-y-8">
-            {/* Hero Header */}
-            <motion.div 
-              className="text-center space-y-6"
-              variants={staggerContainer}
-              initial="initial"
-              animate="animate"
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
+          <div className="max-w-4xl mx-auto px-4">
+            {/* Header */}
+            <motion.div
+              className="text-center mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-card border border-[var(--accent)]/30 text-[var(--accent)]">
-                <Sparkles className="h-5 w-5" />
-                <span className="font-medium">Create Your Perfect Job Post</span>
-              </motion.div>
-              
-              <motion.h1 variants={fadeInUp} className="text-5xl lg:text-6xl font-bold text-[var(--foreground)] leading-tight">
-                Find Your Next
-                <span className="text-[var(--accent)] drop-shadow-lg"> Game Changer</span>
-              </motion.h1>
-              
-              <motion.p variants={fadeInUp} className="text-xl text-[var(--foreground)]/70 max-w-3xl mx-auto leading-relaxed">
-                Craft a compelling job post that attracts top talent from around the world. 
-                Our guided process makes it easy and effective.
-              </motion.p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Post a New Job</h1>
+              <p className="text-gray-600">Create a compelling job post that attracts top talent</p>
             </motion.div>
 
             {/* Progress Steps */}
-            <motion.div 
-              className="max-w-4xl mx-auto"
-              variants={fadeInUp}
+            <motion.div
+              className="flex justify-center mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
             >
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center space-x-4">
                 {FORM_STEPS.map((step, index) => {
-                  const Icon = step.icon
                   const isActive = currentStep === step.id
-                  const isCompleted = completedSteps.includes(step.id)
-                  const isAccessible = completedSteps.includes(step.id) || step.id === Math.max(...completedSteps, 0) + 1
-                  
+                  const isCompleted = currentStep > step.id
+                  const Icon = step.icon
+
                   return (
                     <div key={step.id} className="flex items-center">
                       <motion.button
-                        onClick={() => isAccessible && goToStep(step.id)}
-                        className={`relative flex flex-col items-center group ${isAccessible ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                        whileHover={isAccessible ? { scale: 1.05 } : {}}
-                        whileTap={isAccessible ? { scale: 0.95 } : {}}
-                      >
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all duration-300 mb-3 shadow-lg
-                          ${isActive 
-                            ? 'bg-[var(--accent)] border-[var(--accent)] text-black shadow-[0_0_30px_rgba(212,175,55,0.5)]' 
+                        onClick={() => goToStep(step.id)}
+                        className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                          isActive
+                            ? 'bg-blue-100 text-blue-600'
                             : isCompleted
-                              ? 'bg-green-500 border-green-500 text-[var(--foreground)] shadow-[0_0_20px_rgba(34,197,94,0.3)]'
-                              : isAccessible
-                                ? 'bg-white/10 border-white/30 text-[var(--foreground)] hover:border-[var(--accent)] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]'
-                                : 'bg-white/5 border-white/20 text-[var(--foreground)]/50'
-                          }`}
-                        >
+                              ? 'bg-green-100 text-green-600'
+                              : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 mb-1 ${
+                          isActive
+                            ? 'border-blue-600 bg-blue-600 text-white'
+                            : isCompleted
+                              ? 'border-green-600 bg-green-600 text-white'
+                              : 'border-gray-300'
+                        }`}>
                           {isCompleted ? (
-                            <CheckCircle className="h-6 w-6" />
+                            <Check className="w-5 h-5" />
                           ) : (
-                            <Icon className="h-6 w-6" />
+                            <Icon className="w-5 h-5" />
                           )}
                         </div>
-                        <div className="text-center">
-                          <p className={`font-semibold text-sm transition-colors ${
-                            isActive ? 'text-[var(--accent)]' : isCompleted ? 'text-green-400' : 'text-[var(--foreground)]/70'
-                          }`}>
-                            {step.title}
-                          </p>
-                          <p className="text-xs text-[var(--foreground)]/50 mt-1">{step.description}</p>
-                        </div>
+                        <span className="text-xs font-medium">{step.title}</span>
                       </motion.button>
+
                       {index < FORM_STEPS.length - 1 && (
-                        <div className="flex-1 h-0.5 mx-4 bg-white/20 relative overflow-hidden">
-                          <motion.div 
-                            className={`h-full transition-all duration-500 ${
-                              completedSteps.includes(step.id) ? 'bg-[var(--accent)]' : 'bg-transparent'
-                            }`}
-                            {...(completedSteps.includes(step.id) && progressAnimation)}
-                          />
-                        </div>
+                        <div className={`w-8 h-0.5 mx-2 ${
+                          currentStep > step.id ? 'bg-green-300' : 'bg-gray-200'
+                        }`} />
                       )}
                     </div>
                   )
@@ -474,499 +727,73 @@ export default function PostJobPage() {
               </div>
             </motion.div>
 
-            {/* Form Content */}
-            <div className="max-w-4xl mx-auto">
-              <AnimatePresence mode="wait">
-                {currentStep === 1 && (
-                  <motion.div
-                    key="step1"
-                    {...slideIn}
-                    className="space-y-8"
-                  >
-                    <div className="glass-card rounded-2xl border border-white/20 p-8 shadow-2xl backdrop-blur-xl">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black">
-                          <Briefcase className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Job Basics</h2>
-                          <p className="text-[var(--foreground)]/60">Let's start with the fundamentals</p>
-                        </div>
-                      </div>
+            {/* Form Card */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="pb-4">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center"
+                >
+                  <CardTitle className="text-xl font-semibold text-gray-900">
+                    {FORM_STEPS[currentStep - 1].title}
+                  </CardTitle>
+                  <p className="text-gray-600 mt-1">
+                    {FORM_STEPS[currentStep - 1].subtitle}
+                  </p>
+                </motion.div>
+              </CardHeader>
 
-                      <motion.div 
-                        className="grid lg:grid-cols-2 gap-6"
-                        variants={staggerContainer}
-                        initial="initial"
-                        animate="animate"
-                      >
-                        <EnhancedInput
-                          field="title"
-                          label="Job Title"
-                          placeholder="e.g. Senior Full-Stack Developer"
-                          required
-                          icon={Target}
-                          value={formData.title}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <EnhancedInput
-                          field="company_name"
-                          label="Company Name"
-                          placeholder="Your amazing company"
-                          required
-                          icon={Building}
-                          value={formData.company_name}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <EnhancedInput
-                          field="location"
-                          label="Location"
-                          placeholder="Remote, New York, Global, etc."
-                          required
-                          icon={MapPin}
-                          value={formData.location}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <EnhancedInput
-                          field="category"
-                          label="Category"
-                          placeholder="e.g. Web Development, Design, Marketing"
-                          required
-                          icon={Globe}
-                          value={formData.category}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <EnhancedInput
-                          field="work_type"
-                          label="Work Type"
-                          icon={Users2}
-                          value={formData.work_type}
-                          options={[
-                            { value: 'remote', label: '🌍 Remote' },
-                            { value: 'hybrid', label: '🏢 Hybrid' },
-                            { value: 'onsite', label: '📍 On-site' }
-                          ]}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <EnhancedInput
-                          field="experience_level"
-                          label="Experience Level"
-                          icon={TrendingUp}
-                          value={formData.experience_level}
-                          options={[
-                            { value: 'entry', label: '🌱 Entry Level (0-2 years)' },
-                            { value: 'intermediate', label: '🚀 Intermediate (3-5 years)' },
-                            { value: 'expert', label: '⭐ Expert (5+ years)' }
-                          ]}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {currentStep === 2 && (
-                  <motion.div
-                    key="step2"
-                    {...slideIn}
-                    className="space-y-8"
-                  >
-                    <div className="glass-card rounded-2xl border border-white/20 p-8 shadow-2xl backdrop-blur-xl">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black">
-                          <DollarSign className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Compensation</h2>
-                          <p className="text-[var(--foreground)]/60">Define the value you bring</p>
-                        </div>
-                      </div>
-
-                      <motion.div 
-                        className="space-y-6"
-                        variants={staggerContainer}
-                        initial="initial"
-                        animate="animate"
-                      >
-                        <div className="grid lg:grid-cols-3 gap-6">
-                          <EnhancedInput
-                            field="budget_type"
-                            label="Budget Type"
-                            icon={Award}
-                            value={formData.budget_type}
-                            options={[
-                              { value: 'fixed', label: '💰 Fixed Project' },
-                              { value: 'hourly', label: '⏰ Hourly Rate' }
-                            ]}
-                            handleInputChange={handleInputChange}
-                            setFocusedField={setFocusedField}
-                            focusedField={focusedField}
-                            fieldErrors={fieldErrors}
-                          />
-
-                          <EnhancedInput
-                            field="currency"
-                            label="Currency"
-                            icon={Globe}
-                            value={formData.currency}
-                            options={[
-                              { value: 'USD', label: '🇺🇸 USD ($)' },
-                              { value: 'EUR', label: '🇪🇺 EUR (€)' },
-                              { value: 'GBP', label: '🇬🇧 GBP (£)' },
-                              { value: 'CAD', label: '🇨🇦 CAD ($)' }
-                            ]}
-                            handleInputChange={handleInputChange}
-                            setFocusedField={setFocusedField}
-                            focusedField={focusedField}
-                            fieldErrors={fieldErrors}
-                          />
-                        </div>
-
-                        <div className="grid lg:grid-cols-2 gap-6">
-                          <EnhancedInput
-                            field="budget_min"
-                            label={`Minimum ${formData.budget_type === 'hourly' ? 'Rate' : 'Budget'}`}
-                            placeholder={formData.budget_type === 'hourly' ? '25' : '5000'}
-                            type="number"
-                            required
-                            icon={TrendingUp}
-                            value={formData.budget_min}
-                            handleInputChange={handleInputChange}
-                            setFocusedField={setFocusedField}
-                            focusedField={focusedField}
-                            fieldErrors={fieldErrors}
-                          />
-
-                          <EnhancedInput
-                            field="budget_max"
-                            label={`Maximum ${formData.budget_type === 'hourly' ? 'Rate' : 'Budget'}`}
-                            placeholder={formData.budget_type === 'hourly' ? '75' : '15000'}
-                            type="number"
-                            required
-                            icon={Star}
-                            value={formData.budget_max}
-                            handleInputChange={handleInputChange}
-                            setFocusedField={setFocusedField}
-                            focusedField={focusedField}
-                            fieldErrors={fieldErrors}
-                          />
-                        </div>
-
-                        <EnhancedInput
-                          field="benefits"
-                          label="Benefits & Perks"
-                          placeholder="Health insurance, flexible PTO, equity, remote work stipend..."
-                          icon={Heart}
-                          rows={4}
-                          value={formData.benefits}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <motion.div 
-                          className="p-6 bg-gradient-to-r from-[var(--accent)]/10 to-transparent rounded-xl border border-[var(--accent)]/20"
-                          variants={fadeInUp}
-                        >
-                          <div className="flex items-center gap-3 mb-2">
-                            <Zap className="h-5 w-5 text-[var(--accent)]" />
-                            <span className="font-semibold text-[var(--foreground)]">Pro Tip</span>
-                          </div>
-                          <p className="text-[var(--foreground)]/80 text-sm">
-                            Transparent salary ranges attract 3x more qualified applications. Be competitive and honest about your budget.
-                          </p>
-                        </motion.div>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {currentStep === 3 && (
-                  <motion.div
-                    key="step3"
-                    {...slideIn}
-                    className="space-y-8"
-                  >
-                    <div className="glass-card rounded-2xl border border-white/20 p-8 shadow-2xl backdrop-blur-xl">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black">
-                          <FileText className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Job Details</h2>
-                          <p className="text-[var(--foreground)]/60">Paint the complete picture</p>
-                        </div>
-                      </div>
-
-                      <motion.div 
-                        className="space-y-6"
-                        variants={staggerContainer}
-                        initial="initial"
-                        animate="animate"
-                      >
-                        <EnhancedInput
-                          field="description"
-                          label="Job Description"
-                          placeholder="Describe the role, responsibilities, and what makes this position exciting. Be specific about day-to-day tasks and growth opportunities..."
-                          required
-                          icon={FileText}
-                          rows={6}
-                          value={formData.description}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <EnhancedInput
-                          field="requirements"
-                          label="Requirements & Qualifications"
-                          placeholder="List the key requirements, qualifications, and experience needed. Include must-haves and nice-to-haves..."
-                          icon={CheckCircle}
-                          rows={4}
-                          value={formData.requirements}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <EnhancedInput
-                          field="skills_required"
-                          label="Required Skills"
-                          placeholder="React, TypeScript, Node.js, AWS, Docker (comma separated)"
-                          required
-                          icon={Zap}
-                          value={formData.skills_required}
-                          handleInputChange={handleInputChange}
-                          handleFocus={handleFocus}
-                          handleBlur={handleBlur}
-                          focusedField={focusedField}
-                          fieldErrors={fieldErrors}
-                        />
-
-                        <motion.div 
-                          className="p-6 bg-gradient-to-r from-purple-500/10 to-transparent rounded-xl border border-purple-500/20"
-                          variants={fadeInUp}
-                        >
-                          <div className="flex items-center gap-3 mb-2">
-                            <Sparkles className="h-5 w-5 text-purple-400" />
-                            <span className="font-semibold text-[var(--foreground)]">Writing Tip</span>
-                          </div>
-                          <p className="text-[var(--foreground)]/80 text-sm">
-                            Great job descriptions tell a story. Focus on impact, growth opportunities, and what makes working at your company special.
-                          </p>
-                        </motion.div>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {currentStep === 4 && (
-                  <motion.div
-                    key="step4"
-                    {...slideIn}
-                    className="space-y-8"
-                  >
-                    <div className="glass-card rounded-2xl border border-white/20 p-8 shadow-2xl backdrop-blur-xl">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black">
-                          <Eye className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h2 className="text-2xl font-bold text-[var(--foreground)]">Review & Launch</h2>
-                          <p className="text-[var(--foreground)]/60">Perfect your job post before going live</p>
-                        </div>
-                      </div>
-
-                      <motion.div 
-                        className="space-y-6"
-                        variants={staggerContainer}
-                        initial="initial"
-                        animate="animate"
-                      >
-                        {/* Job Preview */}
-                        <div className="bg-gradient-to-r from-white/5 to-transparent p-6 rounded-xl border border-white/10">
-                          <h3 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
-                            <Eye className="h-5 w-5 text-[var(--accent)]" />
-                            Preview
-                          </h3>
-                          <div className="space-y-4">
-                            <div>
-                              <h4 className="text-2xl font-bold text-[var(--accent)]">{formData.title || 'Your Job Title'}</h4>
-                              <p className="text-[var(--foreground)]/70">{formData.company_name} • {formData.location} • {formData.work_type}</p>
-                            </div>
-                            
-                            <div className="flex items-center gap-4 text-sm">
-                              <span className="px-3 py-1 bg-[var(--accent)]/20 text-[var(--accent)] rounded-full">
-                                {formData.category || 'Category'}
-                              </span>
-                              <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full">
-                                {formData.experience_level} level
-                              </span>
-                              <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full">
-                                {formData.budget_min && formData.budget_max 
-                                  ? `${formData.currency} ${formData.budget_min} - ${formData.budget_max}${formData.budget_type === 'hourly' ? '/hr' : ''}`
-                                  : 'Budget TBD'
-                                }
-                              </span>
-                            </div>
-                            
-                            {formData.description && (
-                              <div>
-                                <p className="text-[var(--foreground)]/80 line-clamp-3">{formData.description}</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Job Summary */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <motion.div
-                            className="bg-gradient-to-r from-[var(--accent)]/10 to-transparent p-6 rounded-xl border border-[var(--accent)]/20"
-                            variants={fadeInUp}
-                          >
-                            <h4 className="text-lg font-semibold text-[var(--foreground)] mb-3">Compensation</h4>
-                            <div className="space-y-2">
-                              <p className="text-[var(--foreground)]/80">
-                                <span className="font-medium">Type:</span> {formData.budget_type === 'hourly' ? 'Hourly Rate' : 'Fixed Project'}
-                              </p>
-                              <p className="text-[var(--foreground)]/80">
-                                <span className="font-medium">Range:</span> {formData.currency} ${formData.budget_min || '0'} - ${formData.budget_max || '0'}
-                                {formData.budget_type === 'hourly' ? '/hour' : ''}
-                              </p>
-                            </div>
-                          </motion.div>
-
-                          <motion.div
-                            className="bg-gradient-to-r from-green-500/10 to-transparent p-6 rounded-xl border border-green-500/20"
-                            variants={fadeInUp}
-                          >
-                            <h4 className="text-lg font-semibold text-[var(--foreground)] mb-3">Requirements</h4>
-                            <div className="space-y-2">
-                              <p className="text-[var(--foreground)]/80">
-                                <span className="font-medium">Level:</span> {formData.experience_level || 'Not specified'}
-                              </p>
-                              <p className="text-[var(--foreground)]/80">
-                                <span className="font-medium">Skills:</span> {formData.skills_required || 'Not specified'}
-                              </p>
-                            </div>
-                          </motion.div>
-                        </div>
-
-                        <motion.div 
-                          className="p-6 bg-gradient-to-r from-green-500/10 to-transparent rounded-xl border border-green-500/20"
-                          variants={fadeInUp}
-                        >
-                          <div className="flex items-center gap-3 mb-2">
-                            <Rocket className="h-5 w-5 text-green-400" />
-                            <span className="font-semibold text-[var(--foreground)]">Ready to Launch!</span>
-                          </div>
-                          <p className="text-[var(--foreground)]/80 text-sm">
-                            Your job post looks great! Once you submit, it will be published immediately and visible to talented freelancers.
-                          </p>
-                        </motion.div>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Navigation Buttons */}
-              <motion.div 
-                className="flex items-center justify-between pt-8"
-                variants={fadeInUp}
-              >
-                <div>
-                  {currentStep > 1 && (
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={prevStep}
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Previous
-                    </Button>
-                  )}
+              <CardContent className="pt-4">
+                <div className="min-h-[400px]">
+                  <AnimatePresence mode="wait" custom={direction}>
+                    {renderStepContent()}
+                  </AnimatePresence>
                 </div>
-                
-                <div className="flex items-center gap-4">
-                  {currentStep < 4 ? (
-                    <Button 
-                      type="button" 
+
+                {/* Navigation */}
+                <div className="flex justify-between mt-8 pt-6 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={prevStep}
+                    disabled={currentStep === 1}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+
+                  {currentStep < FORM_STEPS.length ? (
+                    <Button
                       onClick={nextStep}
-                      className="bg-[var(--accent)] text-black hover:bg-[var(--accent-dark)] flex items-center gap-2 px-8 py-3"
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
                     >
-                      Continue
-                      <ArrowRight className="h-4 w-4" />
+                      Next
+                      <ArrowRight className="w-4 h-4" />
                     </Button>
                   ) : (
                     <Button
-                      type="button"
                       onClick={handleSubmit}
                       disabled={loading}
-                      className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-black hover:from-[var(--accent-dark)] hover:to-[var(--accent)] flex items-center gap-2 px-8 py-3 shadow-[0_0_30px_rgba(212,175,55,0.3)]"
+                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
                     >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
-                          Launching...
-                        </>
-                      ) : (
-                        <>
-                          <Rocket className="h-4 w-4" />
-                          Launch Job Post
-                        </>
-                      )}
+                      {loading ? 'Creating...' : 'Create Job Post'}
+                      <Zap className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
-              </motion.div>
-            </div>
-
-            {/* Payment Modal */}
-            <JobPaymentModal 
-              isOpen={showPaymentModal}
-              onClose={() => setShowPaymentModal(false)}
-              onPaymentSuccess={handlePaymentSuccess}
-              jobTitle={formData.title}
-            />
+              </CardContent>
+            </Card>
           </div>
         </div>
+
+        <JobPaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          jobData={formData}
+          onSuccess={handleJobCreation}
+        />
       </DashboardLayout>
     </ProtectedRoute>
   )

@@ -31,6 +31,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { ProtectedRoute } from '@/components/layout/protected-route'
+import { RoleSwitcher } from '@/components/profile/role-switcher'
 import { useAuthStore } from '@/store/auth'
 import { api } from '@/lib/api'
 
@@ -724,6 +725,19 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           </motion.div>
+
+          {/* Role Switcher */}
+          {user && (
+            <motion.div {...fadeInUp}>
+              <RoleSwitcher
+                currentRole={user.role}
+                userEmail={user.email}
+                onRoleChange={(newRole) => {
+                  // The component handles the refresh automatically
+                }}
+              />
+            </motion.div>
+          )}
 
           {/* Data Management */}
           <motion.div {...fadeInUp}>

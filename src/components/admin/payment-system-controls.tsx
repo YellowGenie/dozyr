@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useConfirmation } from '@/hooks/useConfirmation';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -24,6 +26,7 @@ interface PaymentSystemControlsProps {
 }
 
 export function PaymentSystemControls({ systemStatus, onUpdate }: PaymentSystemControlsProps) {
+  const confirmation = useConfirmation();
   const [loading, setLoading] = useState(false);
   const [settings, setSettings] = useState({
     payment_system_enabled: systemStatus.enabled,
@@ -66,11 +69,17 @@ export function PaymentSystemControls({ systemStatus, onUpdate }: PaymentSystemC
   };
 
   const handleEmergencyShutdown = async () => {
-    if (!confirm('Are you sure you want to initiate emergency shutdown? This will immediately disable all payment processing.')) {
-      return;
-    }
-
-    await updateSetting('emergency_shutdown', true, 'Emergency shutdown initiated by admin');
+    await confirmation.confirm(
+      async () => {
+        await updateSetting('emergency_shutdown', true, 'Emergency shutdown initiated by admin');
+      },
+      {
+        title: 'Emergency Shutdown',
+        description: 'Are you sure you want to initiate emergency shutdown? This will immediately disable all payment processing.',
+        confirmText: 'Shutdown',
+        variant: 'destructive'
+      }
+    );
   };
 
   const getStatusBadge = (status: string) => {
@@ -309,6 +318,18 @@ export function PaymentSystemControls({ systemStatus, onUpdate }: PaymentSystemC
           </div>
         </CardContent>
       </Card>
+
+      <ConfirmationDialog
+        open={confirmation.isOpen}
+        onOpenChange={confirmation.setIsOpen}
+        title={confirmation.options.title}
+        description={confirmation.options.description}
+        confirmText={confirmation.options.confirmText}
+        cancelText={confirmation.options.cancelText}
+        variant={confirmation.options.variant}
+        onConfirm={confirmation.onConfirm}
+        loading={confirmation.loading}
+      />
     </div>
   );
 }
