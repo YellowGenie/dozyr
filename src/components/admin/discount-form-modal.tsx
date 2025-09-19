@@ -244,7 +244,7 @@ export function DiscountFormModal({
                 value={formData.code}
                 onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
                 placeholder="SAVE20"
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
+                className=""
                 disabled={isSubmitting || isLoading}
               />
               {errors.code && <p className="text-red-400 text-sm">{errors.code}</p>}
@@ -255,7 +255,7 @@ export function DiscountFormModal({
                 Status *
               </Label>
               <Select value={formData.status} onValueChange={(value: any) => setFormData(prev => ({ ...prev, status: value }))}>
-                <SelectTrigger className="bg-dozyr-medium-gray border-dozyr-light-gray text-black">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -277,7 +277,7 @@ export function DiscountFormModal({
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="20% Off Special Offer"
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
+              className=""
               disabled={isSubmitting || isLoading}
             />
             {errors.name && <p className="text-red-400 text-sm">{errors.name}</p>}
@@ -293,7 +293,7 @@ export function DiscountFormModal({
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Brief description of this discount..."
               rows={3}
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
+              className=""
               disabled={isSubmitting || isLoading}
             />
           </div>
@@ -305,7 +305,7 @@ export function DiscountFormModal({
                 Discount Type *
               </Label>
               <Select value={formData.type} onValueChange={(value: any) => setFormData(prev => ({ ...prev, type: value }))}>
-                <SelectTrigger className="bg-dozyr-medium-gray border-dozyr-light-gray text-black">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -328,7 +328,7 @@ export function DiscountFormModal({
                 step={formData.type === 'percentage' ? "1" : "0.01"}
                 value={formData.value}
                 onChange={(e) => setFormData(prev => ({ ...prev, value: parseFloat(e.target.value) || 0 }))}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black"
+                className=""
                 disabled={isSubmitting || isLoading}
               />
               {errors.value && <p className="text-red-400 text-sm">{errors.value}</p>}
@@ -363,7 +363,7 @@ export function DiscountFormModal({
                   min_purchase_amount: e.target.value ? parseFloat(e.target.value) : null 
                 }))}
                 placeholder="0.00"
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
+                className=""
                 disabled={isSubmitting || isLoading}
               />
               {errors.min_purchase_amount && <p className="text-red-400 text-sm">{errors.min_purchase_amount}</p>}
@@ -383,7 +383,7 @@ export function DiscountFormModal({
                   max_uses: e.target.value ? parseInt(e.target.value) : null 
                 }))}
                 placeholder="Unlimited"
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-black placeholder-dozyr-light-gray"
+                className=""
                 disabled={isSubmitting || isLoading}
               />
               {errors.max_uses && <p className="text-red-400 text-sm">{errors.max_uses}</p>}
@@ -399,7 +399,7 @@ export function DiscountFormModal({
               type="datetime-local"
               value={formData.expires_at}
               onChange={(e) => setFormData(prev => ({ ...prev, expires_at: e.target.value }))}
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-black"
+              className=""
               disabled={isSubmitting || isLoading}
             />
           </div>

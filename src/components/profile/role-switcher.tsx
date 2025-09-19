@@ -218,15 +218,6 @@ export function RoleSwitcher({ currentRole, userEmail, onRoleChange }: RoleSwitc
           </div>
         </div>
 
-        {/* Admin Restriction Notice */}
-        {!canSwitchToAdmin && (
-          <Alert>
-            <AlertTriangle className="w-4 h-4" />
-            <AlertDescription>
-              Admin role is restricted to @yellowgenie.io email addresses only.
-            </AlertDescription>
-          </Alert>
-        )}
 
         {/* Help Text */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

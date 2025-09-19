@@ -183,7 +183,6 @@ export function PackageFormModal({
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="e.g., Professional Pack"
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
             />
             {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
           </div>
@@ -196,7 +195,6 @@ export function PackageFormModal({
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Describe what this package offers..."
-              className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               rows={3}
             />
             {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
@@ -213,7 +211,6 @@ export function PackageFormModal({
                 min="0"
                 value={formData.price}
                 onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.price && <p className="text-red-400 text-sm mt-1">{errors.price}</p>}
             </div>
@@ -225,7 +222,6 @@ export function PackageFormModal({
                 min="1"
                 value={formData.duration_days}
                 onChange={(e) => handleInputChange('duration_days', parseInt(e.target.value) || 30)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.duration_days && <p className="text-red-400 text-sm mt-1">{errors.duration_days}</p>}
             </div>
@@ -241,7 +237,6 @@ export function PackageFormModal({
                 min="1"
                 value={formData.post_credits}
                 onChange={(e) => handleInputChange('post_credits', parseInt(e.target.value) || 0)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.post_credits && <p className="text-red-400 text-sm mt-1">{errors.post_credits}</p>}
             </div>
@@ -253,7 +248,6 @@ export function PackageFormModal({
                 min="0"
                 value={formData.featured_credits}
                 onChange={(e) => handleInputChange('featured_credits', parseInt(e.target.value) || 0)}
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)]"
               />
               {errors.featured_credits && <p className="text-red-400 text-sm mt-1">{errors.featured_credits}</p>}
             </div>
@@ -268,7 +262,7 @@ export function PackageFormModal({
                 onChange={(e) => setNewFeature(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Add a feature..."
-                className="bg-dozyr-medium-gray border-dozyr-light-gray text-[var(--foreground)] flex-1"
+                className="flex-1"
               />
               <Button type="button" onClick={addFeature} size="sm">
                 <Plus className="h-4 w-4" />

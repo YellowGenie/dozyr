@@ -999,33 +999,39 @@ class ApiClient {
 
   // Admin Job Management
   async getAdminJobs(filters?: {
-    status?: string;
-    category?: string;
-    location?: string;
-    salary_min?: number;
-    salary_max?: number;
-    date_from?: string;
-    date_to?: string;
+    admin_status?: string;
     search?: string;
     sort_by?: string;
     sort_order?: 'asc' | 'desc';
+    page?: number;
     limit?: number;
-    offset?: number;
+    company?: string;
+    manager?: string;
+    dateRange?: string;
   }): Promise<{
     jobs: Array<Job & {
+      admin_status?: 'pending' | 'approved' | 'rejected' | 'inappropriate' | 'hidden';
+      admin_notes?: string;
+      admin_reviewed_at?: string;
+      admin_reviewed_by?: any;
+      company_name: string;
       manager_name: string;
-      applications_count: number;
-      views_count: number;
-      clicks_count: number;
+      manager_email: string;
+      application_count: number;
+      analytics: {
+        views: number;
+        clicks: number;
+        applications: number;
+        declined: number;
+        successful: number;
+        conversionRate: number;
+      };
     }>;
     total: number;
-    analytics: {
-      total_jobs: number;
-      active_jobs: number;
-      pending_jobs: number;
-      rejected_jobs: number;
-      avg_applications_per_job: number;
-    };
+    page: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   }> {
     const params = new URLSearchParams()
     if (filters) {
@@ -1035,22 +1041,61 @@ class ApiClient {
         }
       })
     }
-    
+
     const endpoint = `/admin/jobs${params.toString() ? `?${params.toString()}` : ''}`
     return this.request(endpoint)
   }
 
-  async updateAdminJobStatus(jobId: string, status: 'active' | 'inactive' | 'pending' | 'rejected', reason?: string): Promise<Job> {
-    return this.request(`/admin/jobs/${jobId}/status`, {
+  async getAdminJobDetails(jobId: string): Promise<{
+    job: Job & {
+      admin_status?: 'pending' | 'approved' | 'rejected' | 'inappropriate' | 'hidden';
+      admin_notes?: string;
+      admin_reviewed_at?: string;
+      admin_reviewed_by?: any;
+      company_name: string;
+      manager_name: string;
+      manager_email: string;
+    };
+    applications: Array<{
+      id: string;
+      cover_letter: string;
+      bid_amount: number;
+      timeline_days: number;
+      status: string;
+      applied_at: string;
+      updated_at: string;
+      talent: {
+        id: string;
+        name: string;
+        email: string;
+        title: string;
+        hourly_rate: number;
+      };
+    }>;
+  }> {
+    return this.request(`/admin/jobs/${jobId}`)
+  }
+
+  async getJobApplications(jobId: string, page = 1, limit = 20): Promise<{
+    proposals: Array<any>;
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    return this.request(`/admin/jobs/${jobId}/applications?page=${page}&limit=${limit}`)
+  }
+
+  async updateJobAdminStatus(jobId: string, admin_status: 'pending' | 'approved' | 'rejected' | 'inappropriate' | 'hidden', admin_notes?: string): Promise<{ message: string }> {
+    return this.request(`/admin/jobs/${jobId}/admin-status`, {
       method: 'PUT',
-      body: JSON.stringify({ status, reason }),
+      body: JSON.stringify({ admin_status, admin_notes }),
     })
   }
 
-  async bulkUpdateJobsStatus(jobIds: string[], status: 'active' | 'inactive' | 'pending' | 'rejected', reason?: string): Promise<{ updated: number }> {
+  async bulkUpdateJobsStatus(jobIds: string[], admin_status: 'approved' | 'rejected' | 'inappropriate' | 'hidden', admin_notes?: string): Promise<{ message: string; updated_count: number }> {
     return this.request('/admin/jobs/bulk-update', {
-      method: 'PUT',
-      body: JSON.stringify({ job_ids: jobIds, status, reason }),
+      method: 'POST',
+      body: JSON.stringify({ job_ids: jobIds, admin_status, admin_notes }),
     })
   }
 
@@ -1095,6 +1140,47 @@ class ApiClient {
     await this.request(`/admin/job-reports/${reportId}/resolve`, {
       method: 'POST',
       body: JSON.stringify({ action, notes }),
+    })
+  }
+
+  // Admin Settings Management
+  async getAdminSettings(category?: string): Promise<{
+    settings: Array<{
+      key: string;
+      value: any;
+      description: string;
+      category: string;
+      updated_by: any;
+      updated_at: string;
+    }>;
+  }> {
+    const endpoint = category ? `/admin/settings?category=${category}` : '/admin/settings'
+    return this.request(endpoint)
+  }
+
+  async getJobApprovalSettings(): Promise<{
+    auto_approval: boolean;
+    requires_manual_review: boolean;
+    review_time_hours: number;
+  }> {
+    return this.request('/admin/settings/job-approval')
+  }
+
+  async updateJobApprovalSettings(settings: {
+    auto_approval?: boolean;
+    requires_manual_review?: boolean;
+    review_time_hours?: number;
+  }): Promise<{
+    message: string;
+    settings: {
+      auto_approval: boolean;
+      requires_manual_review: boolean;
+      review_time_hours: number;
+    };
+  }> {
+    return this.request('/admin/settings/job-approval', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
     })
   }
 

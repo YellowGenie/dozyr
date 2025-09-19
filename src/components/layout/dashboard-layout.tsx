@@ -28,7 +28,8 @@ import {
   Wallet,
   HelpCircle,
   Bot,
-  DollarSign
+  DollarSign,
+  UserPlus
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -83,7 +84,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     const baseItems = [
       { href: '/dashboard', icon: Home, label: 'Dashboard' },
       { href: '/messages', icon: MessageSquare, label: 'Messages' },
-      { href: '/interviews', icon: Star, label: 'Interviews' },
     ]
 
     if (user?.role === 'talent') {
@@ -91,11 +91,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         ...baseItems.slice(0, 1), // Dashboard
         { href: '/jobs', icon: Briefcase, label: 'Find Jobs' },
         { href: '/applications', icon: BarChart3, label: 'Applications' },
-        { href: '/contracts', icon: FileSignature, label: 'Contracts', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
+        { href: '/recruitment', icon: UserPlus, label: 'Recruitment', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
         { href: '/profile/edit', icon: Edit3, label: 'Edit Profile' },
         { href: `/talent/${user.id}`, icon: Eye, label: 'Public Profile', external: true },
         { href: '/messages', icon: MessageSquare, label: 'Messages' },
-        { href: '/interviews', icon: Star, label: 'Interviews' },
       ]
     }
 
@@ -105,10 +104,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { href: '/jobs/post', icon: Briefcase, label: 'Post Jobs' },
         { href: '/talent', icon: Users, label: 'Find Talent' },
         { href: '/my-jobs', icon: BarChart3, label: 'My Jobs', badge: newProposalsCount > 0 ? newProposalsCount : undefined },
-        { href: '/contracts', icon: FileSignature, label: 'Contracts', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
+        { href: '/recruitment', icon: UserPlus, label: 'Recruitment', badge: contractNotificationsCount > 0 ? contractNotificationsCount : undefined },
         { href: '/payments', icon: CreditCard, label: 'Payments' },
         { href: '/messages', icon: MessageSquare, label: 'Messages' },
-        { href: '/interviews', icon: Star, label: 'Interviews' },
       ]
     }
 
@@ -117,14 +115,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         ...baseItems.slice(0, 1), // Dashboard (will show admin content)
         { href: '/admin/users', icon: Users, label: 'Users' },
         { href: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
-        { href: '/admin/proposals', icon: FileText, label: 'Proposals' },
-        { href: '/admin/contracts', icon: FileSignature, label: 'Contracts' },
+        { href: '/recruitment', icon: UserPlus, label: 'Recruitment' },
         { href: '/admin/escrows', icon: Wallet, label: 'Escrows' },
         { href: '/admin/payments', icon: DollarSign, label: 'Payments' },
         { href: '/admin/notifications', icon: Mail, label: 'Notifications' },
         { href: '/admin/ai-management', icon: Bot, label: 'AI Management' },
         { href: '/messages', icon: MessageSquare, label: 'Messages' },
-        { href: '/interviews', icon: Star, label: 'Interviews' },
       ]
     }
 
