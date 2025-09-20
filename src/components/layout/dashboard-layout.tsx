@@ -39,6 +39,9 @@ import { Omnisearch } from '@/components/search/Omnisearch'
 import { useProposalNotifications } from '@/hooks/useProposalNotifications'
 import { useContractNotifications } from '@/hooks/useContractNotifications'
 import { AIAssistant } from '@/components/ai/ai-assistant'
+import { ProfileCompletionWorkflow } from '@/components/profile/profile-completion-workflow'
+import { shouldShowCompletionWorkflow } from '@/lib/profile-completion'
+import { api } from '@/lib/api'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -53,6 +56,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [imageKey, setImageKey] = useState(0) // Force re-render when profile image changes
   const { newProposalsCount } = useProposalNotifications()
   const { unreadCount: contractNotificationsCount } = useContractNotifications()
+
+  // Profile completion workflow state
+  const [talentProfile, setTalentProfile] = useState(null)
+  const [isProfileWorkflowOpen, setIsProfileWorkflowOpen] = useState(false)
+  const [hasCheckedProfileCompletion, setHasCheckedProfileCompletion] = useState(false)
+
   // Removed old search - now using Omnisearch component
 
   // Force re-render when user profile image changes
@@ -70,6 +79,39 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     window.addEventListener('profile-image-updated', handleProfileImageUpdate)
     return () => window.removeEventListener('profile-image-updated', handleProfileImageUpdate)
   }, [])
+
+  // Check profile completion for talent users
+  useEffect(() => {
+    const checkProfileCompletion = async () => {
+      if (!user || user.role !== 'talent' || hasCheckedProfileCompletion) return
+
+      try {
+        const profile = await api.getTalentProfile(user.id)
+        setTalentProfile(profile)
+
+        // Only show workflow automatically on first login/dashboard visit
+        // and not on profile-related pages to avoid interrupting user flow
+        const isProfilePage = pathname.includes('/profile') || pathname.includes('/settings')
+
+        if (!isProfilePage && shouldShowCompletionWorkflow(profile)) {
+          // Small delay to let the dashboard load first
+          setTimeout(() => {
+            setIsProfileWorkflowOpen(true)
+          }, 1000)
+        }
+      } catch (error) {
+        console.error('Failed to fetch talent profile:', error)
+      } finally {
+        setHasCheckedProfileCompletion(true)
+      }
+    }
+
+    checkProfileCompletion()
+  }, [user, hasCheckedProfileCompletion, pathname])
+
+  const handleProfileUpdate = (updatedProfile: any) => {
+    setTalentProfile(updatedProfile)
+  }
 
   const handleLogout = async () => {
     try {
@@ -290,6 +332,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </motion.div>
               </Link>
 
+              <Link href="/profile">
+                <motion.div
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                  title="Profile"
+                >
+                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                </motion.div>
+              </Link>
+
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                title="Notifications"
+              >
+                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+              </motion.div>
+
               <motion.div
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
@@ -302,16 +365,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 }}
               >
                 <HelpCircle className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
-                title="Notifications"
-              >
-                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
               </motion.div>
             </div>
           </div>
@@ -409,6 +462,29 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </motion.div>
               </Link>
 
+              <Link href="/profile">
+                <motion.div
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                  title="Profile"
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                </motion.div>
+              </Link>
+
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
+                title="Notifications"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+              </motion.div>
+
               <motion.div
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
@@ -422,17 +498,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 }}
               >
                 <HelpCircle className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
-                title="Notifications"
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
               </motion.div>
             </div>
           </div>
@@ -460,24 +525,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <Link href="/profile">
-                <motion.div
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]"
-                  title="Profile"
-                >
-                  <User className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                </motion.div>
-              </Link>
-
-              <div
+              <motion.div
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
                 className="relative flex items-center justify-center w-10 h-10 rounded-md bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-[var(--primary)]"
                 title="AI Assistant"
                 onClick={() => setIsAIAssistantOpen(true)}
               >
                 <Bot className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-              </div>
+              </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.1, y: -2 }}
@@ -503,6 +559,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         isOpen={isAIAssistantOpen}
         onClose={() => setIsAIAssistantOpen(false)}
       />
+
+      {/* Profile Completion Workflow */}
+      {user?.role === 'talent' && (
+        <ProfileCompletionWorkflow
+          isOpen={isProfileWorkflowOpen}
+          onClose={() => setIsProfileWorkflowOpen(false)}
+          profile={talentProfile}
+          onProfileUpdate={handleProfileUpdate}
+        />
+      )}
     </div>
   )
 }
