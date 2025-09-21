@@ -81,7 +81,7 @@ export default function ContractList({
 
   const fetchContracts = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) throw new Error('No authentication token')
 
       const response = await fetch('/api/v1/contracts', {

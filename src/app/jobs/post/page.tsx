@@ -383,16 +383,32 @@ export default function PostJobPage() {
         status: 'open'
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`, {
+      let endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs`
+      let requestBody = { ...jobData }
+
+      // Determine which endpoint to use based on payment type
+      if (paymentIntentId === 'package_credits') {
+        // Use package credits endpoint
+        endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-package`
+        // Don't include payment_intent_id for package credits
+      } else if (paymentIntentId === 'free_posting') {
+        // Use regular endpoint for free posting
+        // Don't include payment_intent_id for free posting
+      } else {
+        // Use payment-based endpoint
+        endpoint = `${process.env.NEXT_PUBLIC_API_URL}/jobs/create-with-payment`
+        requestBody.payment_intent_id = paymentIntentId
+      }
+
+      console.log('Using endpoint:', endpoint)
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token') || localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || localStorage.getItem('auth_token')}`
         },
-        body: JSON.stringify({
-          ...jobData,
-          payment_intent_id: paymentIntentId
-        })
+        body: JSON.stringify(requestBody)
       })
 
       if (!response.ok) {
@@ -403,7 +419,16 @@ export default function PostJobPage() {
 
       const result = await response.json()
       console.log('Job creation result:', result)
-      showSuccess('Job Created!', paymentIntentId === 'free_posting' ? 'Your job has been posted successfully.' : 'Your job has been posted and payment processed successfully.')
+
+      // Show appropriate success message based on payment type
+      let successMessage = 'Your job has been posted successfully.'
+      if (paymentIntentId === 'package_credits') {
+        successMessage = 'Your job has been posted using your package credits!'
+      } else if (paymentIntentId !== 'free_posting') {
+        successMessage = 'Your job has been posted and payment processed successfully.'
+      }
+
+      showSuccess('Job Created!', successMessage)
       router.push('/my-jobs')
 
     } catch (error) {

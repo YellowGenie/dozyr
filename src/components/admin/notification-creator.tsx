@@ -37,7 +37,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { api } from '@/lib/api'
-import { toast } from '@/hooks/use-toast'
+import { useToast } from '@/hooks/use-toast'
 
 interface NotificationTemplate {
   id: number
@@ -113,8 +113,8 @@ const themeOptions = [
   { value: 'error', label: 'Error', color: 'bg-red-100 text-red-800' }
 ]
 
-export function NotificationCreator({ onNotificationCreated }: { 
-  onNotificationCreated?: () => void 
+export function NotificationCreator({ onNotificationCreated }: {
+  onNotificationCreated?: () => void
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -122,6 +122,7 @@ export function NotificationCreator({ onNotificationCreated }: {
   const [users, setUsers] = useState<User[]>([])
   const [selectedUsers, setSelectedUsers] = useState<number[]>([])
   const [showPreview, setShowPreview] = useState(false)
+  const { toast } = useToast()
   
   const [formData, setFormData] = useState<NotificationFormData>({
     title: '',

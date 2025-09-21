@@ -68,7 +68,7 @@ function EscrowPaymentForm({
 
   const fetchSavedCards = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) return
 
       const response = await fetch('/api/v1/payments/cards', {
@@ -105,7 +105,7 @@ function EscrowPaymentForm({
     setStep('processing')
 
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) throw new Error('No authentication token')
 
       let paymentMethodId = ''

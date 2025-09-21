@@ -16,12 +16,24 @@ import {
   MapPin,
   Users,
   Bell,
-  FileText
+  FileText,
+  Clock,
+  MoreHorizontal,
+  Building,
+  RefreshCw
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from '@/components/ui/dropdown-menu'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { ProtectedRoute } from '@/components/layout/protected-route'
 import { api } from '@/lib/api'
@@ -40,6 +52,9 @@ export default function MyJobsPage() {
   const [loading, setLoading] = useState(true)
   const [needsManagerProfile, setNeedsManagerProfile] = useState(false)
   const [deletingJob, setDeletingJob] = useState<string | null>(null)
+  const [expiringJob, setExpiringJob] = useState<string | null>(null)
+  const [reactivatingJob, setReactivatingJob] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'all' | 'active' | 'expired'>('all')
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -72,6 +87,14 @@ export default function MyJobsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'active':
+        return 'bg-green-500/20 text-green-400 border-green-500/20'
+      case 'paused':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20'
+      case 'closed':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/20'
+      case 'expired':
+        return 'bg-red-500/20 text-red-400 border-red-500/20'
       case 'open':
         return 'bg-green-500/20 text-green-400 border-green-500/20'
       case 'in_progress':
@@ -85,6 +108,40 @@ export default function MyJobsPage() {
     }
   }
 
+  const getAdminStatusColor = (adminStatus: string) => {
+    switch (adminStatus) {
+      case 'approved':
+        return 'bg-green-500/20 text-green-400 border-green-500/20'
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20'
+      case 'rejected':
+        return 'bg-red-500/20 text-red-400 border-red-500/20'
+      case 'inappropriate':
+        return 'bg-red-600/20 text-red-500 border-red-600/20'
+      case 'hidden':
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/20'
+      default:
+        return 'bg-dozyr-medium-gray/20 text-dozyr-light-gray border-dozyr-medium-gray/20'
+    }
+  }
+
+  const getAdminStatusText = (adminStatus: string) => {
+    switch (adminStatus) {
+      case 'approved':
+        return 'Live'
+      case 'pending':
+        return 'Pending'
+      case 'rejected':
+        return 'Rejected'
+      case 'inappropriate':
+        return 'Flagged'
+      case 'hidden':
+        return 'Hidden'
+      default:
+        return 'Unknown'
+    }
+  }
+
   const formatBudget = (job: any) => {
     if (job.budget_type === 'hourly') {
       return `$${job.budget_min}-$${job.budget_max}/hr`
@@ -92,17 +149,47 @@ export default function MyJobsPage() {
     return `$${job.budget_min}-$${job.budget_max}`
   }
 
+  const getFilteredJobs = () => {
+    if (activeTab === 'all') return jobs
+    if (activeTab === 'active') {
+      return jobs.filter((job: any) => ['open', 'in_progress'].includes(job.status))
+    }
+    if (activeTab === 'expired') {
+      return jobs.filter((job: any) => ['expired', 'completed', 'cancelled'].includes(job.status))
+    }
+    return jobs
+  }
+
+  const getJobCounts = () => {
+    const total = jobs.length
+    const active = jobs.filter((job: any) => ['open', 'in_progress'].includes(job.status)).length
+    const expired = jobs.filter((job: any) => ['expired', 'completed', 'cancelled'].includes(job.status)).length
+    return { total, active, expired }
+  }
+
   const handleDeleteJob = async (jobId: string) => {
     await confirmation.confirm(
       async () => {
         setDeletingJob(jobId)
-        await api.deleteJob(jobId)
+        try {
+          await api.deleteJob(jobId)
 
-        // Remove job from local state
-        setJobs(prevJobs => prevJobs.filter((job: any) => job.id !== jobId))
+          // Remove job from local state
+          setJobs(prevJobs => prevJobs.filter((job: any) => job.id !== jobId))
 
-        showSuccess('Job Deleted!', 'Your job has been deleted successfully.')
-        setDeletingJob(null)
+          showSuccess('Job Deleted!', 'Your job has been deleted successfully.')
+        } catch (error: any) {
+          console.error('Failed to delete job:', error)
+
+          // Check if this is an orphaned job issue
+          if (error.message.includes('manager profile') || error.message.includes('ownership')) {
+            showError('Cannot Delete Job', 'This job appears to be orphaned. Please contact an administrator for assistance.')
+          } else {
+            showError('Deletion Failed', 'Failed to delete job: ' + error.message)
+          }
+        } finally {
+          setDeletingJob(null)
+        }
       },
       {
         title: 'Delete Job',
@@ -111,9 +198,85 @@ export default function MyJobsPage() {
         variant: 'destructive'
       }
     ).catch((error) => {
-      console.error('Failed to delete job:', error)
-      showError('Deletion Failed', 'Failed to delete job: ' + error.message)
+      console.error('Dialog cancelled or error:', error)
       setDeletingJob(null)
+    })
+  }
+
+  const handleExpireJob = async (jobId: string) => {
+    await confirmation.confirm(
+      async () => {
+        setExpiringJob(jobId)
+        try {
+          const updatedJob = await api.expireJob(jobId)
+
+          // Update job in local state
+          setJobs(prevJobs => prevJobs.map((job: any) =>
+            job.id === jobId ? { ...job, status: 'expired' } : job
+          ))
+
+          showSuccess('Job Expired!', 'Your job has been marked as expired.')
+        } catch (error: any) {
+          console.error('Failed to expire job:', error)
+
+          // Check if this is an orphaned job issue
+          if (error.message.includes('manager profile') || error.message.includes('ownership')) {
+            showError('Cannot Expire Job', 'This job appears to be orphaned. Please contact an administrator for assistance.')
+          } else {
+            showError('Expire Failed', 'Failed to expire job: ' + error.message)
+          }
+        } finally {
+          setExpiringJob(null)
+        }
+      },
+      {
+        title: 'Expire Job',
+        description: 'Are you sure you want to mark this job as expired? It will no longer be visible to talent.',
+        confirmText: 'Mark as Expired',
+        variant: 'default'
+      }
+    ).catch((error) => {
+      console.error('Dialog cancelled or error:', error)
+      setExpiringJob(null)
+    })
+  }
+
+
+  const handleReactivateJob = async (jobId: string) => {
+    await confirmation.confirm(
+      async () => {
+        setReactivatingJob(jobId)
+        try {
+          const updatedJob = await api.reactivateJob(jobId)
+
+          // Update job in local state
+          setJobs(prevJobs => prevJobs.map((job: any) =>
+            job.id === jobId ? { ...job, status: 'open' } : job
+          ))
+
+          showSuccess('Job Reactivated!', 'Your job has been reactivated and is now open for applications.')
+        } catch (error: any) {
+          console.error('Failed to reactivate job:', error)
+
+          // Check if this is an orphaned job issue
+          if (error.message.includes('manager profile') || error.message.includes('ownership')) {
+            showError('Cannot Reactivate Job', 'This job appears to be orphaned. Please contact an administrator for assistance.')
+          } else {
+            showError('Reactivation Failed', 'Failed to reactivate job: ' + error.message)
+          }
+        } finally {
+          setReactivatingJob(null)
+        }
+      },
+      {
+        title: 'Reactivate Job',
+        description: 'Are you sure you want to reactivate this job? It will become visible to talent again and start accepting applications.',
+        confirmText: 'Reactivate',
+        variant: 'default'
+      }
+    ).catch((error) => {
+      console.error('Dialog cancelled or error:', error)
+      setReactivatingJob(null)
     })
   }
 
@@ -151,6 +314,23 @@ export default function MyJobsPage() {
             </div>
           </motion.div>
 
+          {/* Job Status Tabs */}
+          <motion.div {...fadeInUp}>
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'active' | 'expired')}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="all">
+                  All Jobs ({getJobCounts().total})
+                </TabsTrigger>
+                <TabsTrigger value="active">
+                  Active ({getJobCounts().active})
+                </TabsTrigger>
+                <TabsTrigger value="expired">
+                  Expired/Closed ({getJobCounts().expired})
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </motion.div>
+
           {/* Jobs List */}
           <div className="space-y-4">
             {needsManagerProfile ? (
@@ -171,26 +351,33 @@ export default function MyJobsPage() {
                   </CardContent>
                 </Card>
               </motion.div>
-            ) : jobs.length === 0 ? (
+            ) : getFilteredJobs().length === 0 ? (
               <motion.div {...fadeInUp}>
                 <Card>
                   <CardContent className="p-12 text-center">
                     <Briefcase className="h-12 w-12 text-dozyr-light-gray mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-black mb-2">No jobs posted yet</h3>
+                    <h3 className="text-xl font-semibold text-black mb-2">
+                      {jobs.length === 0 ? 'No jobs posted yet' : `No ${activeTab === 'all' ? '' : activeTab} jobs found`}
+                    </h3>
                     <p className="text-dozyr-light-gray mb-6">
-                      Start by posting your first job to attract talented freelancers.
+                      {jobs.length === 0
+                        ? 'Start by posting your first job to attract talented freelancers.'
+                        : `You don't have any ${activeTab === 'all' ? '' : activeTab} jobs at the moment.`
+                      }
                     </p>
-                    <Link href="/jobs/post">
-                      <Button className="bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/90">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Post Your First Job
-                      </Button>
-                    </Link>
+                    {jobs.length === 0 && (
+                      <Link href="/jobs/post">
+                        <Button className="bg-dozyr-gold text-dozyr-black hover:bg-dozyr-gold/90">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Post Your First Job
+                        </Button>
+                      </Link>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
             ) : (
-              jobs.map((job: any, index: number) => (
+              getFilteredJobs().map((job: any, index: number) => (
                 <motion.div
                   key={job.id}
                   {...fadeInUp}
@@ -220,9 +407,17 @@ export default function MyJobsPage() {
                                 <Badge className={getStatusColor(job.status)}>
                                   {job.status.replace('_', ' ')}
                                 </Badge>
+                                <Badge className={getAdminStatusColor(job.admin_status || 'pending')}>
+                                  {getAdminStatusText(job.admin_status || 'pending')}
+                                </Badge>
                                 {job.new_proposals_count > 0 && (
                                   <Badge className="bg-red-500 text-black animate-pulse">
                                     {job.new_proposals_count} NEW
+                                  </Badge>
+                                )}
+                                {(job as any).is_orphaned && (
+                                  <Badge className="bg-orange-500 text-white">
+                                    ⚠️ ORPHANED
                                   </Badge>
                                 )}
                               </div>
@@ -245,6 +440,16 @@ export default function MyJobsPage() {
                                   Posted {new Date(job.created_at).toLocaleDateString()}
                                 </div>
                               </div>
+
+                              {/* Orphaned job warning */}
+                              {(job as any).is_orphaned && (
+                                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+                                  <p className="text-orange-800 text-sm">
+                                    ⚠️ <strong>Orphaned Job:</strong> This job has lost its connection to a manager profile.
+                                    Contact an administrator for assistance with managing this job.
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -252,8 +457,8 @@ export default function MyJobsPage() {
                         <div className="flex items-center gap-2 ml-4">
                           {job.applications_count > 0 && (
                             <Link href={`/jobs/${job.id}/proposals`}>
-                              <Button 
-                                variant={job.new_proposals_count > 0 ? "default" : "outline"} 
+                              <Button
+                                variant={job.new_proposals_count > 0 ? "default" : "outline"}
                                 size="sm"
                                 className={job.new_proposals_count > 0 ? "bg-red-500 hover:bg-red-600 text-black animate-pulse" : ""}
                               >
@@ -279,20 +484,78 @@ export default function MyJobsPage() {
                               Edit
                             </Button>
                           </Link>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="text-red-400 border-red-400/20 hover:bg-red-400/10"
-                            onClick={() => handleDeleteJob(job.id)}
-                            disabled={deletingJob === job.id}
-                          >
-                            {deletingJob === job.id ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-400 mr-2"></div>
-                            ) : (
-                              <Trash2 className="h-4 w-4 mr-2" />
-                            )}
-                            {deletingJob === job.id ? 'Deleting...' : 'Delete'}
-                          </Button>
+
+                          {/* Actions Dropdown */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              {(job as any).is_orphaned ? (
+                                // Orphaned job - limited actions
+                                <>
+                                  <DropdownMenuItem disabled className="text-gray-400">
+                                    <Clock className="h-4 w-4 mr-2" />
+                                    Actions Disabled
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem disabled className="text-xs text-gray-500">
+                                    Contact administrator to manage this orphaned job
+                                  </DropdownMenuItem>
+                                </>
+                              ) : (
+                                // Normal job - full actions
+                                <>
+                                  {job.status === 'expired' ? (
+                                    // Expired job - show reactivate option
+                                    <DropdownMenuItem
+                                      onClick={() => handleReactivateJob(job.id)}
+                                      disabled={reactivatingJob === job.id}
+                                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    >
+                                      {reactivatingJob === job.id ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600 mr-2"></div>
+                                      ) : (
+                                        <RefreshCw className="h-4 w-4 mr-2" />
+                                      )}
+                                      {reactivatingJob === job.id ? 'Reactivating...' : 'Reactivate Job'}
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    // Active job - show expire option
+                                    <DropdownMenuItem
+                                      onClick={() => handleExpireJob(job.id)}
+                                      disabled={expiringJob === job.id}
+                                      className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                    >
+                                      {expiringJob === job.id ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600 mr-2"></div>
+                                      ) : (
+                                        <Clock className="h-4 w-4 mr-2" />
+                                      )}
+                                      {expiringJob === job.id ? 'Expiring...' : 'Mark as Expired'}
+                                    </DropdownMenuItem>
+                                  )}
+
+                                  <DropdownMenuSeparator />
+
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteJob(job.id)}
+                                    disabled={deletingJob === job.id}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    {deletingJob === job.id ? (
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
+                                    ) : (
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                    )}
+                                    {deletingJob === job.id ? 'Deleting...' : 'Delete Job'}
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                     </CardContent>

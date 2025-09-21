@@ -78,7 +78,7 @@ export default function ContractLifecycle({
 
   const fetchContract = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch(`/api/v1/contracts/${contractId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -101,7 +101,7 @@ export default function ContractLifecycle({
     
     setActionLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       let endpoint = ''
       let body: any = {}
 

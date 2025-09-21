@@ -46,7 +46,7 @@ export default function ContractsPage() {
     // For managers, we need to select an accepted proposal first
     if (userType === 'manager') {
       try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('auth_token')
         const response = await fetch('/api/v1/proposals/manager/accepted', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -87,7 +87,7 @@ export default function ContractsPage() {
   const handleSubmitContract = async (contractData: any) => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch('/api/v1/contracts', {
         method: 'POST',
         headers: {
@@ -128,7 +128,7 @@ export default function ContractsPage() {
   const handleSendContract = async (contractId: string) => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch(`/api/v1/contracts/${contractId}/send`, {
         method: 'POST',
         headers: {
@@ -166,7 +166,7 @@ export default function ContractsPage() {
   const handleAcceptContract = async (contractId: string) => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch(`/api/v1/contracts/${contractId}/accept`, {
         method: 'POST',
         headers: {
@@ -206,7 +206,7 @@ export default function ContractsPage() {
     
     setLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch(`/api/v1/contracts/${showDeclineModal}/decline`, {
         method: 'POST',
         headers: {
@@ -249,7 +249,7 @@ export default function ContractsPage() {
   const handleFundEscrow = async (contractId: string) => {
     // Get contract details to show the amount
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch(`/api/v1/contracts/${contractId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -290,7 +290,7 @@ export default function ContractsPage() {
   const handleReleaseFunds = async (contractId: string, amount: number, milestoneId?: string) => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch('/api/v1/escrow/release', {
         method: 'POST',
         headers: {

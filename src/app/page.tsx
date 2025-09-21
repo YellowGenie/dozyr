@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { 
-  ArrowRight, 
-  Play, 
-  CheckCircle, 
+import { useRouter } from 'next/navigation'
+import {
+  ArrowRight,
+  Play,
+  CheckCircle,
   Star,
   Users,
   MapPin,
@@ -24,6 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Navbar } from '@/components/layout/navbar'
+import { useAuthStore } from '@/store/auth'
 
 // Animation variants
 const fadeInUp = {
@@ -56,10 +58,12 @@ export default function LandingPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const router = useRouter()
+  const { isAuthenticated, user } = useAuthStore()
 
   useEffect(() => {
     setMounted(true)
-    
+
     const handleScroll = () => {
       const scrollTop = window.scrollY
       setIsScrolled(scrollTop > 50)
@@ -68,6 +72,18 @@ export default function LandingPage() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      router.push('/dashboard')
+    }
+  }, [isAuthenticated, user, router])
+
+  // Don't render landing page if user is authenticated
+  if (isAuthenticated && user) {
+    return null
+  }
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault()

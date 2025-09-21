@@ -37,9 +37,9 @@ export default function ManagerSetupPage() {
     e.preventDefault()
     try {
       setLoading(true)
-      await api.updateManagerProfile(formData)
+      await api.createManagerProfile(formData)
       alert('Manager profile created successfully!')
-      router.push('/jobs/post')
+      router.push('/my-jobs')
     } catch (error) {
       console.error('Failed to create manager profile:', error)
       alert('Failed to create manager profile: ' + error.message)

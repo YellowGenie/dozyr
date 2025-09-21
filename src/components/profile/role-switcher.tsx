@@ -81,7 +81,7 @@ export function RoleSwitcher({ currentRole, userEmail, onRoleChange }: RoleSwitc
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token') || localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || localStorage.getItem('auth_token')}`
         },
         body: JSON.stringify({ role: newRole })
       });

@@ -9,6 +9,8 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
+  profileWorkflowShownThisSession: boolean
+  profileBannerDismissedThisSession: boolean
 }
 
 interface AuthActions {
@@ -21,6 +23,8 @@ interface AuthActions {
   setUser: (user: User | null) => void
   verifyEmailCode: (code: string) => Promise<void>
   resendVerificationCode: (email: string) => Promise<void>
+  markProfileWorkflowShown: () => void
+  markProfileBannerDismissed: () => void
 }
 
 type AuthStore = AuthState & AuthActions
@@ -34,6 +38,8 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      profileWorkflowShownThisSession: false,
+      profileBannerDismissedThisSession: false,
 
       // Actions
       login: async (credentials: LoginCredentials) => {
@@ -53,7 +59,9 @@ export const useAuthStore = create<AuthStore>()(
             token: response.token,
             isAuthenticated: true,
             isLoading: false,
-            error: null
+            error: null,
+            profileWorkflowShownThisSession: false, // Reset on login
+            profileBannerDismissedThisSession: false // Reset on login
           })
         } catch (error: any) {
           set({
@@ -77,7 +85,9 @@ export const useAuthStore = create<AuthStore>()(
             token: response.token,
             isAuthenticated: true,
             isLoading: false,
-            error: null
+            error: null,
+            profileWorkflowShownThisSession: false, // Reset on register
+            profileBannerDismissedThisSession: false // Reset on register
           })
         } catch (error: any) {
           set({
@@ -241,7 +251,11 @@ export const useAuthStore = create<AuthStore>()(
           })
           throw error
         }
-      }
+      },
+
+      markProfileWorkflowShown: () => set({ profileWorkflowShownThisSession: true }),
+
+      markProfileBannerDismissed: () => set({ profileBannerDismissedThisSession: true })
     }),
     {
       name: 'dozyr-auth',
@@ -249,6 +263,7 @@ export const useAuthStore = create<AuthStore>()(
         token: state.token,
         user: state.user,
         isAuthenticated: state.isAuthenticated
+        // profileWorkflowShownThisSession and profileBannerDismissedThisSession intentionally excluded - they're session-only
       }),
       onRehydrateStorage: () => (state) => {
         if (state?.token) {

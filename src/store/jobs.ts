@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { Job } from '@/types'
 import { api } from '@/lib/api'
+import { useAuthStore } from '@/store/auth'
 
 interface JobState {
   jobs: Job[]
@@ -42,6 +43,27 @@ interface JobActions {
 
 type JobStore = JobState & JobActions
 
+// Helper function to filter jobs based on user role
+const filterJobsForUser = (jobs: Job[]): Job[] => {
+  const userRole = useAuthStore.getState().user?.role
+
+  // Only filter for talent users - managers and admins can see all jobs
+  if (userRole === 'talent') {
+    return jobs.filter(job => {
+      // Filter out hidden jobs (admin_status: 'hidden')
+      const isHidden = (job as any).admin_status === 'hidden'
+
+      // Filter out expired jobs
+      const isExpired = job.status === 'expired'
+
+      // Only show active, approved jobs to talent
+      return !isHidden && !isExpired && job.status === 'active'
+    })
+  }
+
+  return jobs
+}
+
 export const useJobStore = create<JobStore>()((set, get) => ({
   // State
   jobs: [],
@@ -64,12 +86,13 @@ export const useJobStore = create<JobStore>()((set, get) => ({
     try {
       set({ isLoading: true, error: null })
       const response = await api.getJobs({ page, limit })
+      const filteredJobs = filterJobsForUser(response.jobs || [])
       set({
-        jobs: response.jobs || [],
+        jobs: filteredJobs,
         pagination: {
           page: response.page || 1,
           totalPages: response.totalPages || 1,
-          total: response.total || 0,
+          total: filteredJobs.length, // Update total to reflect filtered count
           hasNextPage: response.hasNextPage || false,
           hasPrevPage: response.hasPrevPage || false
         },
@@ -87,8 +110,9 @@ export const useJobStore = create<JobStore>()((set, get) => ({
     try {
       set({ isFeaturedLoading: true, error: null })
       const response = await api.getFeaturedJobs(10)
+      const filteredJobs = filterJobsForUser(response.jobs || [])
       set({
-        featuredJobs: response.jobs || [],
+        featuredJobs: filteredJobs,
         isFeaturedLoading: false
       })
     } catch (error: any) {
@@ -119,12 +143,13 @@ export const useJobStore = create<JobStore>()((set, get) => ({
     try {
       set({ isLoading: true, error: null, searchFilters: { query, ...filters } })
       const response = await api.searchJobs(query, { ...filters, page: filters?.page || 1, limit: 20 })
+      const filteredJobs = filterJobsForUser(response.jobs || [])
       set({
-        jobs: response.jobs || [],
+        jobs: filteredJobs,
         pagination: {
           page: response.page || 1,
           totalPages: response.totalPages || 1,
-          total: response.total || 0,
+          total: filteredJobs.length, // Update total to reflect filtered count
           hasNextPage: (response.page || 1) < (response.totalPages || 1),
           hasPrevPage: (response.page || 1) > 1
         },

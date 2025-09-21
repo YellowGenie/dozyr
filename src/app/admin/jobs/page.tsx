@@ -29,7 +29,8 @@ import {
   Shield,
   Save,
   CheckCircle,
-  Bell
+  Bell,
+  Trash
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -68,7 +69,7 @@ const fadeInUp = {
 
 interface JobFilters {
   search: string
-  admin_status: 'all' | 'active' | 'expired' | 'rejected_inappropriate' | 'pending' | 'approved' | 'rejected' | 'inappropriate' | 'hidden'
+  admin_status: 'all' | 'active' | 'expired' | 'rejected_inappropriate' | 'pending' | 'approved' | 'rejected' | 'inappropriate' | 'hidden' | 'orphaned'
   company: string
   manager: string
   salaryMin: string
@@ -110,7 +111,7 @@ export default function AdminJobsPage() {
     hasPrevPage: false
   })
 
-  const [activeTab, setActiveTab] = useState<'all' | 'active' | 'pending' | 'expired' | 'rejected_inappropriate'>('all')
+  const [activeTab, setActiveTab] = useState<'all' | 'active' | 'pending' | 'expired' | 'rejected_inappropriate' | 'orphaned'>('all')
   const [selectedJobForDetails, setSelectedJobForDetails] = useState<string | null>(null)
   const [jobDetails, setJobDetails] = useState<any>(null)
   const [jobDetailsLoading, setJobDetailsLoading] = useState(false)
@@ -261,6 +262,40 @@ export default function AdminJobsPage() {
     }
   }
 
+  const handleExpireJob = async (jobId: string) => {
+    try {
+      await api.expireJob(jobId)
+      await loadJobs()
+    } catch (err: any) {
+      setError(err.message || 'Failed to expire job')
+    }
+  }
+
+  const handleHardDeleteJob = async (jobId: string) => {
+    if (!confirm('This will PERMANENTLY delete the job and all associated data. This action cannot be undone. Are you sure?')) {
+      return
+    }
+
+    try {
+      await api.hardDeleteJob(jobId)
+      await loadJobs()
+    } catch (err: any) {
+      setError(err.message || 'Failed to permanently delete job')
+    }
+  }
+
+  const handleReassignJob = async (jobId: string) => {
+    const newManagerId = prompt('Enter the new manager ID to reassign this job to:')
+    if (!newManagerId) return
+
+    try {
+      await api.reassignJob(jobId, newManagerId)
+      await loadJobs()
+    } catch (err: any) {
+      setError(err.message || 'Failed to reassign job')
+    }
+  }
+
   const handleBulkAction = async (action: string) => {
     if (selectedJobs.length === 0) return
 
@@ -405,6 +440,24 @@ export default function AdminJobsPage() {
               <DropdownMenuItem onClick={() => handleJobAction(job.id, 'inappropriate')}>
                 <AlertTriangle className="h-4 w-4 mr-2" />
                 Mark Inappropriate
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {job.status !== 'expired' && (
+                <DropdownMenuItem onClick={() => handleExpireJob(job.id)} className="text-orange-600">
+                  <Clock className="h-4 w-4 mr-2" />
+                  Mark as Expired
+                </DropdownMenuItem>
+              )}
+              {/* Show reassign option for orphaned jobs */}
+              {(job as any).is_orphaned && (
+                <DropdownMenuItem onClick={() => handleReassignJob(job.id)} className="text-blue-600">
+                  <User className="h-4 w-4 mr-2" />
+                  Reassign to Manager
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => handleHardDeleteJob(job.id)} className="text-red-800 font-medium">
+                <Trash className="h-4 w-4 mr-2" />
+                Delete Permanently
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => handleViewDetails(job.id)}>

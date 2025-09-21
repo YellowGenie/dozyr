@@ -113,6 +113,40 @@ export default function JobViewPage() {
     }
   }
 
+  const getAdminStatusColor = (adminStatus?: string) => {
+    switch (adminStatus) {
+      case 'approved':
+        return 'bg-green-500/20 text-green-400 border-green-500/20'
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20'
+      case 'rejected':
+        return 'bg-red-500/20 text-red-400 border-red-500/20'
+      case 'inappropriate':
+        return 'bg-red-600/20 text-red-500 border-red-600/20'
+      case 'hidden':
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/20'
+      default:
+        return 'bg-dozyr-medium-gray/20 text-dozyr-light-gray border-dozyr-medium-gray/20'
+    }
+  }
+
+  const getAdminStatusText = (adminStatus?: string) => {
+    switch (adminStatus) {
+      case 'approved':
+        return 'Live'
+      case 'pending':
+        return 'Pending Review'
+      case 'rejected':
+        return 'Rejected'
+      case 'inappropriate':
+        return 'Inappropriate Content'
+      case 'hidden':
+        return 'Hidden'
+      default:
+        return 'Unknown'
+    }
+  }
+
   const formatBudget = (job: any) => {
     const min = job.budget_min || 0
     const max = job.budget_max || 0
@@ -198,10 +232,15 @@ export default function JobViewPage() {
                 </Link>
                 <div>
                   <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">{job.title}</h1>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <Badge className={getStatusColor(job.status)}>
                       {job.status?.replace('_', ' ') || 'Unknown'}
                     </Badge>
+                    {isManager && (
+                      <Badge className={getAdminStatusColor(job.admin_status)}>
+                        {getAdminStatusText(job.admin_status)}
+                      </Badge>
+                    )}
                     <span className="text-dozyr-light-gray">
                       Posted {new Date(job.created_at).toLocaleDateString()}
                     </span>
@@ -249,6 +288,69 @@ export default function JobViewPage() {
               )}
             </div>
           </motion.div>
+
+          {/* Pending Approval Notice for Managers */}
+          {isManager && job.admin_status === 'pending' && (
+            <motion.div {...fadeInUp}>
+              <Card className="border-yellow-500/20 bg-yellow-500/5">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-full bg-yellow-500/20">
+                      <Clock className="h-5 w-5 text-yellow-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-yellow-400 mb-1">Pending Approval</h3>
+                      <p className="text-sm text-foreground/70">
+                        Your job post is currently under review by our moderation team.
+                        It will be visible to talent within 24 hours once approved.
+                        You can edit or delete the job while it's pending.
+                      </p>
+                      {job.admin_notes && (
+                        <div className="mt-2 p-2 rounded bg-yellow-500/10 border border-yellow-500/20">
+                          <p className="text-xs text-foreground/60">
+                            <strong>Admin Notes:</strong> {job.admin_notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Rejected Job Notice for Managers */}
+          {isManager && (job.admin_status === 'rejected' || job.admin_status === 'inappropriate') && (
+            <motion.div {...fadeInUp}>
+              <Card className="border-red-500/20 bg-red-500/5">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-full bg-red-500/20">
+                      <Trash2 className="h-5 w-5 text-red-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-red-400 mb-1">
+                        {job.admin_status === 'inappropriate' ? 'Content Flagged' : 'Job Rejected'}
+                      </h3>
+                      <p className="text-sm text-foreground/70">
+                        {job.admin_status === 'inappropriate'
+                          ? 'This job post has been flagged for inappropriate content and is not visible to talent.'
+                          : 'This job post has been rejected and is not visible to talent. Please review the admin notes and create a new posting if needed.'
+                        }
+                      </p>
+                      {job.admin_notes && (
+                        <div className="mt-2 p-2 rounded bg-red-500/10 border border-red-500/20">
+                          <p className="text-xs text-foreground/60">
+                            <strong>Admin Notes:</strong> {job.admin_notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Main Content */}

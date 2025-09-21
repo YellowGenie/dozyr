@@ -50,7 +50,7 @@ export interface Job {
   requirements: string[]
   benefits?: string[]
   remote_type: 'fully-remote' | 'hybrid' | 'on-site'
-  status: 'active' | 'paused' | 'closed'
+  status: 'active' | 'paused' | 'closed' | 'expired'
   featured: boolean
   urgent: boolean
   applicant_count?: number

@@ -21,7 +21,7 @@ export function useContractNotifications() {
     if (!user) return
 
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) return
 
       const response = await fetch('/api/v1/notifications/contracts', {
@@ -45,7 +45,7 @@ export function useContractNotifications() {
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) return
 
       const response = await fetch(`/api/v1/notifications/${notificationId}/read`, {
@@ -75,7 +75,7 @@ export function useContractNotifications() {
     if (!user) return []
 
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) return []
 
       // Get contracts that need user action
@@ -108,7 +108,7 @@ export function useContractNotifications() {
     if (!user) return { pending: 0, active: 0, completed: 0 }
 
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) return { pending: 0, active: 0, completed: 0 }
 
       const response = await fetch('/api/v1/contracts/stats', {

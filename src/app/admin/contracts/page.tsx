@@ -82,7 +82,7 @@ export default function AdminContractsPage() {
 
   const fetchContracts = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch('/api/v1/admin/contracts', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -104,7 +104,7 @@ export default function AdminContractsPage() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch('/api/v1/admin/contracts/stats', {
         headers: {
           'Authorization': `Bearer ${token}`

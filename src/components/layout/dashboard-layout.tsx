@@ -38,8 +38,11 @@ import { generateInitials, cn, getImageUrl } from '@/lib/utils'
 import { Omnisearch } from '@/components/search/Omnisearch'
 import { useProposalNotifications } from '@/hooks/useProposalNotifications'
 import { useContractNotifications } from '@/hooks/useContractNotifications'
+import { useAdminNotifications } from '@/contexts/AdminNotificationContext'
 import { AIAssistant } from '@/components/ai/ai-assistant'
 import { ProfileCompletionWorkflow } from '@/components/profile/profile-completion-workflow'
+import { ProfileCompletionBanner } from '@/components/profile/profile-completion-banner'
+import { NotificationPanel } from '@/components/notifications/notification-panel'
 import { shouldShowCompletionWorkflow } from '@/lib/profile-completion'
 import { api } from '@/lib/api'
 
@@ -48,19 +51,22 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user, logout } = useAuthStore()
+  const { user, logout, profileWorkflowShownThisSession, markProfileWorkflowShown, profileBannerDismissedThisSession, markProfileBannerDismissed } = useAuthStore()
   const router = useRouter()
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false)
+  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false)
   const [imageKey, setImageKey] = useState(0) // Force re-render when profile image changes
   const { newProposalsCount } = useProposalNotifications()
   const { unreadCount: contractNotificationsCount } = useContractNotifications()
+  const { unreadCount: adminNotificationsCount } = useAdminNotifications()
 
   // Profile completion workflow state
   const [talentProfile, setTalentProfile] = useState(null)
   const [isProfileWorkflowOpen, setIsProfileWorkflowOpen] = useState(false)
   const [hasCheckedProfileCompletion, setHasCheckedProfileCompletion] = useState(false)
+  const [showProfileBanner, setShowProfileBanner] = useState(false)
 
   // Removed old search - now using Omnisearch component
 
@@ -80,7 +86,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return () => window.removeEventListener('profile-image-updated', handleProfileImageUpdate)
   }, [])
 
-  // Check profile completion for talent users
+  // Check profile completion for talent users - workflow once per session, banner when needed
   useEffect(() => {
     const checkProfileCompletion = async () => {
       if (!user || user.role !== 'talent' || hasCheckedProfileCompletion) return
@@ -89,15 +95,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         const profile = await api.getTalentProfile(user.id)
         setTalentProfile(profile)
 
-        // Only show workflow automatically on first login/dashboard visit
-        // and not on profile-related pages to avoid interrupting user flow
-        const isProfilePage = pathname.includes('/profile') || pathname.includes('/settings')
+        // Check if profile completion is needed
+        if (shouldShowCompletionWorkflow(profile)) {
+          const isProfilePage = pathname.includes('/profile') || pathname.includes('/settings')
 
-        if (!isProfilePage && shouldShowCompletionWorkflow(profile)) {
-          // Small delay to let the dashboard load first
-          setTimeout(() => {
-            setIsProfileWorkflowOpen(true)
-          }, 1000)
+          if (!profileWorkflowShownThisSession && !isProfilePage) {
+            // Show full workflow on first dashboard visit this session
+            setTimeout(() => {
+              setIsProfileWorkflowOpen(true)
+              markProfileWorkflowShown()
+            }, 1000)
+          } else if (!profileBannerDismissedThisSession || isProfilePage) {
+            // Show banner if:
+            // 1. Banner hasn't been dismissed this session, OR
+            // 2. User is on profile/settings pages (always show there after dismissal)
+            setShowProfileBanner(true)
+          }
         }
       } catch (error) {
         console.error('Failed to fetch talent profile:', error)
@@ -107,10 +120,34 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     }
 
     checkProfileCompletion()
-  }, [user, hasCheckedProfileCompletion, pathname])
+  }, [user, hasCheckedProfileCompletion, profileWorkflowShownThisSession, markProfileWorkflowShown, profileBannerDismissedThisSession, pathname])
+
+  // Re-evaluate banner visibility when pathname changes for already loaded profiles
+  useEffect(() => {
+    if (!user || user.role !== 'talent' || !talentProfile || !hasCheckedProfileCompletion) return
+
+    if (shouldShowCompletionWorkflow(talentProfile)) {
+      const isProfilePage = pathname.includes('/profile') || pathname.includes('/settings')
+
+      if (!profileBannerDismissedThisSession || isProfilePage) {
+        setShowProfileBanner(true)
+      } else {
+        setShowProfileBanner(false)
+      }
+    }
+  }, [pathname, talentProfile, profileBannerDismissedThisSession, user, hasCheckedProfileCompletion])
 
   const handleProfileUpdate = (updatedProfile: any) => {
     setTalentProfile(updatedProfile)
+    // Check if banner should be hidden after profile update
+    if (!shouldShowCompletionWorkflow(updatedProfile)) {
+      setShowProfileBanner(false)
+    }
+  }
+
+  const handleStartWorkflowFromBanner = () => {
+    setShowProfileBanner(false)
+    setIsProfileWorkflowOpen(true)
   }
 
   const handleLogout = async () => {
@@ -348,9 +385,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 whileTap={{ scale: 0.95 }}
                 className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
                 title="Notifications"
+                onClick={() => setIsNotificationPanelOpen(true)}
               >
                 <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                {adminNotificationsCount > 0 && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {adminNotificationsCount > 9 ? '9+' : adminNotificationsCount}
+                  </div>
+                )}
               </motion.div>
 
               <motion.div
@@ -479,10 +521,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 whileTap={{ scale: 0.95 }}
                 className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 hover:bg-[var(--primary)] transition-all duration-300 group cursor-pointer"
                 title="Notifications"
-                onClick={() => setIsSidebarOpen(false)}
+                onClick={() => {
+                  setIsSidebarOpen(false)
+                  setIsNotificationPanelOpen(true)
+                }}
               >
                 <Bell className="h-5 w-5 text-gray-600 group-hover:text-white transition-colors" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                {adminNotificationsCount > 0 && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-medium">
+                    {adminNotificationsCount > 9 ? '9+' : adminNotificationsCount}
+                  </div>
+                )}
               </motion.div>
 
               <motion.div
@@ -559,6 +608,20 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         isOpen={isAIAssistantOpen}
         onClose={() => setIsAIAssistantOpen(false)}
       />
+
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={isNotificationPanelOpen}
+        onClose={() => setIsNotificationPanelOpen(false)}
+      />
+
+      {/* Profile Completion Banner */}
+      {user?.role === 'talent' && showProfileBanner && (
+        <ProfileCompletionBanner
+          profile={talentProfile}
+          onStartWorkflow={handleStartWorkflowFromBanner}
+        />
+      )}
 
       {/* Profile Completion Workflow */}
       {user?.role === 'talent' && (

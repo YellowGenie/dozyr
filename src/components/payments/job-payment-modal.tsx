@@ -47,8 +47,14 @@ function PaymentForm({ onSuccess, onClose, jobData }: { onSuccess: (paymentInten
   const createPaymentIntent = async () => {
     try {
       console.log('Starting createPaymentIntent...')
-      const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('auth_token')
       console.log('Token found:', !!token)
+      console.log('API URL:', process.env.NEXT_PUBLIC_API_URL)
+
+      const requestBody = {
+        description: `Job posting fee for "${jobData?.title || 'New Job'}"`
+      }
+      console.log('Request body:', requestBody)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/create-payment-intent`, {
         method: 'POST',
@@ -56,17 +62,23 @@ function PaymentForm({ onSuccess, onClose, jobData }: { onSuccess: (paymentInten
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          description: `Job posting fee for "${jobData?.title || 'New Job'}"`
-        })
+        body: JSON.stringify(requestBody)
       })
 
       console.log('Response status:', response.status, response.ok)
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.log('Response error:', errorText)
-        throw new Error('Failed to create payment intent')
+        console.log('Response error text:', errorText)
+        let errorMessage = 'Failed to create payment intent'
+        try {
+          const errorJson = JSON.parse(errorText)
+          errorMessage = errorJson.error || errorJson.message || errorMessage
+        } catch (e) {
+          console.log('Error text is not JSON:', errorText)
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
@@ -74,12 +86,16 @@ function PaymentForm({ onSuccess, onClose, jobData }: { onSuccess: (paymentInten
 
       // Handle free posting case
       if (data.free_posting || data.using_package_credits) {
-        return {
+        console.log('Detected free posting or package credits, setting payment intent...')
+        const resultData = {
           free_posting: data.free_posting,
           using_package_credits: data.using_package_credits,
           package_info: data.package_info,
           message: data.message
         }
+        console.log('Setting payment intent to:', resultData)
+        setPaymentIntent(resultData)
+        return resultData
       }
 
       // Handle package purchase requirement
@@ -101,13 +117,14 @@ function PaymentForm({ onSuccess, onClose, jobData }: { onSuccess: (paymentInten
     } catch (err) {
       console.error('Error in createPaymentIntent:', err)
       setError(err instanceof Error ? err.message : 'Failed to initialize payment')
+      setPaymentIntent(null) // Set to null to trigger error state
       return null
     }
   }
 
   const confirmPaymentWithBackend = async (paymentIntentId: string) => {
     try {
-      const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('auth_token')
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/confirm-payment`, {
         method: 'POST',
@@ -134,7 +151,7 @@ function PaymentForm({ onSuccess, onClose, jobData }: { onSuccess: (paymentInten
 
   const createPackagePaymentIntent = async (packageId: string) => {
     try {
-      const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('auth_token')
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/create-package-payment-intent`, {
         method: 'POST',
@@ -220,6 +237,19 @@ function PaymentForm({ onSuccess, onClose, jobData }: { onSuccess: (paymentInten
       createPaymentIntent()
     }
   }, [])
+
+  // Auto-proceed when using package credits or free posting
+  useEffect(() => {
+    if (paymentIntent?.free_posting || paymentIntent?.using_package_credits) {
+      // Automatically proceed with job creation after a short delay
+      const timer = setTimeout(() => {
+        onSuccess('package_credits') // Use special identifier for package credits
+        onClose()
+      }, 2000) // 2-second delay to show the success message
+
+      return () => clearTimeout(timer)
+    }
+  }, [paymentIntent, onSuccess, onClose])
 
   // Debug logging
   console.log('Current paymentIntent state:', paymentIntent)

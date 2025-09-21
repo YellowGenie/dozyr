@@ -88,7 +88,7 @@ export default function AdminEscrowsPage() {
 
   const fetchEscrows = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch('/api/v1/admin/escrows', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -110,7 +110,7 @@ export default function AdminEscrowsPage() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       const response = await fetch('/api/v1/admin/escrows/stats', {
         headers: {
           'Authorization': `Bearer ${token}`

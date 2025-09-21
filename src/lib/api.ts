@@ -526,6 +526,13 @@ class ApiClient {
     return this.request(endpoint)
   }
 
+  async createManagerProfile(data: Partial<ManagerProfile>): Promise<ManagerProfile> {
+    return this.request('/profiles/manager/me', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
   async updateManagerProfile(data: Partial<ManagerProfile>): Promise<ManagerProfile> {
     return this.request('/profiles/manager/me', {
       method: 'PUT',
@@ -612,8 +619,61 @@ class ApiClient {
     await this.request(`/jobs/${id}`, { method: 'DELETE' })
   }
 
+  async expireJob(id: string): Promise<Job> {
+    // Use the existing updateJob endpoint to set status to expired
+    return this.updateJob(id, { status: 'expired' })
+  }
+
+  async reactivateJob(id: string): Promise<Job> {
+    // Reactivate an expired job by setting status back to open
+    return this.updateJob(id, { status: 'open' })
+  }
+
+  async hardDeleteJob(id: string): Promise<void> {
+    // For now, use the regular delete endpoint
+    // In a real implementation, the backend would differentiate between soft and hard delete
+    await this.deleteJob(id)
+  }
+
+  // Admin-only job management for orphaned jobs
+  async adminExpireJob(id: string): Promise<Job> {
+    return this.request(`/admin/jobs/${id}/expire`, {
+      method: 'PUT',
+    })
+  }
+
+  async adminHardDeleteJob(id: string): Promise<void> {
+    await this.request(`/admin/jobs/${id}/hard-delete`, { method: 'DELETE' })
+  }
+
+  async getOrphanedJobs(): Promise<{ jobs: Job[] }> {
+    return this.request('/admin/jobs/orphaned')
+  }
+
+  async reassignJob(jobId: string, newManagerId: string): Promise<Job> {
+    return this.request(`/admin/jobs/${jobId}/reassign`, {
+      method: 'PUT',
+      body: JSON.stringify({ manager_id: newManagerId }),
+    })
+  }
+
   async getMyJobs(): Promise<{ jobs: Job[] }> {
     return this.request('/jobs/manager/my-jobs')
+  }
+
+  async validateManagerProfile(): Promise<{ valid: boolean; profile: ManagerProfile | null }> {
+    try {
+      const profile = await this.getManagerProfile()
+      return {
+        valid: profile && profile.user_id !== null,
+        profile
+      }
+    } catch (error) {
+      return {
+        valid: false,
+        profile: null
+      }
+    }
   }
 
   // Job Applications (using proposals endpoints)
@@ -746,19 +806,19 @@ class ApiClient {
 
   // Notifications
   async getNotifications(): Promise<{ notifications: Notification[] }> {
-    return this.request('/notifications')
+    return this.request('/user/notifications/active')
   }
 
   async markNotificationAsRead(id: string): Promise<void> {
-    await this.request(`/notifications/${id}/read`, { method: 'POST' })
+    await this.request(`/user/notifications/${id}/view`, { method: 'POST' })
   }
 
   async markAllNotificationsAsRead(): Promise<void> {
-    await this.request('/notifications/read-all', { method: 'POST' })
+    await this.request('/user/notifications/dismiss-all', { method: 'POST' })
   }
 
   async deleteNotification(id: string): Promise<void> {
-    await this.request(`/notifications/${id}`, { method: 'DELETE' })
+    await this.request(`/user/notifications/${id}/dismiss`, { method: 'POST' })
   }
 
   // Admin

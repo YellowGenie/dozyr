@@ -130,7 +130,7 @@ export default function ContractDetails({
 
   const fetchContract = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) throw new Error('No authentication token')
 
       const response = await fetch(`/api/v1/contracts/${contractId}`, {
@@ -150,7 +150,7 @@ export default function ContractDetails({
 
   const fetchEscrowAccount = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
       if (!token) return
 
       const response = await fetch(`/api/v1/escrow/contract/${contractId}`, {
