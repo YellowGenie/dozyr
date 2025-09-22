@@ -130,12 +130,14 @@ export function useContractNotifications() {
 
   useEffect(() => {
     if (user) {
-      fetchContractNotifications()
-      
+      // Temporarily disabled - endpoint not implemented yet
+      // fetchContractNotifications()
+
       // Set up polling for real-time updates
-      const interval = setInterval(fetchContractNotifications, 30000) // Poll every 30 seconds
-      
-      return () => clearInterval(interval)
+      // const interval = setInterval(fetchContractNotifications, 30000) // Poll every 30 seconds
+
+      // return () => clearInterval(interval)
+      setLoading(false)
     }
   }, [user])
 

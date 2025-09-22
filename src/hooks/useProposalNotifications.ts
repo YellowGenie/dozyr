@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '@/store/auth'
 
 export function useProposalNotifications() {
@@ -8,7 +8,7 @@ export function useProposalNotifications() {
   const [isLoading, setIsLoading] = useState(false)
   const { user, isAuthenticated } = useAuthStore()
 
-  const fetchNewProposalsCount = async () => {
+  const fetchNewProposalsCount = useCallback(async () => {
     if (!isAuthenticated || !user || user.role !== 'manager') {
       return
     }
@@ -16,7 +16,7 @@ export function useProposalNotifications() {
     try {
       setIsLoading(true)
       const token = localStorage.getItem('auth_token')
-      
+
       const response = await fetch('/api/v1/proposals/manager/new-proposals-count', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -33,16 +33,16 @@ export function useProposalNotifications() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [isAuthenticated, user])
 
-  const clearNotifications = async (jobId?: string) => {
+  const clearNotifications = useCallback(async (jobId?: string) => {
     if (!isAuthenticated || !user || user.role !== 'manager') {
       return
     }
 
     try {
       const token = localStorage.getItem('auth_token')
-      
+
       if (jobId) {
         // Mark proposals for specific job as viewed
         const response = await fetch(`/api/v1/proposals/jobs/${jobId}/mark-viewed`, {
@@ -64,15 +64,16 @@ export function useProposalNotifications() {
     } catch (error) {
       console.error('Error clearing notifications:', error)
     }
-  }
+  }, [isAuthenticated, user, fetchNewProposalsCount])
 
   useEffect(() => {
     fetchNewProposalsCount()
-    
+
+    // TEMPORARILY DISABLED to fix infinite loops
     // Set up polling to check for new proposals every 30 seconds
-    const interval = setInterval(fetchNewProposalsCount, 30000)
-    
-    return () => clearInterval(interval)
+    // const interval = setInterval(fetchNewProposalsCount, 30000)
+
+    // return () => clearInterval(interval)
   }, [isAuthenticated, user])
 
   return {

@@ -83,13 +83,13 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
+    <Card className="proposal-form-card w-full max-w-4xl mx-auto bg-white border-teal-100 shadow-lg hover:shadow-xl transition-shadow duration-200">
+      <CardHeader className="bg-gradient-to-r from-teal-50 to-white border-b border-teal-100">
+        <CardTitle className="flex items-center gap-2 text-gray-900">
+          <FileText className="h-5 w-5 text-teal-600" />
           Submit Proposal for "{job.title}"
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-gray-600">
           Submit your proposal for this job. Include details about what you can offer, your pricing, and availability.
         </CardDescription>
         <div className="flex flex-wrap gap-2 mt-4">
@@ -103,7 +103,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
       </CardHeader>
 
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 bg-white">
           {/* Cover Letter */}
           <div className="space-y-2">
             <Label htmlFor="cover_letter" className="text-base font-medium">
@@ -114,7 +114,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
               placeholder="Write a compelling cover letter explaining why you're the perfect fit for this job..."
               value={formData.cover_letter}
               onChange={(e) => handleInputChange('cover_letter', e.target.value)}
-              className={`min-h-[120px] ${errors.cover_letter ? 'border-red-500' : ''}`}
+              className={`min-h-[120px] focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors ${errors.cover_letter ? 'border-red-500' : 'border-gray-200'}`}
               disabled={isLoading}
             />
             {errors.cover_letter && (
@@ -132,7 +132,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
               placeholder="Describe what you can deliver for this project. Include specific deliverables, your approach, and any unique value you bring..."
               value={formData.draft_offering}
               onChange={(e) => handleInputChange('draft_offering', e.target.value)}
-              className={`min-h-[100px] ${errors.draft_offering ? 'border-red-500' : ''}`}
+              className={`min-h-[100px] focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors ${errors.draft_offering ? 'border-red-500' : 'border-gray-200'}`}
               disabled={isLoading}
             />
             {errors.draft_offering && (
@@ -155,7 +155,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
                   max={job.budget_max || undefined}
                   value={formData.bid_amount}
                   onChange={(e) => handleInputChange('bid_amount', parseFloat(e.target.value) || 0)}
-                  className={`pl-8 ${errors.bid_amount ? 'border-red-500' : ''}`}
+                  className={`pl-8 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors ${errors.bid_amount ? 'border-red-500' : 'border-gray-200'}`}
                   disabled={isLoading}
                 />
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sm text-muted-foreground">
@@ -182,7 +182,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
                 min="1"
                 value={formData.timeline_days}
                 onChange={(e) => handleInputChange('timeline_days', parseInt(e.target.value) || 0)}
-                className={errors.timeline_days ? 'border-red-500' : ''}
+                className={`focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors ${errors.timeline_days ? 'border-red-500' : 'border-gray-200'}`}
                 disabled={isLoading}
               />
               {errors.timeline_days && (
@@ -201,7 +201,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
               placeholder="Optional: Provide a detailed breakdown of your pricing, payment milestones, or any additional costs..."
               value={formData.pricing_details}
               onChange={(e) => handleInputChange('pricing_details', e.target.value)}
-              className="min-h-[80px]"
+              className="min-h-[80px] focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors border-gray-200"
               disabled={isLoading}
             />
           </div>
@@ -217,7 +217,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
               placeholder="When can you start? How many hours per day/week can you dedicate to this project?"
               value={formData.availability}
               onChange={(e) => handleInputChange('availability', e.target.value)}
-              className={`min-h-[80px] ${errors.availability ? 'border-red-500' : ''}`}
+              className={`min-h-[80px] focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors ${errors.availability ? 'border-red-500' : 'border-gray-200'}`}
               disabled={isLoading}
             />
             {errors.availability && (
@@ -226,7 +226,7 @@ export function ProposalForm({ job, onSubmit, onCancel, isLoading = false }: Pro
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between bg-gray-50 border-t border-teal-100">
           <Button
             type="button"
             variant="outline"

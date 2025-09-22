@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/auth'
 import { useToast } from '@/contexts/ToastContext'
 import { useConfirmation } from '@/hooks/useConfirmation'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
+import { ProposalForm } from '@/components/proposals/proposal-form'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -27,6 +28,7 @@ import { Badge } from '@/components/ui/badge'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { ProtectedRoute } from '@/components/layout/protected-route'
 import { api } from '@/lib/api'
+import { ProposalFormData, Job } from '@/types'
 import Link from 'next/link'
 
 const fadeInUp = {
@@ -41,10 +43,17 @@ export default function JobViewPage() {
   const { user } = useAuthStore()
   const { showSuccess, showError } = useToast()
   const confirmation = useConfirmation()
-  const [job, setJob] = useState<any>(null)
+  const [job, setJob] = useState<Job | null>(null)
+  const [userProposal, setUserProposal] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [loadingProposal, setLoadingProposal] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [submittingProposal, setSubmittingProposal] = useState(false)
+  const [showProposalForm, setShowProposalForm] = useState(false)
+  const [showProposalDetails, setShowProposalDetails] = useState(false)
+
+  const isManager = user?.role === 'manager'
+  const isTalent = user?.role === 'talent'
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -71,10 +80,27 @@ export default function JobViewPage() {
       }
     }
 
+    const fetchUserProposal = async () => {
+      if (!isTalent || !params.id) return
+
+      try {
+        setLoadingProposal(true)
+        const response = await api.getUserProposalForJob(params.id as string)
+        setUserProposal(response.proposal)
+      } catch (error: any) {
+        // This is expected when user hasn't submitted a proposal yet
+        console.log('No existing proposal found for this job (this is normal if user hasnt submitted a proposal)')
+        setUserProposal(null)
+      } finally {
+        setLoadingProposal(false)
+      }
+    }
+
     if (params.id) {
       fetchJob()
+      fetchUserProposal()
     }
-  }, [params.id])
+  }, [params.id, isTalent])
 
   const handleDelete = async () => {
     await confirmation.confirm(
@@ -147,18 +173,57 @@ export default function JobViewPage() {
     }
   }
 
+  const getProposalStatusColor = (status?: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/20'
+      case 'accepted':
+        return 'bg-green-500/20 text-green-400 border-green-500/20'
+      case 'rejected':
+        return 'bg-red-500/20 text-red-400 border-red-500/20'
+      case 'withdrawn':
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/20'
+      case 'interview':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/20'
+      case 'approved':
+        return 'bg-dozyr-gold/20 text-dozyr-gold border-dozyr-gold/20'
+      default:
+        return 'bg-dozyr-medium-gray/20 text-dozyr-light-gray border-dozyr-medium-gray/20'
+    }
+  }
+
+  const getProposalStatusText = (status?: string) => {
+    switch (status) {
+      case 'pending':
+        return 'Under Review'
+      case 'accepted':
+        return 'Accepted'
+      case 'rejected':
+        return 'Rejected'
+      case 'withdrawn':
+        return 'Withdrawn'
+      case 'interview':
+        return 'Interview Stage'
+      case 'approved':
+        return 'Approved'
+      case 'no_longer_accepting':
+        return 'No Longer Accepting'
+      case 'inappropriate':
+        return 'Flagged as Inappropriate'
+      default:
+        return 'Unknown'
+    }
+  }
+
   const formatBudget = (job: any) => {
     const min = job.budget_min || 0
     const max = job.budget_max || 0
-    
+
     if (job.budget_type === 'hourly') {
       return `$${min}-$${max}/hr`
     }
     return `$${min.toLocaleString()}-$${max.toLocaleString()}`
   }
-
-  const isManager = user?.role === 'manager'
-  const isTalent = user?.role === 'talent'
 
   if (loading) {
     return (
@@ -198,22 +263,43 @@ export default function JobViewPage() {
     )
   }
 
-  const handleSubmitProposal = async () => {
-    if (!isTalent) return
+  const handleSubmitProposal = async (proposalData: ProposalFormData) => {
+    if (!isTalent || !job) return
 
     try {
       setSubmittingProposal(true)
       await api.submitProposal(params.id as string, {
-        cover_letter: 'This is a placeholder proposal. The proposal system needs to be implemented.',
-        bid_amount: job.budget_min || 0
+        cover_letter: proposalData.cover_letter,
+        bid_amount: proposalData.bid_amount,
+        timeline_days: proposalData.timeline_days,
+        draft_offering: proposalData.draft_offering,
+        pricing_details: proposalData.pricing_details,
+        availability: proposalData.availability
       })
       showSuccess('Proposal Submitted!', 'Your proposal has been submitted successfully.')
-    } catch (error) {
+      setShowProposalForm(false)
+
+      // Refresh user proposal status
+      try {
+        const response = await api.getUserProposalForJob(params.id as string)
+        setUserProposal(response.proposal)
+      } catch (error) {
+        console.log('Failed to refresh proposal status - this is normal:', error)
+      }
+    } catch (error: any) {
       console.error('Failed to submit proposal:', error)
       showError('Submission Failed', 'Failed to submit proposal: ' + error.message)
     } finally {
       setSubmittingProposal(false)
     }
+  }
+
+  const handleShowProposalForm = () => {
+    setShowProposalForm(true)
+  }
+
+  const handleCancelProposal = () => {
+    setShowProposalForm(false)
   }
 
   return (
@@ -272,18 +358,29 @@ export default function JobViewPage() {
               )}
               {isTalent && (
                 <div className="flex items-center gap-3">
-                  <Button
-                    className="bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90"
-                    onClick={handleSubmitProposal}
-                    disabled={submittingProposal}
-                  >
-                    {submittingProposal ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                    ) : (
+                  {userProposal ? (
+                    <div className="flex items-center gap-3">
+                      <Badge className={getProposalStatusColor(userProposal.status)}>
+                        {getProposalStatusText(userProposal.status)}
+                      </Badge>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowProposalDetails(true)}
+                        className="text-[var(--accent)] border-[var(--accent)]/20 hover:bg-[var(--accent)]/10"
+                      >
+                        View My Proposal
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      className="bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90"
+                      onClick={handleShowProposalForm}
+                      disabled={showProposalForm || loadingProposal}
+                    >
                       <Briefcase className="h-4 w-4 mr-2" />
-                    )}
-                    {submittingProposal ? 'Submitting...' : 'Submit Proposal'}
-                  </Button>
+                      {loadingProposal ? 'Loading...' : 'Submit Proposal'}
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -442,10 +539,11 @@ export default function JobViewPage() {
                       <p className="text-foreground/70 mb-4">
                         {job.applications_count || 0} applications received
                       </p>
-                      <Button variant="outline" className="w-full" disabled>
-                        View Applications
-                        <span className="text-xs ml-2">(Coming Soon)</span>
-                      </Button>
+                      <Link href={`/jobs/${job.id}/proposals`}>
+                        <Button variant="outline" className="w-full">
+                          View Applications
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -457,32 +555,190 @@ export default function JobViewPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Briefcase className="h-5 w-5" />
-                      Apply for this Job
+                      {userProposal ? 'My Proposal' : 'Apply for this Job'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <p className="text-foreground/70 text-sm">
-                        Ready to apply? Submit your proposal to get started.
-                      </p>
-                      <Button
-                        className="w-full bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90"
-                        onClick={handleSubmitProposal}
-                        disabled={submittingProposal}
-                      >
-                        {submittingProposal ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                        ) : (
-                          <Briefcase className="h-4 w-4 mr-2" />
-                        )}
-                        {submittingProposal ? 'Submitting...' : 'Submit Proposal'}
-                      </Button>
+                      {userProposal ? (
+                        <>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-foreground/70 text-sm">Status</span>
+                              <Badge className={getProposalStatusColor(userProposal.status)} size="sm">
+                                {getProposalStatusText(userProposal.status)}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-foreground/70 text-sm">Bid Amount</span>
+                              <span className="text-[var(--foreground)] text-sm font-medium">
+                                ${userProposal.bid_amount?.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-foreground/70 text-sm">Timeline</span>
+                              <span className="text-[var(--foreground)] text-sm font-medium">
+                                {userProposal.timeline_days} days
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-foreground/70 text-sm">Submitted</span>
+                              <span className="text-[var(--foreground)] text-sm font-medium">
+                                {new Date(userProposal.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setShowProposalDetails(true)}
+                          >
+                            View Full Proposal
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-foreground/70 text-sm">
+                            Ready to apply? Submit your proposal to get started.
+                          </p>
+                          <Button
+                            className="w-full bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90"
+                            onClick={handleShowProposalForm}
+                            disabled={showProposalForm || loadingProposal}
+                          >
+                            <Briefcase className="h-4 w-4 mr-2" />
+                            {loadingProposal ? 'Loading...' : 'Submit Proposal'}
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               )}
             </motion.div>
           </div>
+
+          {/* Proposal Form Modal */}
+          {showProposalForm && job && isTalent && (
+            <motion.div
+              {...fadeInUp}
+              transition={{ delay: 0.2 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            >
+              <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <ProposalForm
+                  job={job}
+                  onSubmit={handleSubmitProposal}
+                  onCancel={handleCancelProposal}
+                  isLoading={submittingProposal}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {/* Proposal Details Modal */}
+          {showProposalDetails && userProposal && (
+            <motion.div
+              {...fadeInUp}
+              transition={{ delay: 0.2 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            >
+              <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <Card className="bg-white border-teal-100 shadow-lg">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-dozyr-dark-gray">My Proposal</CardTitle>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowProposalDetails(false)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Status and Basic Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 mb-1">Status</p>
+                        <Badge className={getProposalStatusColor(userProposal.status)}>
+                          {getProposalStatusText(userProposal.status)}
+                        </Badge>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 mb-1">Bid Amount</p>
+                        <p className="font-semibold text-dozyr-dark-gray">
+                          ${userProposal.bid_amount?.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 mb-1">Timeline</p>
+                        <p className="font-semibold text-dozyr-dark-gray">
+                          {userProposal.timeline_days} days
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Cover Letter */}
+                    <div>
+                      <h3 className="font-semibold text-dozyr-dark-gray mb-2">Cover Letter</h3>
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                          {userProposal.cover_letter}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Draft Offering */}
+                    {userProposal.draft_offering && (
+                      <div>
+                        <h3 className="font-semibold text-dozyr-dark-gray mb-2">Draft Offering</h3>
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                            {userProposal.draft_offering}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pricing Details */}
+                    {userProposal.pricing_details && (
+                      <div>
+                        <h3 className="font-semibold text-dozyr-dark-gray mb-2">Pricing Details</h3>
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                            {userProposal.pricing_details}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Availability */}
+                    {userProposal.availability && (
+                      <div>
+                        <h3 className="font-semibold text-dozyr-dark-gray mb-2">Availability</h3>
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                            {userProposal.availability}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Submission Date */}
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-600">
+                        Submitted on {new Date(userProposal.created_at).toLocaleDateString()} at{' '}
+                        {new Date(userProposal.created_at).toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </motion.div>
+          )}
         </div>
       </DashboardLayout>
 

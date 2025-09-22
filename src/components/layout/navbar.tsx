@@ -266,7 +266,8 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 transition-colors"
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden">
-                    {user.profile_image && user.profile_image.trim() !== '' ? (
+                    {/* TEMPORARILY DISABLED - Fixing infinite loop */}
+                    {false && user.profile_image && user.profile_image.trim() !== '' ? (
                       <img
                         src={user.profile_image}
                         alt="Profile"
@@ -278,9 +279,9 @@ export function Navbar({ isScrolled = false }: NavbarProps) {
                         }}
                       />
                     ) : null}
-                    <div 
+                    <div
                       className="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center"
-                      style={{ display: user.profile_image && user.profile_image.trim() !== '' ? 'none' : 'flex' }}
+                      style={{ display: 'flex' }}
                     >
                       <span className="text-black font-bold text-sm">
                         {generateInitials(user.first_name, user.last_name)}

@@ -47,7 +47,7 @@ export default function JobProposalsPage() {
         setProposals(proposalsResponse.proposals || [])
         
         // Mark proposals as viewed
-        await clearNotifications(jobId)
+        // await clearNotifications(jobId) // TEMPORARILY DISABLED
         
       } catch (error: any) {
         console.error('Error fetching job proposals:', error)
@@ -60,7 +60,7 @@ export default function JobProposalsPage() {
     if (jobId) {
       fetchJobAndProposals()
     }
-  }, [jobId, clearNotifications])
+  }, [jobId]) // TEMPORARILY REMOVED clearNotifications
 
   const handleUpdateProposalStatus = async (proposalId: string, status: Proposal['status']) => {
     try {

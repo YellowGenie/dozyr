@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import ReactCrop, {
   centerCrop,
   makeAspectCrop,
@@ -317,40 +317,30 @@ export default function ProfileImageUpload({ user, isEditing, onImageUpdate }: P
   console.log('ProfileImageUpload - hasProfileImage:', hasProfileImage)
   console.log('ProfileImageUpload - user.profile_image:', user?.profile_image)
 
-  // Get image URL with proxy and cache busting
-  const getImageSrc = () => {
+  // Memoize image URL to prevent infinite loops - disable cache busting to prevent infinite loop
+  const imageUrl = useMemo(() => {
     if (!hasProfileImage) return ''
-    return getImageUrl(user.profile_image!, true)
-  }
+    return getImageUrl(user.profile_image!, false) // Disable cache busting
+  }, [hasProfileImage, user?.profile_image])
 
   return (
     <div className="text-center">
       <div className="relative inline-block mb-4">
-        {hasProfileImage ? (
+        {/* TEMPORARILY DISABLED - Testing infinite loop fix */}
+        {false && hasProfileImage ? (
           <img
             key={`profile-image-${imageKey}`}
-            src={getImageSrc()}
+            src={imageUrl}
             alt="Profile"
             className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-[var(--accent)] shadow-lg"
             onError={(e) => {
               console.error('Profile image failed to load:', user.profile_image)
-              console.error('Full image URL:', getImageSrc())
+              console.error('Full image URL:', imageUrl)
               console.error('Image load error event:', e)
 
               setImageLoadError(true)
 
-              // Test if it's a network/CORS issue by trying to fetch
-              fetch(getImageSrc(), { method: 'HEAD' })
-                .then(response => {
-                  console.log('HEAD request status:', response.status)
-                  console.log('HEAD request headers:', response.headers)
-                  if (!response.ok) {
-                    console.error('Image URL returned HTTP error:', response.status)
-                  }
-                })
-                .catch(fetchError => {
-                  console.error('Fetch test failed - likely CORS or network issue:', fetchError)
-                })
+              console.log('Image failed to load:', imageUrl)
 
               // Hide the broken image and show initials instead
               e.currentTarget.style.display = 'none'

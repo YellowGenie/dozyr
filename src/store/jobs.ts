@@ -56,8 +56,8 @@ const filterJobsForUser = (jobs: Job[]): Job[] => {
       // Filter out expired jobs
       const isExpired = job.status === 'expired'
 
-      // Only show active, approved jobs to talent
-      return !isHidden && !isExpired && job.status === 'active'
+      // Only show open, approved jobs to talent
+      return !isHidden && !isExpired && job.status === 'open'
     })
   }
 

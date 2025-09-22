@@ -23,7 +23,7 @@ class ApiClient {
   private token: string | null = null
 
   constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3004/api/v1'
+    this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'
     
     // Initialize token from localStorage if available
     if (typeof window !== 'undefined') {
@@ -742,6 +742,10 @@ class ApiClient {
 
   async getProposalsByStatus(jobId: string, status: string): Promise<{ proposals: any[] }> {
     return this.request(`/proposals/jobs/${jobId}/proposals/${status}`)
+  }
+
+  async getUserProposalForJob(jobId: string): Promise<{ proposal: any | null }> {
+    return this.request(`/proposals/jobs/${jobId}/my-proposal`)
   }
 
   // Saved Jobs
