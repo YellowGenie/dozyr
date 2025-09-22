@@ -40,8 +40,8 @@ import { useProposalNotifications } from '@/hooks/useProposalNotifications'
 import { useContractNotifications } from '@/hooks/useContractNotifications'
 import { useAdminNotifications } from '@/contexts/AdminNotificationContext'
 import { AIAssistant } from '@/components/ai/ai-assistant'
-import { ProfileCompletionWorkflow } from '@/components/profile/profile-completion-workflow'
-import { ProfileCompletionBanner } from '@/components/profile/profile-completion-banner'
+// import { ProfileCompletionWorkflow } from '@/components/profile/profile-completion-workflow'
+// import { ProfileCompletionBanner } from '@/components/profile/profile-completion-banner'
 import { NotificationPanel } from '@/components/notifications/notification-panel'
 import { shouldShowCompletionWorkflow } from '@/lib/profile-completion'
 import { api } from '@/lib/api'
@@ -86,7 +86,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return () => window.removeEventListener('profile-image-updated', handleProfileImageUpdate)
   }, [])
 
-  // Check profile completion for talent users - workflow once per session, banner when needed
+  // Check profile completion for talent users - DISABLED in favor of new Upwork-style modal
+  /*
   useEffect(() => {
     const checkProfileCompletion = async () => {
       if (!user || user.role !== 'talent' || hasCheckedProfileCompletion) return
@@ -136,6 +137,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       }
     }
   }, [pathname, talentProfile, profileBannerDismissedThisSession, user, hasCheckedProfileCompletion])
+  */
 
   const handleProfileUpdate = (updatedProfile: any) => {
     setTalentProfile(updatedProfile)
@@ -615,7 +617,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         onClose={() => setIsNotificationPanelOpen(false)}
       />
 
-      {/* Profile Completion Banner */}
+      {/* Profile Completion Components - Disabled in favor of new Upwork-style modal in talent dashboard */}
+      {/*
       {user?.role === 'talent' && showProfileBanner && (
         <ProfileCompletionBanner
           profile={talentProfile}
@@ -623,7 +626,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         />
       )}
 
-      {/* Profile Completion Workflow */}
       {user?.role === 'talent' && (
         <ProfileCompletionWorkflow
           isOpen={isProfileWorkflowOpen}
@@ -632,6 +634,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           onProfileUpdate={handleProfileUpdate}
         />
       )}
+      */}
     </div>
   )
 }

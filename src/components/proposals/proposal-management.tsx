@@ -33,22 +33,22 @@ interface ProposalManagementProps {
   proposals: Proposal[]
   onUpdateProposalStatus: (proposalId: string, status: Proposal['status']) => Promise<void>
   onMarkAsViewed: () => Promise<void>
+  onCreateInterview?: (proposal: Proposal) => Promise<void>
   isLoading?: boolean
 }
 
-export function ProposalManagement({ 
-  job, 
-  proposals, 
-  onUpdateProposalStatus, 
+export function ProposalManagement({
+  job,
+  proposals,
+  onUpdateProposalStatus,
   onMarkAsViewed,
-  isLoading = false 
+  onCreateInterview,
+  isLoading = false
 }: ProposalManagementProps) {
   const [selectedTab, setSelectedTab] = useState('all')
 
-  useEffect(() => {
-    // Mark proposals as viewed when component mounts
-    onMarkAsViewed()
-  }, [onMarkAsViewed])
+  // Removed automatic marking as viewed to prevent infinite loops
+  // onMarkAsViewed can be called manually when needed
 
   const getStatusBadgeVariant = (status: Proposal['status']) => {
     switch (status) {
@@ -103,7 +103,14 @@ export function ProposalManagement({
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Proposals for "{job.title}"</span>
-            <Badge variant="secondary">{proposals.length} Proposal{proposals.length !== 1 ? 's' : ''}</Badge>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary">{proposals.length} Proposal{proposals.length !== 1 ? 's' : ''}</Badge>
+              {proposals.some(p => !p.viewed_by_manager) && (
+                <Button variant="outline" size="sm" onClick={onMarkAsViewed} disabled={isLoading}>
+                  Mark All as Viewed
+                </Button>
+              )}
+            </div>
           </CardTitle>
           <CardDescription>
             Review and manage proposals from talented applicants
@@ -151,6 +158,7 @@ export function ProposalManagement({
                   proposal={proposal}
                   job={job}
                   onStatusUpdate={handleStatusUpdate}
+                  onCreateInterview={onCreateInterview}
                   isLoading={isLoading}
                 />
               ))}
@@ -166,10 +174,11 @@ interface ProposalCardProps {
   proposal: Proposal
   job: Job
   onStatusUpdate: (proposalId: string, status: Proposal['status']) => Promise<void>
+  onCreateInterview?: (proposal: Proposal) => Promise<void>
   isLoading: boolean
 }
 
-function ProposalCard({ proposal, job, onStatusUpdate, isLoading }: ProposalCardProps) {
+function ProposalCard({ proposal, job, onStatusUpdate, onCreateInterview, isLoading }: ProposalCardProps) {
   const getStatusBadgeVariant = (status: Proposal['status']) => {
     switch (status) {
       case 'pending': return 'default'
@@ -244,28 +253,37 @@ function ProposalCard({ proposal, job, onStatusUpdate, isLoading }: ProposalCard
               <DropdownMenuContent align="end">
                 {proposal.status === 'pending' && (
                   <>
-                    <DropdownMenuItem 
+                    {onCreateInterview && (
+                      <DropdownMenuItem
+                        onClick={() => onCreateInterview(proposal)}
+                        disabled={isLoading}
+                      >
+                        <UserCheck className="h-4 w-4 mr-2" />
+                        Create Interview
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem
                       onClick={() => onStatusUpdate(proposal.id, 'interview')}
                       disabled={isLoading}
                     >
                       <UserCheck className="h-4 w-4 mr-2" />
                       Mark for Interview
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onStatusUpdate(proposal.id, 'approved')}
                       disabled={isLoading}
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Approve
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onStatusUpdate(proposal.id, 'rejected')}
                       disabled={isLoading}
                     >
                       <XCircle className="h-4 w-4 mr-2" />
                       Reject
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onStatusUpdate(proposal.id, 'inappropriate')}
                       disabled={isLoading}
                     >

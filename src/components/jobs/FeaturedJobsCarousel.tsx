@@ -163,16 +163,7 @@ export default function FeaturedJobsCarousel() {
   }
 
   if (featuredJobs.length === 0) {
-    return (
-      <div className="w-full">
-        <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">Featured Jobs</h2>
-        <div className="text-center py-8 bg-dozyr-medium-gray/10 rounded-lg">
-          <Star className="h-12 w-12 text-dozyr-medium-gray mx-auto mb-3" />
-          <p className="text-dozyr-light-gray">No featured jobs available at the moment</p>
-          <p className="text-xs text-dozyr-medium-gray mt-1">Check back later for special opportunities!</p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   // Duplicate jobs for infinite scroll effect

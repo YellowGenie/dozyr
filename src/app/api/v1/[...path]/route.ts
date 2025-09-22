@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const BACKEND_URL = process.env.NODE_ENV === 'production'
   ? 'https://wish-well-b0nc.onrender.com'
-  : 'http://localhost:3005'
+  : 'http://localhost:3000'
 
 export async function GET(
   request: NextRequest,

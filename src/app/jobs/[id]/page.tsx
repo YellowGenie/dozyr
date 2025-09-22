@@ -19,7 +19,9 @@ import {
   Clock,
   Star,
   Edit,
-  Trash2
+  Trash2,
+  BookmarkPlus,
+  Search
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -28,6 +30,7 @@ import { Badge } from '@/components/ui/badge'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { ProtectedRoute } from '@/components/layout/protected-route'
 import { api } from '@/lib/api'
+import { formatRelativeTime } from '@/lib/utils'
 import { ProposalFormData, Job } from '@/types'
 import Link from 'next/link'
 
@@ -241,7 +244,7 @@ export default function JobViewPage() {
     return (
       <ProtectedRoute requiredRole={['manager', 'talent']}>
         <DashboardLayout>
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <Card>
               <CardContent className="p-12 text-center">
                 <Briefcase className="h-12 w-12 text-foreground/40 mx-auto mb-4" />
@@ -305,85 +308,160 @@ export default function JobViewPage() {
   return (
     <ProtectedRoute requiredRole={['manager', 'talent']}>
       <DashboardLayout>
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header */}
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Enhanced Header */}
           <motion.div {...fadeInUp}>
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <Link href={isManager ? "/my-jobs" : "/jobs"}>
-                  <Button variant="outline" size="sm">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    {isManager ? 'Back to My Jobs' : 'Back to Jobs'}
-                  </Button>
-                </Link>
-                <div>
-                  <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">{job.title}</h1>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <Badge className={getStatusColor(job.status)}>
-                      {job.status?.replace('_', ' ') || 'Unknown'}
-                    </Badge>
-                    {isManager && (
-                      <Badge className={getAdminStatusColor(job.admin_status)}>
-                        {getAdminStatusText(job.admin_status)}
+            <div className="mb-6">
+              <Link href={isManager ? "/my-jobs" : "/jobs"}>
+                <Button variant="ghost" size="sm" className="mb-4 -ml-2">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  {isManager ? 'Back to My Jobs' : 'Back to Jobs'}
+                </Button>
+              </Link>
+            </div>
+
+            {/* Job Header Card */}
+            <Card className="mb-8 shadow-sm border-gray-200">
+              <CardContent className="p-8">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                  <div className="flex-1">
+                    {/* Company Info */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 bg-[var(--accent)]/10 rounded-xl flex items-center justify-center">
+                        <Building className="h-6 w-6 text-[var(--accent)]" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-semibold text-[var(--foreground)]">{job.company_name || 'Company'}</h2>
+                        <div className="flex items-center gap-2 text-sm text-foreground/60">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span>Payment verified</span>
+                          <span>•</span>
+                          <Star className="h-3 w-3 fill-current text-yellow-400" />
+                          <span>4.9 rating</span>
+                          <span>•</span>
+                          <span>32 jobs posted</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Job Title */}
+                    <h1 className="text-4xl font-bold text-[var(--foreground)] mb-4 leading-tight">{job.title}</h1>
+
+                    {/* Job Meta Info */}
+                    <div className="flex flex-wrap items-center gap-4 mb-6">
+                      <div className="flex items-center gap-2 text-foreground/70">
+                        <MapPin className="h-4 w-4" />
+                        <span>{job.location || 'Remote'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground/70">
+                        <Clock className="h-4 w-4" />
+                        <span className="capitalize">{job.job_type?.replace('-', ' ') || 'Full-time'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground/70">
+                        <Calendar className="h-4 w-4" />
+                        <span>Posted {formatRelativeTime(job.created_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground/70">
+                        <Users className="h-4 w-4" />
+                        <span>{job.applicant_count || 0} proposals</span>
+                      </div>
+                    </div>
+
+                    {/* Status Badges */}
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <Badge className={getStatusColor(job.status)} variant="outline">
+                        {job.status?.replace('_', ' ') || 'Unknown'}
                       </Badge>
-                    )}
-                    <span className="text-dozyr-light-gray">
-                      Posted {new Date(job.created_at).toLocaleDateString()}
-                    </span>
+                      {isManager && (
+                        <Badge className={getAdminStatusColor(job.admin_status)} variant="outline">
+                          {getAdminStatusText(job.admin_status)}
+                        </Badge>
+                      )}
+                      {job.featured && (
+                        <Badge className="bg-gradient-to-r from-orange-400 to-pink-500 text-white border-0">
+                          Featured Job
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3 lg:w-auto w-full">
+                    {isManager ? (
+                      <div className="flex flex-col gap-3">
+                        <Link href={`/jobs/${job.id}/edit`} className="w-full">
+                          <Button variant="outline" className="w-full">
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Job
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="outline"
+                          className="text-red-500 border-red-200 hover:bg-red-50 w-full"
+                          onClick={handleDelete}
+                          disabled={deleting}
+                        >
+                          {deleting ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500 mr-2"></div>
+                          ) : (
+                            <Trash2 className="h-4 w-4 mr-2" />
+                          )}
+                          {deleting ? 'Deleting...' : 'Delete Job'}
+                        </Button>
+                      </div>
+                    ) : isTalent ? (
+                      <div className="flex flex-col gap-3">
+                        {userProposal ? (
+                          <>
+                            <Badge className={getProposalStatusColor(userProposal.status)} variant="outline">
+                              {getProposalStatusText(userProposal.status)}
+                            </Badge>
+                            <Button
+                              variant="outline"
+                              onClick={() => setShowProposalDetails(true)}
+                              className="w-full"
+                            >
+                              View My Proposal
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              size="lg"
+                              className="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white w-full"
+                              onClick={handleShowProposalForm}
+                              disabled={showProposalForm || loadingProposal}
+                            >
+                              <Briefcase className="h-5 w-5 mr-2" />
+                              {loadingProposal ? 'Loading...' : 'Submit Proposal'}
+                            </Button>
+                            <Button variant="outline" className="w-full">
+                              <BookmarkPlus className="h-4 w-4 mr-2" />
+                              Save Job
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
-              </div>
-              {isManager && (
-                <div className="flex items-center gap-3">
-                  <Link href={`/jobs/${job.id}/edit`}>
-                    <Button variant="outline">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Job
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    className="text-red-400 border-red-400/20 hover:bg-red-400/10"
-                    onClick={handleDelete}
-                    disabled={deleting}
-                  >
-                    {deleting ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-400 mr-2"></div>
-                    ) : (
-                      <Trash2 className="h-4 w-4 mr-2" />
-                    )}
-                    {deleting ? 'Deleting...' : 'Delete Job'}
-                  </Button>
-                </div>
-              )}
-              {isTalent && (
-                <div className="flex items-center gap-3">
-                  {userProposal ? (
-                    <div className="flex items-center gap-3">
-                      <Badge className={getProposalStatusColor(userProposal.status)}>
-                        {getProposalStatusText(userProposal.status)}
-                      </Badge>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowProposalDetails(true)}
-                        className="text-[var(--accent)] border-[var(--accent)]/20 hover:bg-[var(--accent)]/10"
-                      >
-                        View My Proposal
-                      </Button>
+
+                {/* Budget Display */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <DollarSign className="h-5 w-5 text-[var(--accent)]" />
+                    <div>
+                      <span className="text-2xl font-bold text-[var(--foreground)]">
+                        {formatBudget(job)}
+                      </span>
+                      <span className="text-foreground/60 ml-2 capitalize">
+                        {job.budget_type || 'fixed'} price
+                      </span>
                     </div>
-                  ) : (
-                    <Button
-                      className="bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90"
-                      onClick={handleShowProposalForm}
-                      disabled={showProposalForm || loadingProposal}
-                    >
-                      <Briefcase className="h-4 w-4 mr-2" />
-                      {loadingProposal ? 'Loading...' : 'Submit Proposal'}
-                    </Button>
-                  )}
+                  </div>
                 </div>
-              )}
-            </div>
+              </CardContent>
+            </Card>
           </motion.div>
 
           {/* Pending Approval Notice for Managers */}
@@ -449,99 +527,109 @@ export default function JobViewPage() {
             </motion.div>
           )}
 
-          <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Content Layout */}
+          <div className="grid lg:grid-cols-4 gap-8">
             {/* Main Content */}
-            <motion.div {...fadeInUp} className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5" />
+            <motion.div {...fadeInUp} className="lg:col-span-3 space-y-8">
+              {/* Job Description */}
+              <Card className="shadow-sm border-gray-200">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Briefcase className="h-5 w-5 text-[var(--accent)]" />
                     Job Description
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="prose prose-invert max-w-none">
-                    <p className="text-dozyr-light-gray whitespace-pre-wrap leading-relaxed">
+                <CardContent>
+                  <div className="prose max-w-none">
+                    <div className="text-[var(--foreground)] whitespace-pre-wrap leading-relaxed text-base">
                       {job.description}
-                    </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Skills Required */}
+              {job.skills && job.skills.length > 0 && (
+                <Card className="shadow-sm border-gray-200">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      <Star className="h-5 w-5 text-[var(--accent)]" />
+                      Skills & Expertise
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-3">
+                      {job.skills.map((skill, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20 px-3 py-1 text-sm font-medium"
+                        >
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Project Details */}
+              <Card className="shadow-sm border-gray-200">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Calendar className="h-5 w-5 text-[var(--accent)]" />
+                    Project Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <DollarSign className="h-6 w-6 text-[var(--accent)] mx-auto mb-2" />
+                      <div className="text-sm text-foreground/60 mb-1">Budget</div>
+                      <div className="font-semibold text-[var(--foreground)]">{formatBudget(job)}</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <Clock className="h-6 w-6 text-[var(--accent)] mx-auto mb-2" />
+                      <div className="text-sm text-foreground/60 mb-1">Type</div>
+                      <div className="font-semibold text-[var(--foreground)] capitalize">{job.budget_type || 'Fixed'}</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <Star className="h-6 w-6 text-[var(--accent)] mx-auto mb-2" />
+                      <div className="text-sm text-foreground/60 mb-1">Experience</div>
+                      <div className="font-semibold text-[var(--foreground)] capitalize">{job.experience_level || 'Any'}</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <Users className="h-6 w-6 text-[var(--accent)] mx-auto mb-2" />
+                      <div className="text-sm text-foreground/60 mb-1">Proposals</div>
+                      <div className="font-semibold text-[var(--foreground)]">{job.applicant_count || 0}</div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
 
-            {/* Sidebar */}
+            {/* Enhanced Sidebar */}
             <motion.div {...fadeInUp} className="space-y-6">
-              {/* Job Details */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5" />
-                    Job Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground/70">Budget</span>
-                      <span className="text-[var(--foreground)] font-medium">{formatBudget(job)}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground/70">Type</span>
-                      <span className="text-[var(--foreground)] font-medium capitalize">{job.budget_type}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground/70">Experience</span>
-                      <span className="text-[var(--foreground)] font-medium capitalize">{job.experience_level}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground/70">Category</span>
-                      <span className="text-[var(--foreground)] font-medium">{job.category || 'General'}</span>
-                    </div>
-                    {isManager && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-foreground/70">Applications</span>
-                        <span className="text-[var(--foreground)] font-medium">{job.applications_count || 0}</span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Company Info */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5" />
-                    Company
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="text-[var(--foreground)] font-medium">{job.company_name || 'Your Company'}</h4>
-                      <p className="text-foreground/70 text-sm">{job.location || 'Remote'}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* Applications - Only for managers */}
               {isManager && (
-                <Card>
-                  <CardHeader>
+                <Card className="shadow-sm border-gray-200">
+                  <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Applications
+                      <Users className="h-5 w-5 text-[var(--accent)]" />
+                      Manage Applications
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-4">
-                      <p className="text-foreground/70 mb-4">
-                        {job.applications_count || 0} applications received
-                      </p>
+                    <div className="space-y-4">
+                      <div className="text-center py-4">
+                        <div className="text-3xl font-bold text-[var(--accent)] mb-1">
+                          {job.applications_count || 0}
+                        </div>
+                        <p className="text-foreground/70 text-sm">Applications received</p>
+                      </div>
                       <Link href={`/jobs/${job.id}/proposals`}>
-                        <Button variant="outline" className="w-full">
-                          View Applications
+                        <Button className="w-full bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white">
+                          Review Applications
                         </Button>
                       </Link>
                     </div>
@@ -549,72 +637,121 @@ export default function JobViewPage() {
                 </Card>
               )}
 
-              {/* Quick Apply - Only for talents */}
-              {isTalent && (
-                <Card>
-                  <CardHeader>
+              {/* Proposal Status - Only for talents */}
+              {isTalent && userProposal && (
+                <Card className="shadow-sm border-gray-200">
+                  <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-2">
-                      <Briefcase className="h-5 w-5" />
-                      {userProposal ? 'My Proposal' : 'Apply for this Job'}
+                      <Briefcase className="h-5 w-5 text-[var(--accent)]" />
+                      My Proposal
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {userProposal ? (
-                        <>
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className="text-foreground/70 text-sm">Status</span>
-                              <Badge className={getProposalStatusColor(userProposal.status)} size="sm">
-                                {getProposalStatusText(userProposal.status)}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-foreground/70 text-sm">Bid Amount</span>
-                              <span className="text-[var(--foreground)] text-sm font-medium">
-                                ${userProposal.bid_amount?.toLocaleString()}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-foreground/70 text-sm">Timeline</span>
-                              <span className="text-[var(--foreground)] text-sm font-medium">
-                                {userProposal.timeline_days} days
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-foreground/70 text-sm">Submitted</span>
-                              <span className="text-[var(--foreground)] text-sm font-medium">
-                                {new Date(userProposal.created_at).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                          <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => setShowProposalDetails(true)}
-                          >
-                            View Full Proposal
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-foreground/70 text-sm">
-                            Ready to apply? Submit your proposal to get started.
-                          </p>
-                          <Button
-                            className="w-full bg-[var(--accent)] text-black hover:bg-[var(--accent)]/90"
-                            onClick={handleShowProposalForm}
-                            disabled={showProposalForm || loadingProposal}
-                          >
-                            <Briefcase className="h-4 w-4 mr-2" />
-                            {loadingProposal ? 'Loading...' : 'Submit Proposal'}
-                          </Button>
-                        </>
-                      )}
+                      <div className="text-center p-4 bg-gray-50 rounded-lg">
+                        <Badge className={getProposalStatusColor(userProposal.status)} className="mb-2">
+                          {getProposalStatusText(userProposal.status)}
+                        </Badge>
+                        <div className="text-sm text-foreground/60">Current Status</div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-foreground/70">Bid Amount</span>
+                          <span className="font-semibold">${userProposal.bid_amount?.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-foreground/70">Timeline</span>
+                          <span className="font-semibold">{userProposal.timeline_days} days</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-foreground/70">Submitted</span>
+                          <span className="font-semibold">{new Date(userProposal.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setShowProposalDetails(true)}
+                      >
+                        View Full Proposal
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
               )}
+
+              {/* About Client */}
+              <Card className="shadow-sm border-gray-200">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5 text-[var(--accent)]" />
+                    About the Client
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-[var(--accent)]/10 rounded-full flex items-center justify-center">
+                        <Building className="h-6 w-6 text-[var(--accent)]" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-[var(--foreground)]">{job.company_name || 'Company'}</h4>
+                        <p className="text-foreground/70 text-sm">{job.location || 'Remote'}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                      <div className="text-center">
+                        <div className="font-semibold text-[var(--foreground)]">4.9</div>
+                        <div className="flex items-center justify-center mb-1">
+                          <Star className="h-3 w-3 fill-current text-yellow-400" />
+                          <Star className="h-3 w-3 fill-current text-yellow-400" />
+                          <Star className="h-3 w-3 fill-current text-yellow-400" />
+                          <Star className="h-3 w-3 fill-current text-yellow-400" />
+                          <Star className="h-3 w-3 fill-current text-yellow-400" />
+                        </div>
+                        <div className="text-xs text-foreground/60">Client rating</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-[var(--foreground)]">32</div>
+                        <div className="text-xs text-foreground/60">Jobs posted</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 pt-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-foreground/70">Payment verified</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Similar Jobs */}
+              <Card className="shadow-sm border-gray-200">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="h-5 w-5 text-[var(--accent)]" />
+                    Similar Jobs
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                      <h5 className="font-medium text-sm text-[var(--foreground)] mb-1">Frontend Developer Needed</h5>
+                      <p className="text-xs text-foreground/60">$50-$75/hr • Remote</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                      <h5 className="font-medium text-sm text-[var(--foreground)] mb-1">React.js Expert Required</h5>
+                      <p className="text-xs text-foreground/60">$60-$90/hr • Remote</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                      <h5 className="font-medium text-sm text-[var(--foreground)] mb-1">UI/UX Designer Wanted</h5>
+                      <p className="text-xs text-foreground/60">$40-$65/hr • Remote</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="w-full mt-4">
+                    View More Similar Jobs
+                  </Button>
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
 

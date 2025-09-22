@@ -74,7 +74,7 @@ export function useProposalNotifications() {
     // const interval = setInterval(fetchNewProposalsCount, 30000)
 
     // return () => clearInterval(interval)
-  }, [isAuthenticated, user])
+  }, [fetchNewProposalsCount])
 
   return {
     newProposalsCount,

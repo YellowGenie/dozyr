@@ -11,6 +11,7 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { ProtectedRoute } from '@/components/layout/protected-route'
 import { ProposalManagement } from '@/components/proposals/proposal-management'
 import { useProposalNotifications } from '@/hooks/useProposalNotifications'
+import { CreateInterviewFromProposalDialog } from '@/components/interviews/create-interview-from-proposal-dialog'
 import { api } from '@/lib/api'
 import { Job, Proposal } from '@/types'
 import Link from 'next/link'
@@ -30,25 +31,30 @@ export default function JobProposalsPage() {
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [proposalsPerPage] = useState(10)
+  const [showInterviewDialog, setShowInterviewDialog] = useState(false)
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
+
   const { clearNotifications, refreshCount } = useProposalNotifications()
 
   useEffect(() => {
     const fetchJobAndProposals = async () => {
       try {
         setLoading(true)
-        
+
         // Fetch job details
         const jobResponse = await api.getJob(jobId)
         setJob(jobResponse)
-        
+
         // Fetch proposals
-        const proposalsResponse = await api.getJobProposals(jobId)
+        const proposalsResponse = await api.getJobProposals(jobId, currentPage, proposalsPerPage)
         setProposals(proposalsResponse.proposals || [])
-        
-        // Mark proposals as viewed
-        // await clearNotifications(jobId) // TEMPORARILY DISABLED
-        
+        setTotal(proposalsResponse.total || 0)
+        setTotalPages(proposalsResponse.totalPages || 1)
+
       } catch (error: any) {
         console.error('Error fetching job proposals:', error)
         setError(error.message || 'Failed to load job proposals')
@@ -60,7 +66,7 @@ export default function JobProposalsPage() {
     if (jobId) {
       fetchJobAndProposals()
     }
-  }, [jobId]) // TEMPORARILY REMOVED clearNotifications
+  }, [jobId, currentPage, proposalsPerPage])
 
   const handleUpdateProposalStatus = async (proposalId: string, status: Proposal['status']) => {
     try {
@@ -81,10 +87,33 @@ export default function JobProposalsPage() {
 
   const handleMarkAsViewed = async () => {
     try {
-      await clearNotifications(jobId)
+      await api.markProposalsAsViewed(jobId)
+      // Refresh proposals to update viewed status
+      const proposalsResponse = await api.getJobProposals(jobId, currentPage, proposalsPerPage)
+      setProposals(proposalsResponse.proposals || [])
+      // Refresh notification count
       refreshCount()
     } catch (error) {
       console.error('Error marking proposals as viewed:', error)
+    }
+  }
+
+  const handleCreateInterview = async (proposal: Proposal) => {
+    setSelectedProposal(proposal)
+    setShowInterviewDialog(true)
+  }
+
+  const handleInterviewCreated = async (interview: any) => {
+    // Mark the proposal as 'interview' status
+    try {
+      await api.updateProposalStatus(selectedProposal?.id || '', 'interview')
+      // Refresh proposals
+      const proposalsResponse = await api.getJobProposals(jobId, currentPage, proposalsPerPage)
+      setProposals(proposalsResponse.proposals || [])
+      // Show success message
+      alert('Interview created successfully!')
+    } catch (error) {
+      console.error('Error updating proposal status:', error)
     }
   }
 
@@ -174,13 +203,83 @@ export default function JobProposalsPage() {
 
           {/* Proposals Management */}
           <motion.div {...fadeInUp} transition={{ delay: 0.1 }}>
-            <ProposalManagement 
+            <ProposalManagement
               job={job}
               proposals={proposals}
               onUpdateProposalStatus={handleUpdateProposalStatus}
               onMarkAsViewed={handleMarkAsViewed}
+              onCreateInterview={handleCreateInterview}
             />
           </motion.div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <motion.div {...fadeInUp} transition={{ delay: 0.2 }}>
+              <div className="flex items-center justify-between bg-white rounded-lg p-4 border">
+                <div className="text-sm text-dozyr-light-gray">
+                  Showing {((currentPage - 1) * proposalsPerPage) + 1} to {Math.min(currentPage * proposalsPerPage, total)} of {total} proposals
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    Previous
+                  </Button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          className={currentPage === pageNum ? "bg-dozyr-gold text-dozyr-black" : ""}
+                          onClick={() => setCurrentPage(pageNum)}
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Interview Creation Dialog */}
+          <CreateInterviewFromProposalDialog
+            open={showInterviewDialog}
+            onClose={() => {
+              setShowInterviewDialog(false)
+              setSelectedProposal(null)
+            }}
+            onSuccess={handleInterviewCreated}
+            proposal={selectedProposal}
+            job={job}
+          />
         </div>
       </DashboardLayout>
     </ProtectedRoute>

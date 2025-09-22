@@ -719,8 +719,13 @@ class ApiClient {
     })
   }
 
-  async getJobProposals(jobId: string): Promise<{ proposals: any[] }> {
-    return this.request(`/proposals/jobs/${jobId}/proposals`)
+  async getJobProposals(jobId: string, page = 1, limit = 20): Promise<{
+    proposals: any[],
+    total: number,
+    page: number,
+    totalPages: number
+  }> {
+    return this.request(`/proposals/jobs/${jobId}/proposals?page=${page}&limit=${limit}`)
   }
 
   async updateProposalStatus(proposalId: string, status: string) {
@@ -1575,6 +1580,144 @@ class ApiClient {
       body: JSON.stringify({ rating, feedback })
     })
     return { success: response.success }
+  }
+
+  // Interview Templates
+  async getInterviewTemplates(filters?: {
+    category?: string
+    difficulty_level?: string
+    tags?: string[]
+    search?: string
+    page?: number
+    limit?: number
+  }): Promise<{
+    templates: any[]
+    total: number
+    page: number
+    totalPages: number
+  }> {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach(v => params.append(key, v))
+          } else {
+            params.set(key, String(value))
+          }
+        }
+      })
+    }
+
+    const endpoint = `/interview-templates${params.toString() ? `?${params.toString()}` : ''}`
+    const response = await this.request<{ success: boolean, data: any }>(endpoint)
+    return response.data
+  }
+
+  async getPublicInterviewTemplates(filters?: {
+    category?: string
+    difficulty_level?: string
+    tags?: string[]
+    search?: string
+    page?: number
+    limit?: number
+  }): Promise<{
+    templates: any[]
+    total: number
+    page: number
+    totalPages: number
+  }> {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach(v => params.append(key, v))
+          } else {
+            params.set(key, String(value))
+          }
+        }
+      })
+    }
+
+    const endpoint = `/interview-templates/public/all${params.toString() ? `?${params.toString()}` : ''}`
+    const response = await this.request<{ success: boolean, data: any }>(endpoint)
+    return response.data
+  }
+
+  async getInterviewTemplate(id: string): Promise<{ template: any }> {
+    const response = await this.request<{ success: boolean, data: any }>(`/interview-templates/${id}`)
+    return { template: response.data }
+  }
+
+  async createInterviewTemplate(data: {
+    name: string
+    description?: string
+    category?: string
+    questions?: any[]
+    estimated_duration?: number
+    difficulty_level?: string
+    tags?: string[]
+    is_public?: boolean
+  }): Promise<{ template_id: string }> {
+    const response = await this.request<{ success: boolean, template_id: string }>('/interview-templates', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+    return { template_id: response.template_id }
+  }
+
+  async updateInterviewTemplate(id: string, data: {
+    name?: string
+    description?: string
+    category?: string
+    questions?: any[]
+    estimated_duration?: number
+    difficulty_level?: string
+    tags?: string[]
+    is_public?: boolean
+  }): Promise<{ success: boolean }> {
+    const response = await this.request<{ success: boolean }>(`/interview-templates/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+    return { success: response.success }
+  }
+
+  async deleteInterviewTemplate(id: string): Promise<{ success: boolean }> {
+    const response = await this.request<{ success: boolean }>(`/interview-templates/${id}`, {
+      method: 'DELETE'
+    })
+    return { success: response.success }
+  }
+
+  async duplicateInterviewTemplate(id: string, name?: string): Promise<{ template_id: string }> {
+    const response = await this.request<{ success: boolean, template_id: string }>(`/interview-templates/${id}/duplicate`, {
+      method: 'POST',
+      body: JSON.stringify({ name })
+    })
+    return { template_id: response.template_id }
+  }
+
+  async useInterviewTemplate(id: string): Promise<{ template: any }> {
+    const response = await this.request<{ success: boolean, data: any }>(`/interview-templates/${id}/use`, {
+      method: 'POST'
+    })
+    return { template: response.data }
+  }
+
+  // Profile Completion Modal Methods
+  async dismissProfileCompletionModal(permanent: boolean = false): Promise<{ success: boolean, message: string }> {
+    const response = await this.request<{ success: boolean, message: string }>('/users/profile-completion-modal/dismiss', {
+      method: 'POST',
+      body: JSON.stringify({ permanent })
+    })
+    return response
+  }
+
+  async getProfileCompletionModalStatus(): Promise<{ hide_modal: boolean, last_dismissed: string | null }> {
+    const response = await this.request<{ success: boolean, data: any }>('/users/profile-completion-modal/status')
+    return response.data
   }
 }
 

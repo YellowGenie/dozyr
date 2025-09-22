@@ -26,8 +26,10 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { ProtectedRoute } from '@/components/layout/protected-route'
+import { ProfileCompletionModal } from '@/components/talent/profile-completion-modal'
 import { useAuthStore } from '@/store/auth'
 import { api } from '@/lib/api'
+import { calculateProfileCompletion, shouldShowCompletionWorkflow } from '@/lib/profile-completion'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -50,6 +52,9 @@ export default function TalentDashboardPage() {
   const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [profileData, setProfileData] = useState(null)
+  const [showCompletionModal, setShowCompletionModal] = useState(false)
+  const [modalStatus, setModalStatus] = useState({ hide_modal: false, last_dismissed: null })
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -76,8 +81,78 @@ export default function TalentDashboardPage() {
       }
     }
 
+    const fetchProfileData = async () => {
+      try {
+        if (user?.id) {
+          const profile = await api.getTalentProfile(user.id)
+          setProfileData(profile)
+        }
+      } catch (err) {
+        console.error('Failed to load profile data:', err)
+        setProfileData(null)
+      }
+    }
+
+    const fetchModalStatus = async () => {
+      try {
+        const status = await api.getProfileCompletionModalStatus()
+        setModalStatus(status)
+      } catch (err) {
+        console.error('Failed to load modal status:', err)
+        setModalStatus({ hide_modal: false, last_dismissed: null })
+      }
+    }
+
     fetchDashboardData()
-  }, [])
+    fetchProfileData()
+    fetchModalStatus()
+  }, [user?.id])
+
+  // Check if we should show the profile completion modal
+  useEffect(() => {
+    if (profileData && modalStatus && user) {
+      const shouldShow = shouldShowProfileCompletion(profileData, modalStatus)
+      setShowCompletionModal(shouldShow)
+    }
+  }, [profileData, modalStatus, user])
+
+  const shouldShowProfileCompletion = (profile: any, status: any): boolean => {
+    // Don't show if user has permanently dismissed it
+    if (status.hide_modal) {
+      return false
+    }
+
+    // Don't show if recently dismissed (within last 24 hours)
+    if (status.last_dismissed) {
+      const dismissedTime = new Date(status.last_dismissed)
+      const now = new Date()
+      const hoursSinceDismissed = (now.getTime() - dismissedTime.getTime()) / (1000 * 60 * 60)
+
+      if (hoursSinceDismissed < 24) {
+        return false
+      }
+    }
+
+    // Show if profile completion is less than 80%
+    const completion = calculateProfileCompletion(profile)
+    return completion.percentage < 80
+  }
+
+  const handleDismissModal = async (permanent: boolean = false) => {
+    try {
+      await api.dismissProfileCompletionModal(permanent)
+      setShowCompletionModal(false)
+
+      // Update modal status
+      const newStatus = {
+        hide_modal: permanent,
+        last_dismissed: new Date().toISOString()
+      }
+      setModalStatus(newStatus)
+    } catch (error) {
+      console.error('Failed to dismiss modal:', error)
+    }
+  }
 
   if (loading) {
     return (
@@ -269,27 +344,46 @@ export default function TalentDashboardPage() {
                 <CardContent className="space-y-4">
                   {recommendedJobs.length > 0 ? (
                     recommendedJobs.map((job) => (
-                      <div key={job.id} className="p-4 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors cursor-pointer" onClick={() => router.push(`/jobs/${job.id}`)}>
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-[var(--foreground)] truncate">{job.title}</h4>
-                            <div className="flex items-center gap-4 text-sm text-foreground/70 mt-1">
+                      <div key={job.id} className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-[var(--accent)]/30 transition-all cursor-pointer group" onClick={() => router.push(`/jobs/${job.id}`)}>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-[var(--accent)]/10 rounded-lg flex items-center justify-center">
+                              <Building className="h-4 w-4 text-[var(--accent)]" />
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-[var(--foreground)]">{job.company_name}</div>
                               <div className="flex items-center gap-1">
-                                <Building className="h-3 w-3" />
-                                {job.company_name}
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {job.location}
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-xs text-foreground/60">Payment verified</span>
                               </div>
                             </div>
                           </div>
-                          <div className="ml-4 text-right">
+                          <div className="text-right">
                             <span className="text-xs text-foreground/60">{job.posted_at}</span>
                           </div>
                         </div>
+
+                        <h4 className="font-semibold text-[var(--foreground)] mb-2 group-hover:text-[var(--accent)] transition-colors truncate">{job.title}</h4>
+
+                        <div className="flex items-center gap-3 text-sm text-foreground/70 mb-3">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            <span>{job.location}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            <span>Full-time</span>
+                          </div>
+                        </div>
+
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-[var(--accent)]">{job.salary_range}</span>
+                          <div className="inline-flex items-center gap-2 bg-[var(--accent)]/5 px-3 py-1 rounded-lg">
+                            <DollarSign className="h-3 w-3 text-[var(--accent)]" />
+                            <span className="font-semibold text-[var(--foreground)] text-sm">{job.salary_range}</span>
+                          </div>
+                          <Button size="sm" className="h-7 bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs">
+                            Apply Now
+                          </Button>
                         </div>
                       </div>
                     ))
@@ -298,6 +392,12 @@ export default function TalentDashboardPage() {
                       <Star className="h-12 w-12 text-foreground/40 mx-auto mb-4" />
                       <p className="text-foreground/70">No recommended jobs</p>
                       <p className="text-sm text-foreground/50">Complete your profile to get personalized job recommendations</p>
+                      <Button
+                        className="mt-4 bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white"
+                        onClick={() => router.push('/jobs')}
+                      >
+                        Browse All Jobs
+                      </Button>
                     </div>
                   )}
                 </CardContent>
@@ -433,6 +533,15 @@ export default function TalentDashboardPage() {
             </Card>
           </motion.div>
         </div>
+
+        {/* Profile Completion Modal */}
+        <ProfileCompletionModal
+          open={showCompletionModal}
+          onClose={() => setShowCompletionModal(false)}
+          onDismiss={() => handleDismissModal(false)}
+          profileData={profileData}
+          userHasProfileImage={!!user?.profile_image}
+        />
       </DashboardLayout>
     </ProtectedRoute>
   )

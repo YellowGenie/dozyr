@@ -11,6 +11,7 @@ import {
   User,
   FileText,
   Loader2,
+  Briefcase,
   Template
 } from 'lucide-react'
 
@@ -26,19 +27,28 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api'
+import { Proposal, Job } from '@/types'
 
-interface CreateInterviewDialogProps {
+interface CreateInterviewFromProposalDialogProps {
   open: boolean
   onClose: () => void
   onSuccess: (interview: any) => void
+  proposal: Proposal | null
+  job: Job | null
 }
 
-export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterviewDialogProps) {
+export function CreateInterviewFromProposalDialog({
+  open,
+  onClose,
+  onSuccess,
+  proposal,
+  job
+}: CreateInterviewFromProposalDialogProps) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    questions: [''],
-    estimated_duration: '',
+    questions: ['Tell me about your experience with this type of project.', 'What is your approach to this work?', 'How do you handle project timelines and deadlines?'],
+    estimated_duration: '60',
     scheduled_at: '',
     priority: 'medium'
   })
@@ -48,6 +58,17 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Pre-populate title when proposal/job changes
+  useEffect(() => {
+    if (proposal && job) {
+      setFormData(prev => ({
+        ...prev,
+        title: `Interview for ${job.title} - ${proposal.first_name} ${proposal.last_name}`,
+        description: `Technical interview for the ${job.title} position. Reviewing the proposal from ${proposal.first_name} ${proposal.last_name} with a bid of ${job.currency}${proposal.bid_amount} for ${proposal.timeline_days} days.`
+      }))
+    }
+  }, [proposal, job])
 
   // Fetch templates when dialog opens
   useEffect(() => {
@@ -87,8 +108,7 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
       // Apply template to form
       setFormData(prev => ({
         ...prev,
-        title: template.name,
-        description: template.description || '',
+        description: template.description || prev.description,
         questions: template.questions.map((q: any) => q.text || q),
         estimated_duration: String(template.estimated_duration),
         priority: prev.priority // Keep existing priority
@@ -102,9 +122,14 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.title.trim() || !formData.description.trim()) {
       setError('Title and description are required')
+      return
+    }
+
+    if (!proposal) {
+      setError('No proposal selected')
       return
     }
 
@@ -116,6 +141,9 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
       const interviewData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
+        talent_id: proposal.talent_id,
+        job_id: job?.id,
+        proposal_id: proposal.id,
         questions: formData.questions.filter(q => q.trim()),
         estimated_duration: formData.estimated_duration ? parseInt(formData.estimated_duration) : undefined,
         scheduled_at: formData.scheduled_at || undefined,
@@ -136,8 +164,8 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
     setFormData({
       title: '',
       description: '',
-      questions: [''],
-      estimated_duration: '',
+      questions: ['Tell me about your experience with this type of project.', 'What is your approach to this work?', 'How do you handle project timelines and deadlines?'],
+      estimated_duration: '60',
       scheduled_at: '',
       priority: 'medium'
     })
@@ -174,10 +202,32 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Star className="h-5 w-5" />
-            Create New Interview
+            Create Interview from Proposal
           </DialogTitle>
         </DialogHeader>
-        
+
+        {proposal && job && (
+          <div className="bg-dozyr-dark border border-dozyr-medium-gray rounded-lg p-4 mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Briefcase className="h-5 w-5 text-dozyr-gold" />
+              <h3 className="font-semibold">{job.title}</h3>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-dozyr-light-gray">
+              <div className="flex items-center gap-1">
+                <User className="h-4 w-4" />
+                {proposal.first_name} {proposal.last_name}
+              </div>
+              <div className="flex items-center gap-1">
+                <span>{job.currency}{proposal.bid_amount}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                {proposal.timeline_days} days
+              </div>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -282,12 +332,11 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Describe the role, expectations, and interview process..."
+                placeholder="Describe the interview process and expectations..."
                 className="mt-1"
                 rows={3}
               />
             </div>
-
           </div>
 
           {/* Interview Questions */}
@@ -341,6 +390,8 @@ export function CreateInterviewDialog({ open, onClose, onSuccess }: CreateInterv
                 onChange={(e) => setFormData(prev => ({ ...prev, estimated_duration: e.target.value }))}
                 placeholder="60"
                 className="mt-1"
+                min="15"
+                max="480"
               />
             </div>
 
